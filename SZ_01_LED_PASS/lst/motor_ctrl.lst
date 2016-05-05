@@ -1,0 +1,645 @@
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MOTOR_CTRL
+OBJECT MODULE PLACED IN .\out\motor_ctrl.obj
+COMPILER INVOKED BY: C:\Program Files\Keil C51\C51\BIN\C51.EXE motor_ctrl.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\motor_
+                    -ctrl.lst) OBJECT(.\out\motor_ctrl.obj)
+
+line level    source
+
+   1          #include "motor_ctrl.h"
+   2          #include "led_display.h"
+   3          #include "sys.h"
+   4          
+   5          #define  CCP_S0 0x10
+   6          #define  CCP_S1 0x20
+   7          
+   8          
+   9          #define MOTO_EN P35
+  10          #define MOTO_CW P33
+  11          #define MOTO_TQ P20
+  12          
+  13          #define MOTO_EN2 P36
+  14          #define MOTO_CW2 P30
+  15          
+  16          
+  17          #define INCR_STEP_MS 50  /* 加速段占空比递增的时间间隔:ms */
+  18          //#define DECR_STEP_MS 20  /* 减速段占空比递减的时间间隔:ms */
+  19          
+  20          
+  21          extern xdata public_stru public_val;
+  22          
+  23          
+  24          sfr P_SW1   = 0xA2;
+  25          sfr CCON    = 0xD8;
+  26          sbit CCF0   = CCON^0;
+  27          sbit CCF1   = CCON^1;
+  28          sbit CR     = CCON^6;
+  29          sbit CF     = CCON^7;
+  30          sfr  CMOD   = 0xD9;
+  31          sfr  CL     = 0xE9;
+  32          sfr  CH     = 0xF9;
+  33          sfr  CCAPM0 = 0xDA;
+  34          sfr  CCAP0L = 0xEA;
+  35          sfr  CCAP0H = 0xFA;
+  36          sfr  CCAPM1 = 0xDB;
+  37          sfr  CCAP1L = 0xEB;
+  38          sfr  CCAP1H = 0xFB;
+  39          sfr  CCAPM2 = 0xDC;
+  40          sfr  CCAP2L = 0xEC;
+  41          sfr  CCAP2H = 0xFC;
+  42          sfr  PCA_PWM0  = 0xf2;
+  43          sfr  PCA_PWM1  = 0xf3;
+  44          sfr  PCA_PWM2  = 0xf4;
+  45          
+  46          
+  47          
+  48          int electromagnet_step = 888;
+  49          int zl_moto_step = 888;
+  50          
+  51          /* 步进驱动频率到定时器配置值的换算：f(x)=0xffff-(10^6)/(0.1808*x)，x是频率，单位hz */
+  52          
+  53          #if 0                                        
+              xdata unsigned int timer1_table[34] = { 
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 2   
+
+                   /* 300     320     340*/
+                              0xB7FA, 0xBC7A, 0xC073,
+                   /* 360     380     400     420     440     460     480*/
+                      0xC3FB, 0xC723, 0xC9FB, 0xCC8E, 0xCEE4, 0xD107, 0xD2FC,
+                               /* 500     520     540     560     580     600     620*/
+                              0xD4C9, 0xD672, 0xD7FC, 0xD96A, 0xDABE, 0xDBFC, 0xDD26,
+                       /* 640     660     680*/
+                              0xDE3C, 0xDF42, 0xE039,
+              
+                   /* 5.5k    6k      6.5k    7k      7.5k    8k */
+                      0xFC11, 0xFC65, 0xFCAC, 0xFCE8, 0xFD1D, 0xFD4B,
+                              0,0,0,0,
+              
+                       /* 10k     11k     12k     13k   */
+                          0xFDD5, 0xFE08, 0xFE32, 0xFE55}; 
+              #else
+  71          
+  72          //xdata unsigned int timer1_table[60] = { 
+  73          xdata unsigned int timer1_table[66] = { 
+  74          
+  75                   0,
+  76                  
+  77               /* 下降脉冲频率 */
+  78               300, 350, 400, 450, 500, 550, 600, 650, 700, 750,
+  79               800, 850, 900, 950, 1000, 1050, 1100, 1150, 1200, 1250,
+  80                   1300, 1350, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1750,
+  81          
+  82                   /* 上升脉冲频率 */ 
+  83                   //5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000,
+  84                   //10500, 11000, 11500, 12000, 12500, 13000, 13500, 14000, 14500, 15000,
+  85                   3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 
+  86                   8000, 8500, 9000, 9500, 10000, 10500, 11000, 11500, 12000, 12500,
+  87          
+  88          
+  89                   /* 推饼脉冲频率 */
+  90                   5000, 6000, 7000, 8000, 9000,
+  91                   10000, 11000, 12000, 13000, 14000, 15000, 16000, 17000, 18000, 19000}; 
+  92          
+  93          #endif
+  94          
+  95          static unsigned char use_vel;
+  96          static unsigned int last_vel = 0;
+  97          
+  98          unsigned long ulPulseCnt = 0;   /* 步进电机脉冲翻转计数 */
+  99          char cMotorReverse = 0;   /* 当前翻转的电机:0升降电机，1推饼电机 */
+ 100          
+ 101          //char cLiftDownFlag = 0;   /* 升降电机下降标志，用于下降时电机启动速度控制 */
+ 102          
+ 103          
+ 104          //电机使能
+ 105          void EnableAxis(char c_motor, short s_motor_enable)
+ 106          {
+ 107   1              if (c_motor == 0)  /* 升降电机 */
+ 108   1              {
+ 109   2                      if(s_motor_enable) MOTO_EN = 1;
+ 110   2                      else MOTO_EN = 0;
+ 111   2              }
+ 112   1              else  /* 推饼电机 */
+ 113   1              {
+ 114   2                      if(s_motor_enable) MOTO_EN2 = 1;
+ 115   2                      else MOTO_EN2 = 0;
+ 116   2              }
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 3   
+
+ 117   1      }
+ 118          
+ 119          //设置电机运动方向
+ 120          void SetAxisDirection(char c_motor, short s_motor_dir)
+ 121          {
+ 122   1              if (c_motor == 0)  /* 升降电机 */
+ 123   1              {
+ 124   2                      if(s_motor_dir) MOTO_CW = 1;
+ 125   2                      else MOTO_CW = 0;
+ 126   2              }
+ 127   1              else  /* 推饼电机 */
+ 128   1              {
+ 129   2                      if(s_motor_dir) MOTO_CW2 = 1;
+ 130   2                      else MOTO_CW2 = 0;
+ 131   2              }
+ 132   1      }
+ 133          
+ 134          //设置电机电流
+ 135          void SetAxisTQ(short tq_mode)
+ 136          {       
+ 137   1              if(tq_mode) MOTO_TQ = 1;
+ 138   1              else MOTO_TQ = 0;
+ 139   1      }
+ 140          
+ 141          
+ 142          
+ 143          
+ 144          /* 步进脉冲翻转 */
+ 145          void timer1_rountine(void) interrupt 3
+ 146          {
+ 147   1              if (cMotorReverse == 0) /* 升降电机PUL */
+ 148   1              {
+ 149   2              P27 = !P27; 
+ 150   2              }
+ 151   1              else  /* 推饼电机PUL2 */
+ 152   1              {
+ 153   2                      P31 = !P31;
+ 154   2              }
+ 155   1      
+ 156   1              ulPulseCnt++;
+ 157   1      }
+ 158          
+ 159          
+ 160          /***************IO翻转设置并启动函数*******************
+ 161          函数原型：      void IoReverseStart(uchar duty_cycle)
+ 162          入口参数：duty_cycle  为占空比参数
+ 163          出口参数：无
+ 164          备注：占空比为（100hH-duty_cycle）/100H
+ 165          ***********************************/
+ 166          void IoReverseStart(uchar duty_cycle,uchar chn)
+ 167          {
+ 168   1              CR = 1; 
+ 169   1              if(chn == CHN_STEP)
+ 170   1                      {
+ 171   2                          //IE2 |= 0x04;
+ 172   2                          TR1 = 1;
+ 173   2                      }
+ 174   1              else if(chn == CHN_ZL)
+ 175   1                      {
+ 176   2                              CCAPM1  = 0x42;
+ 177   2                              CCAP1H  =  CCAP1L  = duty_cycle;                        
+ 178   2                      }
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 4   
+
+ 179   1      }
+ 180          
+ 181          /***************IO翻转停止函数*******************
+ 182          函数原型：      void IoReverseStop(void)
+ 183          入口参数：无
+ 184          出口参数：无
+ 185          备注：占
+ 186          ***********************************/
+ 187          void IoReverseStop(uchar chn)
+ 188          {
+ 189   1      //      CR   =0;
+ 190   1              if(chn == CHN_STEP)
+ 191   1                      {
+ 192   2                              //IE2 &= 0xFB;
+ 193   2                              TR1 = 0;
+ 194   2                      }
+ 195   1              else if(chn == CHN_ZL)
+ 196   1                      {
+ 197   2                              CCAPM1 = 0x00;
+ 198   2                      }
+ 199   1      }
+ 200          
+ 201          /* 将步进脉冲频率换算成定时器配置值
+ 202             f(x)=0xffff-(10^6)/(0.1808*x)，x是频率，单位hz 
+ 203          */
+ 204          unsigned int CalcTimer1Value(unsigned int freq)
+ 205          {
+ 206   1              return (0xffffL - 1000000L / (unsigned int)(0.1808 * (float)freq));
+ 207   1      }
+ 208          
+ 209          //void set_vel(unsigned char vel)
+ 210          void set_vel(unsigned int vel)
+ 211          {
+ 212   1              unsigned int uiTemp;
+ 213   1              
+ 214   1              if (vel != last_vel)
+ 215   1              {
+ 216   2                  //TL1 = timer1_table[vel] & 0xff;                     //初始化计时值
+ 217   2                  //TH1 = (timer1_table[vel] >> 8) & 0xff;
+ 218   2      
+ 219   2                      /* modified by james for 19403 */
+ 220   2                      uiTemp = CalcTimer1Value(vel);  
+ 221   2                      TL1 = uiTemp & 0xff;
+ 222   2                      TH1 = (uiTemp >> 8) & 0xff;
+ 223   2      
+ 224   2                      last_vel = vel;
+ 225   2              }
+ 226   1      }
+ 227          
+ 228          /***************步进电机控制函数*******************
+ 229          函数原型：      void step_moto_control(void)
+ 230          入口参数：无
+ 231          出口参数：无
+ 232          备注：占
+ 233          ***********************************/
+ 234          
+ 235          void step_moto_control(void)
+ 236          {
+ 237   1              static uchar delay=0;
+ 238   1              switch(electromagnet_step)      
+ 239   1              {
+ 240   2                      case 0:
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 5   
+
+ 241   2                              IoReverseStop(CHN_STEP);
+ 242   2                              electromagnet_step =1;
+ 243   2                              break;
+ 244   2                              
+ 245   2                      case 1:
+ 246   2                              set_vel(timer1_table[START_SPEED]);  //启动速度固定
+ 247   2                              IoReverseStart(0x80,CHN_STEP);
+ 248   2                              delay = 0;
+ 249   2                              electromagnet_step =10;
+ 250   2                              break;
+ 251   2                              
+ 252   2                      case 10:
+ 253   2                              delay++;
+ 254   2                              if(delay > 20)  /* 20ms后切换到过渡速度1 */
+ 255   2                                      {
+ 256   3                                              delay = 0;
+ 257   3                                              if (MID_SPEED1 <= timer1_table[use_vel])
+ 258   3                                              {
+ 259   4                                                      set_vel(MID_SPEED1); 
+ 260   4                                                      electromagnet_step =20;
+ 261   4                                              }
+ 262   3                                              else
+ 263   3                                              {
+ 264   4                                                      electromagnet_step =60;
+ 265   4                                              }                                       
+ 266   3                                      }
+ 267   2                              break;
+ 268   2      
+ 269   2                      case 20:
+ 270   2                              delay++;
+ 271   2                              if(delay > 20)  /* 20ms后切换到过渡速度2 */
+ 272   2                                      {
+ 273   3                                              delay = 0;
+ 274   3                                              if (MID_SPEED2 <= timer1_table[use_vel])
+ 275   3                                              {
+ 276   4                                                      set_vel(MID_SPEED2); 
+ 277   4                                                      electromagnet_step =30;
+ 278   4                                              }
+ 279   3                                              else
+ 280   3                                              {
+ 281   4                                                      electromagnet_step =60;
+ 282   4                                              }
+ 283   3                                      }
+ 284   2                              break;
+ 285   2      
+ 286   2                      case 30:
+ 287   2                              delay++;
+ 288   2                              if(delay > 20)  /* 20ms后切换到过渡速度3 */
+ 289   2                                      {
+ 290   3                                              delay = 0;
+ 291   3                                              if (MID_SPEED3 <= timer1_table[use_vel])
+ 292   3                                              {
+ 293   4                                                      set_vel(MID_SPEED3);
+ 294   4                                                      electromagnet_step =40; 
+ 295   4                                              }
+ 296   3                                              else
+ 297   3                                              {
+ 298   4                                                      electromagnet_step =60;
+ 299   4                                              }
+ 300   3                                      }
+ 301   2                              break;          
+ 302   2      
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 6   
+
+ 303   2                      case 40:
+ 304   2                              delay++;
+ 305   2                              if(delay > 20)  /* 20ms后切换到过渡速度4 */
+ 306   2                                      {
+ 307   3                                              delay = 0;
+ 308   3                                              if (MID_SPEED4 <= timer1_table[use_vel])
+ 309   3                                              {
+ 310   4                                                      set_vel(MID_SPEED4); 
+ 311   4                                                      electromagnet_step =50;
+ 312   4                                              }
+ 313   3                                              else
+ 314   3                                              {
+ 315   4                                                      electromagnet_step =60;
+ 316   4                                              }                                       
+ 317   3                                      }
+ 318   2                              break;                  
+ 319   2      
+ 320   2                      case 50:
+ 321   2                              delay++;
+ 322   2                              if(delay > 20)  /* 20ms后切换到过渡速度5 */
+ 323   2                                      {
+ 324   3                                              delay = 0;
+ 325   3                                              if (MID_SPEED5 <= timer1_table[use_vel])
+ 326   3                                              {
+ 327   4                                                      set_vel(MID_SPEED5); 
+ 328   4                                              }
+ 329   3                                              electromagnet_step =60;
+ 330   3                                      }
+ 331   2                              break;
+ 332   2      
+ 333   2                      case 60:
+ 334   2                              delay++;
+ 335   2                              if(delay > 20)  /* 20ms后切换到设定速度 */
+ 336   2                                      {
+ 337   3                                              delay = 0;
+ 338   3      
+ 339   3                                              set_vel(timer1_table[use_vel]); 
+ 340   3      
+ 341   3                                              electromagnet_step =888;
+ 342   3                                      }
+ 343   2                              break;          
+ 344   2      
+ 345   2                      case 100:          /* 收到停止命令，切换到当前速度的3/4 */
+ 346   2                              delay = 0;
+ 347   2                              if (last_vel > timer1_table[START_SPEED])
+ 348   2                              {
+ 349   3                                      set_vel((last_vel * 3) >> 2);
+ 350   3                                      electromagnet_step = 110;                                                               
+ 351   3                              }
+ 352   2                              else
+ 353   2                              {
+ 354   3                                      electromagnet_step = 130;
+ 355   3                              }
+ 356   2                              break;
+ 357   2      
+ 358   2                      case 110:
+ 359   2                              delay++;
+ 360   2                              if(delay > 20)  /* 20ms后切换到当前速度的2/4 */
+ 361   2                              {
+ 362   3                                      delay = 0;
+ 363   3                                      set_vel(last_vel >> 1);
+ 364   3                                      electromagnet_step = 120;
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 7   
+
+ 365   3      
+ 366   3                              }                       
+ 367   2                              break;
+ 368   2      
+ 369   2                      case 120:
+ 370   2                              delay++;
+ 371   2                              if(delay > 20)  /* 20ms后切换到当前速度1/4 */
+ 372   2                              {
+ 373   3                                      delay = 0;
+ 374   3                                      set_vel(last_vel >> 2);
+ 375   3                                      electromagnet_step = 130;
+ 376   3                              }                       
+ 377   2                              break;
+ 378   2      
+ 379   2                      case 130:
+ 380   2                              delay++;
+ 381   2                              if(delay > 20)  /* 20ms后停止 */
+ 382   2                              {
+ 383   3                                      delay = 0;
+ 384   3                                      IoReverseStop(CHN_STEP);
+ 385   3                                      electromagnet_step = 888;
+ 386   3                              }                       
+ 387   2                              break;
+ 388   2                                                              
+ 389   2                      default :
+ 390   2                              break;
+ 391   2              }
+ 392   1      }
+ 393          
+ 394          //设置步进电机运动
+ 395          //set_cmd 0:启动电机 100:电机降速运行 100ms后停止
+ 396          //set_val 电机运行速度
+ 397          void set_step_moto(char set_cmd, unsigned char set_val)
+ 398          {
+ 399   1              electromagnet_step = set_cmd;
+ 400   1              use_vel = set_val;
+ 401   1      }
+ 402          
+ 403          
+ 404          
+ 405          /***************pwm初始化函数*******************
+ 406          函数原型：      void pwm_init(void)
+ 407          入口参数：无
+ 408          出口参数：无
+ 409          备注：在主程序中调用一次
+ 410          ***********************************/
+ 411          void pwm_init(void)
+ 412          {
+ 413   1              ACC    =  P_SW1;
+ 414   1              ACC   &=  ~(CCP_S0);
+ 415   1              ACC   |= CCP_S1;
+ 416   1              P_SW1  =   ACC;
+ 417   1              CCON   =   0;
+ 418   1              CL     =   0;
+ 419   1              CH     =   0;
+ 420   1              CMOD   =   0x04;
+ 421   1              PCA_PWM2   = 0x00;
+ 422   1              CCAPM2  = 0x00;
+ 423   1              PCA_PWM1   = 0x00;
+ 424   1              CCAPM1  = 0x00;
+ 425   1              //Timer1Init();
+ 426   1      }
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 8   
+
+ 427          
+ 428          
+ 429          /***************直流电机控制函数*******************
+ 430          函数原型：      void zl_moto_control(void)
+ 431          入口参数：无
+ 432          出口参数：无
+ 433          备注：占
+ 434          ***********************************/
+ 435          
+ 436          
+ 437          /* 启动加速、停止减速控制 by james */
+ 438          void zl_moto_control(void)
+ 439          {
+ 440   1              static uint delay=0;
+ 441   1              switch(zl_moto_step)    
+ 442   1              {
+ 443   2                      case 0:
+ 444   2                              IoReverseStop(CHN_ZL);
+ 445   2                              zl_moto_step =1;
+ 446   2                              break;
+ 447   2                              
+ 448   2                      case 1:                 
+ 449   2                              //IoReverseStart(0x20,CHN_ZL);
+ 450   2                              IoReverseStart(0x30,CHN_ZL);
+ 451   2                              delay = 0;
+ 452   2                              zl_moto_step =10;                       
+ 453   2                              break;
+ 454   2                              
+ 455   2                      case 10:
+ 456   2                              delay++;
+ 457   2                              if(delay > INCR_STEP_MS)  
+ 458   2                                      {
+ 459   3                                              //IoReverseStart(0x40,CHN_ZL);
+ 460   3                                              IoReverseStart(0x70,CHN_ZL);
+ 461   3                                              delay = 0;
+ 462   3                                              zl_moto_step =20;
+ 463   3                                      }
+ 464   2                              break;
+ 465   2                              
+ 466   2                      case 20:
+ 467   2                              delay++;
+ 468   2                              if(delay > INCR_STEP_MS)  
+ 469   2                                      {
+ 470   3                                              //IoReverseStart(0x60,CHN_ZL);
+ 471   3                                              IoReverseStart(0xa0,CHN_ZL);
+ 472   3                                              delay = 0;
+ 473   3                                              zl_moto_step =30;
+ 474   3                                      }
+ 475   2                              break;
+ 476   2                              
+ 477   2                      case 30:
+ 478   2                              delay++;
+ 479   2                              if(delay > INCR_STEP_MS)  
+ 480   2                                      {
+ 481   3                                              //IoReverseStart(0x80,CHN_ZL);
+ 482   3                                              IoReverseStart(0xd0,CHN_ZL);
+ 483   3                                              delay = 0;
+ 484   3                                              //zl_moto_step =35;
+ 485   3                                              zl_moto_step =60;
+ 486   3                                      }
+ 487   2                              break;
+ 488   2                              
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 9   
+
+ 489   2                      /*case 35:
+ 490   2                              delay++;
+ 491   2                              if(delay > INCR_STEP_MS)  
+ 492   2                                      {
+ 493   2                                              IoReverseStart(0xa0,CHN_ZL);
+ 494   2                                              delay = 0;
+ 495   2                                              zl_moto_step =40;
+ 496   2                                      }
+ 497   2                              break;
+ 498   2                              
+ 499   2                      case 40:
+ 500   2                              delay++;
+ 501   2                              if(delay > INCR_STEP_MS)  
+ 502   2                                      {
+ 503   2                                              IoReverseStart(0xc0,CHN_ZL);
+ 504   2                                              delay = 0;
+ 505   2                                              zl_moto_step =50;
+ 506   2                                      }
+ 507   2                              break;
+ 508   2                              
+ 509   2                      case 50:
+ 510   2                              delay++;
+ 511   2                              if(delay > INCR_STEP_MS)  
+ 512   2                                      {
+ 513   2                                              IoReverseStart(0xe0,CHN_ZL);
+ 514   2                                              delay = 0;
+ 515   2                                              zl_moto_step =60;
+ 516   2                                      }
+ 517   2                              break;*/
+ 518   2      
+ 519   2                      case 60:
+ 520   2                              delay++;
+ 521   2                              if(delay > INCR_STEP_MS)  
+ 522   2                                      {
+ 523   3                                              delay = 0;
+ 524   3                                              IoReverseStop(CHN_ZL);
+ 525   3                                              P26 = 0;
+ 526   3                                              zl_moto_step =888;
+ 527   3                                      }
+ 528   2                              break;
+ 529   2                              
+ 530   2                      case 100:  /* 直接停止，但由于惯性电机会继续运动一段距离 */
+ 531   2      
+ 532   2                      #if 0
+                                      //IoReverseStart(0xc0,CHN_ZL);  //75%
+                                      IoReverseStart(0x80,CHN_ZL);  //50%
+                                      delay = 0;
+                                      //zl_moto_step = 120;
+                                      zl_moto_step = 160;
+                              #else             
+ 539   2                              /* modified for v19416 */
+ 540   2                              IoReverseStop(CHN_ZL);
+ 541   2                              P26 = 1;
+ 542   2                              zl_moto_step = 888;
+ 543   2                      #endif
+ 544   2                                      
+ 545   2                              break;
+ 546   2      
+ 547   2                      /*case 120:
+ 548   2                              
+ 549   2                              delay++;
+ 550   2                              if(delay > DECR_STEP_MS)  
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 10  
+
+ 551   2                                      {
+ 552   2                                              IoReverseStart(0x80,CHN_ZL); //50%
+ 553   2                                              delay = 0;
+ 554   2                                              zl_moto_step =140;
+ 555   2                                      }
+ 556   2      
+ 557   2                              break;
+ 558   2                              
+ 559   2                      case 140:
+ 560   2                              
+ 561   2                              delay++;
+ 562   2                              if(delay > DECR_STEP_MS)  
+ 563   2                                      {
+ 564   2                                              IoReverseStart(0x40,CHN_ZL);  //25%
+ 565   2                                              delay = 0;
+ 566   2                                              zl_moto_step =160;
+ 567   2                                      }
+ 568   2      
+ 569   2                              break;
+ 570   2      
+ 571   2                      case 160:
+ 572   2                              
+ 573   2                              delay++;
+ 574   2                              if(delay > DECR_STEP_MS)
+ 575   2                              {
+ 576   2                                      delay = 0;
+ 577   2                                      IoReverseStop(CHN_ZL);
+ 578   2                                      P26 = 1;
+ 579   2                                      zl_moto_step = 888;
+ 580   2                              }
+ 581   2                              
+ 582   2                              break;*/
+ 583   2                      
+ 584   2                      default :
+ 585   2                              break;
+ 586   2              }
+ 587   1      }
+ 588          
+ 589          
+ 590          
+ 591          //设置电机运动
+ 592          //set_cmd 0:启动电机 100:停止电机
+ 593          void set_zl_moto(char set_cmd)
+ 594          {
+ 595   1              zl_moto_step = set_cmd;
+ 596   1      }
+ 597          
+ 598          
+ 599          
+ 600          
+ 601          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1055    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =    132    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     15       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.00   MOTOR_CTRL                                                            04/10/2015 13:57:45 PAGE 11  
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

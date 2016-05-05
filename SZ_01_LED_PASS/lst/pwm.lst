@@ -1,0 +1,416 @@
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE PWM
+OBJECT MODULE PLACED IN .\out\pwm.obj
+COMPILER INVOKED BY: C:\Program Files\Keil C51\C51\BIN\C51.EXE pwm.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\pwm.lst) OBJE
+                    -CT(.\out\pwm.obj)
+
+line level    source
+
+   1          #include "pwm.h"
+   2          #include "led_display.h"
+   3          #include "sys.h"
+   4          
+   5          #define  CCP_S0 0x10
+   6          #define  CCP_S1 0x20
+   7          sfr P_SW1   = 0xA2;
+   8          sfr CCON    = 0xD8;
+   9          sbit CCF0   = CCON^0;
+  10          sbit CCF1   = CCON^1;
+  11          sbit CR     = CCON^6;
+  12          sbit CF     = CCON^7;
+  13          sfr  CMOD   = 0xD9;
+  14          sfr  CL     = 0xE9;
+  15          sfr  CH     = 0xF9;
+  16          sfr  CCAPM0 = 0xDA;
+  17          sfr  CCAP0L = 0xEA;
+  18          sfr  CCAP0H = 0xFA;
+  19          sfr  CCAPM1 = 0xDB;
+  20          sfr  CCAP1L = 0xEB;
+  21          sfr  CCAP1H = 0xFB;
+  22          sfr  CCAPM2 = 0xDC;
+  23          sfr  CCAP2L = 0xEC;
+  24          sfr  CCAP2H = 0xFC;
+  25          sfr  PCA_PWM0  = 0xf2;
+  26          sfr  PCA_PWM1  = 0xf3;
+  27          sfr  PCA_PWM2  = 0xf4;
+  28          
+  29          #define MOTO_EN P20
+  30          #define MOTO_CW P13
+  31          #define MOTO_TQ P35
+  32          #define MOTO_ALE P33
+  33          
+  34          
+  35          /* 步进驱动频率到定时器配置值的换算：f(x)=0xffff-(10^6)/(0.1808*x)，x是频率，单位hz */
+  36          
+  37                                       /* 300     320     340*/
+  38          xdata int timer1_table[24] = {  0xB7FA, 0xBC7A, 0xC073,
+  39                                       /* 360     380     400     420     440     460     480*/
+  40                                          0xC3FB, 0xC723, 0xC9FB, 0xCC8E, 0xCEE4, 0xD107, 0xD2FC,
+  41                                                           /* 500     520     540     560     580     600     620*/
+  42                                                                          0xD4C9, 0xD672, 0xD7FC, 0xD96A, 0xDABE, 0xDBFC, 0xDD26,
+  43                                                                   /* 640     660     680*/
+  44                                                                          0xDE3C, 0xDF42, 0xE039,
+  45          
+  46                                       /* 4.5k    5k      5.5k    6k */
+  47                                          0xFB31, 0xFBAC, 0xFC11, 0xFC65}; 
+  48          
+  49          extern xdata public_stru public_val;
+  50          static unsigned char use_val;
+  51          //电机使能
+  52          void EnableAxis(short s_motor_enable)
+  53          {
+  54   1              if(s_motor_enable) MOTO_EN = 1;
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 2   
+
+  55   1              else MOTO_EN = 0;
+  56   1      }
+  57          
+  58          //设置电机运动方向
+  59          void SetAxisDirection(short s_motor_dir)
+  60          {
+  61   1              if(s_motor_dir) MOTO_CW = 1;
+  62   1              else MOTO_CW = 0;
+  63   1      }
+  64          
+  65          //设置电机电流
+  66          void SetAxisTQ(short tq_mode)
+  67          {
+  68   1              if(tq_mode) MOTO_TQ = 1;
+  69   1              else MOTO_TQ = 0;
+  70   1      }
+  71          
+  72          
+  73          /***************pwm初始化函数*******************
+  74          函数原型：      void pwm_init(void)
+  75          入口参数：无
+  76          出口参数：无
+  77          备注：在主程序中调用一次
+  78          ***********************************/
+  79          void pwm_init(void)
+  80          {
+  81   1              ACC    =  P_SW1;
+  82   1              ACC   &=  ~(CCP_S0);
+  83   1              ACC   |= CCP_S1;
+  84   1              P_SW1  =   ACC;
+  85   1              CCON   =   0;
+  86   1              CL     =   0;
+  87   1              CH     =   0;
+  88   1              CMOD   =   0x04;
+  89   1              PCA_PWM2   = 0x00;
+  90   1              CCAPM2  = 0x00;
+  91   1              PCA_PWM1   = 0x00;
+  92   1              CCAPM1  = 0x00;
+  93   1              //Timer1Init();
+  94   1      }
+  95          
+  96          //-----------------------------------------------
+  97          //中断服务程序
+  98          //void t2int() interrupt 12
+  99          
+ 100          void timer1_rountine(void) interrupt 3
+ 101          {
+ 102   1          P27 = !P27; 
+ 103   1      }
+ 104          
+ 105          
+ 106          /***************pwm设置并启动函数*******************
+ 107          函数原型：      void IoReverseStart(uchar duty_cycle)
+ 108          入口参数：duty_cycle  为占空比参数
+ 109          出口参数：无
+ 110          备注：占空比为（100hH-duty_cycle）/100H
+ 111          ***********************************/
+ 112          void IoReverseStart(uchar duty_cycle,uchar chn)
+ 113          {
+ 114   1              CR = 1; 
+ 115   1              if(chn == CHN_STEP)
+ 116   1                      {
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 3   
+
+ 117   2                          //IE2 |= 0x04;
+ 118   2                          TR1 = 1;
+ 119   2                      }
+ 120   1              else if(chn == CHN_ZL)
+ 121   1                      {
+ 122   2                              CCAPM1  = 0x42;
+ 123   2                              CCAP1H  =  CCAP1L  = duty_cycle;                        
+ 124   2                      }
+ 125   1      }
+ 126          
+ 127          /***************pwm停止函数*******************
+ 128          函数原型：      void IoReverseStop(void)
+ 129          入口参数：无
+ 130          出口参数：无
+ 131          备注：占
+ 132          ***********************************/
+ 133          void IoReverseStop(uchar chn)
+ 134          {
+ 135   1      //      CR   =0;
+ 136   1              if(chn == CHN_STEP)
+ 137   1                      {
+ 138   2                              //IE2 &= 0xFB;
+ 139   2                              TR1 = 0;
+ 140   2                      }
+ 141   1              else if(chn == CHN_ZL)
+ 142   1                      {
+ 143   2                              CCAPM1 = 0x00;
+ 144   2                      }
+ 145   1      }
+ 146          
+ 147          void set_vel(unsigned char val)
+ 148          {
+ 149   1          TL1 = timer1_table[val] & 0xff ;                     //初始化计时值
+ 150   1          TH1 = timer1_table[val] >> 8;
+ 151   1      }
+ 152          
+ 153          /***************步进电机控制函数*******************
+ 154          函数原型：      void step_moto_control(void)
+ 155          入口参数：无
+ 156          出口参数：无
+ 157          备注：占
+ 158          ***********************************/
+ 159          int electromagnet_step = 888;
+ 160          void step_moto_control(void)
+ 161          {
+ 162   1              static uchar delay=0;
+ 163   1              switch(electromagnet_step)      
+ 164   1              {
+ 165   2                      case 0:
+ 166   2                              IoReverseStop(CHN_STEP);
+ 167   2                              electromagnet_step =1;
+ 168   2                              break;
+ 169   2                              
+ 170   2                      case 1:
+ 171   2                              set_vel(START_SPEED);  //启动速度固定
+ 172   2                              IoReverseStart(0x80,CHN_STEP);
+ 173   2                              delay = 0;
+ 174   2                              electromagnet_step =10;
+ 175   2                              break;
+ 176   2                              
+ 177   2                      case 10:
+ 178   2                              delay++;
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 4   
+
+ 179   2                              if(delay > 100)  /* 100ms后切换到设定速度 */
+ 180   2                                      {
+ 181   3                                              delay = 0;
+ 182   3                                              set_vel(use_val); //运行速度应使用菜单值
+ 183   3                                              electromagnet_step =888;
+ 184   3                                      }
+ 185   2                              break;
+ 186   2      
+ 187   2                      case 100:
+ 188   2                              delay = 0;
+ 189   2                              set_vel(START_SPEED);
+ 190   2                              electromagnet_step = 110;
+ 191   2                              break;
+ 192   2                              
+ 193   2                      case 110:
+ 194   2                              delay++;
+ 195   2                              //if(delay > 100)
+ 196   2                              if(delay > 50)  /* 收到停止命令50ms后立即停止 */
+ 197   2                                      {
+ 198   3                                              delay = 0;
+ 199   3                                              IoReverseStop(CHN_STEP);
+ 200   3                                              electromagnet_step = 888;
+ 201   3                                      }                       
+ 202   2                              break;
+ 203   2                              
+ 204   2                      default :
+ 205   2                              break;
+ 206   2              }
+ 207   1      }
+ 208          
+ 209          //设置步进电机运动
+ 210          //set_cmd 0:启动电机 100:电机降速运行 100ms后停止
+ 211          //set_val 电机运行速度
+ 212          void set_step_moto(char set_cmd, unsigned char set_val)
+ 213          {
+ 214   1              electromagnet_step = set_cmd;
+ 215   1              use_val = set_val;
+ 216   1      }
+ 217          
+ 218          
+ 219          /***************直流电机控制函数*******************
+ 220          函数原型：      void zl_moto_control(void)
+ 221          入口参数：无
+ 222          出口参数：无
+ 223          备注：占
+ 224          ***********************************/
+ 225          #define INCR_STEP_MS 50  /* 加速段占空比递增的时间间隔:ms */
+ 226          #define DECR_STEP_MS 50  /* 减速段占空比递减的时间间隔:ms */
+ 227          
+ 228          int zl_moto_step = 888;
+ 229          
+ 230          
+ 231          /* 启动加速、停止减速控制 by james */
+ 232          void zl_moto_control(void)
+ 233          {
+ 234   1              static uint delay=0;
+ 235   1              switch(zl_moto_step)    
+ 236   1              {
+ 237   2                      case 0:
+ 238   2                              IoReverseStop(CHN_ZL);
+ 239   2                              zl_moto_step =1;
+ 240   2                              break;
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 5   
+
+ 241   2                              
+ 242   2                      case 1:
+ 243   2                              delay++;
+ 244   2                              if(delay > INCR_STEP_MS) 
+ 245   2                                      {
+ 246   3                                              IoReverseStart(0x20,CHN_ZL);
+ 247   3                                              delay = 0;
+ 248   3                                              zl_moto_step =10;
+ 249   3                                      }
+ 250   2                              break;
+ 251   2                      case 10:
+ 252   2                              delay++;
+ 253   2                              if(delay > INCR_STEP_MS)  
+ 254   2                                      {
+ 255   3                                              IoReverseStart(0x40,CHN_ZL);
+ 256   3                                              delay = 0;
+ 257   3                                              zl_moto_step =20;
+ 258   3                                      }
+ 259   2                              break;
+ 260   2                      case 20:
+ 261   2                              delay++;
+ 262   2                              if(delay > INCR_STEP_MS)  
+ 263   2                                      {
+ 264   3                                              IoReverseStart(0x60,CHN_ZL);
+ 265   3                                              delay = 0;
+ 266   3                                              zl_moto_step =30;
+ 267   3                                      }
+ 268   2                              break;
+ 269   2                      case 30:
+ 270   2                              delay++;
+ 271   2                              if(delay > INCR_STEP_MS)  
+ 272   2                                      {
+ 273   3                                              IoReverseStart(0x80,CHN_ZL);
+ 274   3                                              delay = 0;
+ 275   3                                              zl_moto_step =35;
+ 276   3                                      }
+ 277   2                              break;
+ 278   2                      case 35:
+ 279   2                              delay++;
+ 280   2                              if(delay > INCR_STEP_MS)  
+ 281   2                                      {
+ 282   3                                              IoReverseStart(0xa0,CHN_ZL);
+ 283   3                                              delay = 0;
+ 284   3                                              zl_moto_step =40;
+ 285   3                                      }
+ 286   2                              break;
+ 287   2                      case 40:
+ 288   2                              delay++;
+ 289   2                              if(delay > INCR_STEP_MS)  
+ 290   2                                      {
+ 291   3                                              IoReverseStart(0xc0,CHN_ZL);
+ 292   3                                              delay = 0;
+ 293   3                                              zl_moto_step =50;
+ 294   3                                      }
+ 295   2                              break;
+ 296   2                      case 50:
+ 297   2                              delay++;
+ 298   2                              if(delay > INCR_STEP_MS)  
+ 299   2                                      {
+ 300   3                                              IoReverseStart(0xe0,CHN_ZL);
+ 301   3                                              delay = 0;
+ 302   3                                              zl_moto_step =60;
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 6   
+
+ 303   3                                      }
+ 304   2                              break;
+ 305   2      
+ 306   2                      case 60:
+ 307   2                              delay++;
+ 308   2                              if(delay > INCR_STEP_MS)  
+ 309   2                                      {
+ 310   3                                              delay = 0;
+ 311   3                                              IoReverseStop(CHN_ZL);
+ 312   3                                              P26 = 0;
+ 313   3                                              zl_moto_step =888;
+ 314   3                                      }
+ 315   2                              break;
+ 316   2                              
+ 317   2      
+ 318   2                      case 100:  /* 减速停止 */
+ 319   2      
+ 320   2                              IoReverseStart(0xc0,CHN_ZL);  //75%
+ 321   2                              delay = 0;
+ 322   2                              zl_moto_step = 120;
+ 323   2                                      
+ 324   2                              break;
+ 325   2      
+ 326   2                      case 120:
+ 327   2                              
+ 328   2                              delay++;
+ 329   2                              if(delay > DECR_STEP_MS)  
+ 330   2                                      {
+ 331   3                                              IoReverseStart(0x80,CHN_ZL); //50%
+ 332   3                                              delay = 0;
+ 333   3                                              zl_moto_step =140;
+ 334   3                                      }
+ 335   2      
+ 336   2                              break;
+ 337   2                              
+ 338   2                      case 140:
+ 339   2                              
+ 340   2                              delay++;
+ 341   2                              if(delay > DECR_STEP_MS)  
+ 342   2                                      {
+ 343   3                                              IoReverseStart(0x40,CHN_ZL);  //25%
+ 344   3                                              delay = 0;
+ 345   3                                              zl_moto_step =160;
+ 346   3                                      }
+ 347   2      
+ 348   2                              break;
+ 349   2      
+ 350   2                      case 160:
+ 351   2                              
+ 352   2                              delay++;
+ 353   2                              if(delay > DECR_STEP_MS)
+ 354   2                              {
+ 355   3                                      delay = 0;
+ 356   3                                      IoReverseStop(CHN_ZL);
+ 357   3                                      P26 = 1;
+ 358   3                                      zl_moto_step = 888;
+ 359   3                              }
+ 360   2                              
+ 361   2                              break;
+ 362   2                      
+ 363   2                      default :
+ 364   2                              break;
+C51 COMPILER V9.00   PWM                                                                   06/09/2014 10:21:14 PAGE 7   
+
+ 365   2              }
+ 366   1      }
+ 367          
+ 368          
+ 369          
+ 370          //设置电机运动
+ 371          //set_cmd 0:启动电机 100:停止电机
+ 372          void set_zl_moto(char set_cmd)
+ 373          {
+ 374   1              zl_moto_step = set_cmd;
+ 375   1      }
+ 376          
+ 377          
+ 378          
+ 379          
+ 380          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    731    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     48    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

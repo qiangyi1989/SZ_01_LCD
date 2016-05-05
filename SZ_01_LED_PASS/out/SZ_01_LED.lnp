@@ -1,0 +1,9 @@
+".\out\STARTUP.obj",
+".\out\main.obj",
+".\out\I2c.obj",
+".\out\LED_Display.obj",
+".\out\eeprom.obj",
+".\out\save_cnt.obj",
+".\out\uart.obj" 
+TO ".\out\SZ_01_LED" 
+PRINT(".\lst\SZ_01_LED.m51")

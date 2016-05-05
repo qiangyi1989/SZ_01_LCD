@@ -1,0 +1,256 @@
+C51 COMPILER V9.00   I2C                                                                   02/18/2016 09:38:51 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE I2C
+OBJECT MODULE PLACED IN .\out\I2c.obj
+COMPILER INVOKED BY: D:\Program Files (x86)\Keil\C51\BIN\C51.EXE I2c.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\I2c.lst) OB
+                    -JECT(.\out\I2c.obj)
+
+line level    source
+
+   1          /**
+   2           * Copyright (c) 2012, 长沙晗光电子科技有限公司
+   3           * All rights reserved.
+   4           *
+   5           * FILE:   I2c.c
+   6           * 模拟I2C程序
+   7           *
+   8           * @file i2c.h
+   9           * 头文件.
+  10           *
+  11           * @author JWD
+  12           * @version 1.0     = return 12121
+  13           * @date 2012-12-26
+  14           *
+  15           */
+  16          
+  17          #include "I2c.h"
+  18          #include "reg51.h"
+  19          #include<intrins.h>
+  20          void I2c_Start(void);
+  21          void I2c_Stop(void);
+  22          void I2c_Gpio_In(void);
+  23          void I2c_Gpio_Out(void);
+  24          
+  25          sbit P10 = P1^0;
+  26          sbit P11 = P1^1;
+  27          sbit P14 = P1^4;
+  28          sbit P15 = P1^5;
+  29          
+  30          
+  31          #define I2C_DELAY 0
+  32          
+  33          #define I2C_SDA_GPIO P11
+  34          #define I2C_SCK_GPIO P10
+  35          #define I2C_SDA_DIR_GPIO P14
+  36          #define I2C_SCK_DIR_GPIO P15
+  37          
+  38          xdata unsigned int disp_buf[5] = {0xFF,0xFF,0xFF,0xFF,0xFF};
+  39          
+  40          void DELAY_US(long us_val)
+  41          {
+  42   1              long i;
+  43   1              for(i = 0; i < us_val; i++)
+  44   1                      {
+  45   2                              _nop_();
+  46   2                      }
+  47   1      }
+  48          
+  49          void I2c_Start(void)   
+  50          {  
+  51   1      //  DELAY_US(I2C_DELAY);   
+  52   1        I2C_SCK_GPIO = 1; // SCK     
+  53   1        I2C_SCK_GPIO = 1; // SCK     
+  54   1        I2C_SDA_GPIO = 1; // SDA   
+C51 COMPILER V9.00   I2C                                                                   02/18/2016 09:38:51 PAGE 2   
+
+  55   1        I2C_SDA_GPIO = 1; // SDA   
+  56   1        DELAY_US(I2C_DELAY);   
+  57   1        I2C_SDA_GPIO = 0; // SDA   
+  58   1        I2C_SDA_GPIO = 0; // SDA    
+  59   1      }   
+  60             
+  61          void I2c_Stop(void)   
+  62          {   
+  63   1      /*
+  64   1        clk = 0; 
+  65   1        Delay_us(2); 
+  66   1        dio = 0; 
+  67   1        Delay_us(2); 
+  68   1        clk = 1; 
+  69   1        Delay_us(2); 
+  70   1        dio = 1; 
+  71   1      */
+  72   1      //  DELAY_US(I2C_DELAY);   
+  73   1        I2C_SCK_GPIO = 0; // SCK   
+  74   1        I2C_SCK_GPIO = 0; // SCK   
+  75   1        DELAY_US(I2C_DELAY);   
+  76   1        I2C_SDA_GPIO = 0; // SDA   
+  77   1        I2C_SDA_GPIO = 0; // SDA   
+  78   1        DELAY_US(I2C_DELAY);   
+  79   1        I2C_SCK_GPIO = 1; // SCK   
+  80   1        I2C_SCK_GPIO = 1; // SCK   
+  81   1        DELAY_US(I2C_DELAY);   
+  82   1        I2C_SDA_GPIO = 1; // SDA   
+  83   1        I2C_SDA_GPIO = 1; // SDA   
+  84   1      }   
+  85             
+  86          // 应答标志   
+  87          void I2c_Ack(void)   
+  88          {
+  89   1      /*
+  90   1      clk = 0;        
+  91   1      Delay_us(5);       //在第八个时钟下降沿之后延时 5us，开始判断 ACK 信号 
+  92   1      while(dio); 
+  93   1                        clk = 1; 
+  94   1      Delay_us(2); 
+  95   1                        clk=0; 
+  96   1      */
+  97   1      //  DELAY_US(I2C_DELAY);   
+  98   1        I2C_SCK_GPIO = 0; // SCK   
+  99   1        I2C_SCK_GPIO = 0; // SCK  
+ 100   1        DELAY_US(I2C_DELAY);   
+ 101   1      //  while(I2C_SDA_GPIO);
+ 102   1        I2C_SCK_GPIO = 1; // SCK   
+ 103   1        I2C_SCK_GPIO = 1; // SCK  
+ 104   1        DELAY_US(I2C_DELAY);   
+ 105   1        I2C_SCK_GPIO = 0; // SCK   
+ 106   1        I2C_SCK_GPIO = 0; // SCK  
+ 107   1        
+ 108   1      }   
+ 109             
+ 110             
+ 111          void I2c_Send_Byte(unsigned int oneByte)   
+ 112          {   
+ 113   1      unsigned char i; 
+ 114   1          for(i=0;i<8;i++) 
+ 115   1          {      
+ 116   2                      DELAY_US(I2C_DELAY); 
+C51 COMPILER V9.00   I2C                                                                   02/18/2016 09:38:51 PAGE 3   
+
+ 117   2              I2C_SCK_GPIO = 0; 
+ 118   2              I2C_SCK_GPIO = 0;
+ 119   2                      DELAY_US(I2C_DELAY); 
+ 120   2                      if(oneByte&0x01)             //低位在前 
+ 121   2                      { 
+ 122   3                      I2C_SDA_GPIO = 1; 
+ 123   3                      I2C_SDA_GPIO = 1; 
+ 124   3                      } 
+ 125   2                      else 
+ 126   2                      { 
+ 127   3                      I2C_SDA_GPIO = 0; 
+ 128   3                      I2C_SDA_GPIO = 0; 
+ 129   3                      } 
+ 130   2                      DELAY_US(I2C_DELAY); 
+ 131   2                      oneByte=oneByte>>1; 
+ 132   2                      I2C_SCK_GPIO = 1; 
+ 133   2                      I2C_SCK_GPIO = 1; 
+ 134   2                      DELAY_US(I2C_DELAY); 
+ 135   2          }   
+ 136   1      }   
+ 137             
+ 138            
+ 139          void TM1637_Write(void)   
+ 140          {   
+ 141   1              unsigned char i;   
+ 142   1              I2c_Gpio_Out(); 
+ 143   1              
+ 144   1              I2c_Start(); 
+ 145   1              I2c_Send_Byte(0x40); // 40H 地址自动加 1 模式,44H 固定地址模式,本程序采
+ 146   1              I2c_Gpio_In(); 
+ 147   1              I2c_Ack(); 
+ 148   1              I2c_Gpio_Out(); 
+ 149   1              I2c_Stop(); 
+ 150   1              I2c_Start(); 
+ 151   1              I2c_Send_Byte(0xc0); //设置首地址， 
+ 152   1              I2c_Gpio_In(); 
+ 153   1              I2c_Ack(); 
+ 154   1              I2c_Gpio_Out(); 
+ 155   1              for(i=0;i<5;i++) //地址自加，不必每次都写地址 
+ 156   1              { 
+ 157   2                I2c_Send_Byte(disp_buf[i]); // | 0x80 送数据  驱动必须要小数点亮才能正确传输
+ 158   2            I2c_Gpio_In(); 
+ 159   2            I2c_Ack(); 
+ 160   2            I2c_Gpio_Out(); 
+ 161   2              } 
+ 162   1          I2c_Stop(); 
+ 163   1          I2c_Start(); 
+ 164   1          I2c_Send_Byte(0x8C); //开显示  ，最大亮度 
+ 165   1              I2c_Gpio_In(); 
+ 166   1              I2c_Ack(); 
+ 167   1              I2c_Gpio_Out(); 
+ 168   1          I2c_Stop(); 
+ 169   1      }   
+ 170          
+ 171          #if 0
+                 
+              unsigned char TM1637_Read(void)   
+              {    
+              //unsigned char rekey,rkey,i; 
+              unsigned char rekey,i; 
+              
+                      I2c_Start(); 
+C51 COMPILER V9.00   I2C                                                                   02/18/2016 09:38:51 PAGE 4   
+
+                      I2c_Send_Byte(0x42);                                          //读按键命令 
+                      I2c_Gpio_In(); 
+                      I2c_Ack(); 
+                      I2c_Gpio_Out(); 
+                      I2C_SDA_GPIO = 1; 
+                      I2C_SDA_GPIO = 1; 
+                      
+                      I2c_Gpio_In(); 
+                        for(i=0;i<8;i++)                                         //从低位开始读 
+                        {      
+                              I2C_SCK_GPIO = 0; 
+                              I2C_SCK_GPIO = 0; 
+                              rekey=rekey>>1; 
+                              DELAY_US(I2C_DELAY);
+                              I2C_SCK_GPIO = 1; 
+                              I2C_SCK_GPIO = 1; 
+                              if(I2C_SDA_GPIO) 
+                              { 
+                                  rekey=rekey|0x80; 
+                              } 
+                              else 
+                              { 
+                                  rekey=rekey|0x00; 
+                              } 
+                              DELAY_US(I2C_DELAY); 
+                         }     
+                      I2c_Gpio_In(); 
+                      I2c_Ack(); 
+                      I2c_Gpio_Out(); 
+                      I2c_Stop(); 
+                      return (rekey);                       
+              }   
+              
+              #endif
+ 213             
+ 214          // I2C SDA input   
+ 215          void I2c_Gpio_In(void)   
+ 216          {   
+ 217   1          I2C_SDA_DIR_GPIO = 0;
+ 218   1          I2C_SCK_DIR_GPIO = 1;
+ 219   1      }   
+ 220             
+ 221          // I2C SDA output   
+ 222          void I2c_Gpio_Out(void)   
+ 223          {   
+ 224   1          I2C_SDA_DIR_GPIO = 1;
+ 225   1          I2C_SCK_DIR_GPIO = 1;
+ 226   1      } 
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    313    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =     10    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      12
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
