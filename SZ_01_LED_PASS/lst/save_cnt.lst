@@ -1,10 +1,10 @@
-C51 COMPILER V9.00   SAVE_CNT                                                              04/09/2016 11:07:34 PAGE 1   
+C51 COMPILER V9.00   SAVE_CNT                                                              05/05/2016 16:13:40 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE SAVE_CNT
 OBJECT MODULE PLACED IN .\out\save_cnt.obj
-COMPILER INVOKED BY: D:\Program Files (x86)\Keil\C51\BIN\C51.EXE save_cnt.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\save_c
-                    -nt.lst) OBJECT(.\out\save_cnt.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE save_cnt.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\save_cnt.lst) OBJECT(.\out
+                    -\save_cnt.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52   1      unsigned long ver_data[3],max_ver_data[2];
   53   1      unsigned int i;
   54   1              for(i = 0; i < 640; i++) //遍历存储区,找出最大值所有序号
-C51 COMPILER V9.00   SAVE_CNT                                                              04/09/2016 11:07:34 PAGE 2   
+C51 COMPILER V9.00   SAVE_CNT                                                              05/05/2016 16:13:40 PAGE 2   
 
   55   1                      {
   56   2                              progadd = EEPROM_LOCK_VAL + (i<<2);         //根据运行分钟数计算偏移地址
@@ -126,7 +126,7 @@ line level    source
  114   1      }
 *** WARNING C280 IN LINE 49 OF SAVE_CNT.C: 'i_pr': unreferenced local variable
  115          
-C51 COMPILER V9.00   SAVE_CNT                                                              04/09/2016 11:07:34 PAGE 3   
+C51 COMPILER V9.00   SAVE_CNT                                                              05/05/2016 16:13:40 PAGE 3   
 
  116          //读取清零计数
  117          void read_user_count(void)
@@ -190,7 +190,7 @@ line level    source
  175   1      #endif  
  176   1      }
 *** WARNING C280 IN LINE 155 OF SAVE_CNT.C: 'add_index': unreferenced local variable
-C51 COMPILER V9.00   SAVE_CNT                                                              04/09/2016 11:07:34 PAGE 4   
+C51 COMPILER V9.00   SAVE_CNT                                                              05/05/2016 16:13:40 PAGE 4   
 
 *** WARNING C280 IN LINE 155 OF SAVE_CNT.C: 'temp_32': unreferenced local variable
  177          

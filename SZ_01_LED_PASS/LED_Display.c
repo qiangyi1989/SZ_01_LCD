@@ -20,6 +20,8 @@
 #include "global.h"
 #include "sys.h"
 
+#include "uart.h"
+
 #ifdef DISP_C
 
 #define BELL P25
@@ -65,7 +67,7 @@ static long StrToData(char *string,char len,char nType);
 sbit P25 = P2^5;
 //sbit P21 = P2^1;
 //sbit P22 = P2^2;
-sbit P14 = P1^4;
+//sbit P14 = P1^4;
 
 //#define RED P17
 //#define YELLOW P54
@@ -102,7 +104,7 @@ static xdata char  PasswordBuff[5];								//密码数据缓冲区
 static xdata char  DisplayBuff[10];
 
 int  DisplayState;											//画面状态
-
+int  LCDDisplayState;
 
 static xdata const MAIN_SHOW * pMain;								//主画面数据指针
 static xdata const MENU_SHOW * pMenu;								//菜单指针
@@ -207,6 +209,9 @@ xdata char speed_mode = 1;   //速度模式: 1高速， 0低速
 
 xdata char qz_wait = 0;      //等待切纸确认: 0未等待，1等待
 
+//add by yq
+xdata char Menu0_Number;						   
+						   
 /*++++++++++++++++++++++++++++++++++++++++++++++++
 功能：显示字符串。
 
@@ -823,7 +828,9 @@ void LEDDisplay(void)
 	int iBellOnTime, iBellOffTime;
 
 	static xdata unsigned int dj_key_dely = 0,dj_key_step = 0;
-
+	//ADD by yq
+	xdata unsigned char  cMenuSn;
+	
 	unKey.u_bit.K1 = P24;
 	unKey.u_bit.K2 = P23;
 	unKey.u_bit.K3 = P22;
@@ -1003,7 +1010,6 @@ void LEDDisplay(void)
 					}
 			break;
 		}
-	
 		
     switch(DisplayState)
 	{
@@ -1620,6 +1626,9 @@ void LEDDisplay(void)
 					
 					now_menu.par_id = DisplayItemNum;
 					now_menu.event_flag = 1;
+					//add by yq
+					if (cMenuSn-- <= 10)
+						cMenuSn = 29;
 		            break;	
 		        case KEY_INCREASE:
 
@@ -1628,6 +1637,9 @@ void LEDDisplay(void)
 
 					now_menu.par_id = DisplayItemNum;
 					now_menu.event_flag = 1;
+					//add by yq
+					if (cMenuSn++ >= 29)
+						cMenuSn = 10;
 		            break;	
 		        case KEY_ENT:	
 					if(
@@ -1919,7 +1931,61 @@ void LEDDisplay(void)
 	    break;    				
 		
 	}
+    if(LCDDisplayState != DisplayState)
+	{
+		LCDDisplayState = DisplayState;
+		
+		switch(LCDDisplayState)
+		{
+			case ST_MAIN:
+				GpuSend("CLS(0);\r\n");
+				DELAY_US(UART2_DELAY);
+				//add 0407
+				DELAY_US(UART1s_DELAY);
+				//cAlarmFlag = 0;						
+				//add 0407
+				GpuSend("SPG(52);\r\n");
+				
+				break;
+			case ST_PASSWORD:
+				//add 0323
+				GpuSend("CLS(0);\r\n");
+				DELAY_US(UART2_DELAY);
+				//add 0407
+				DELAY_US(UART1s_DELAY);
 
+				GpuSend("SPG(27);\r\n");
+				DELAY_US(UART2_DELAY);		
+				GpuSend("DS48(20,174,'00000',0);\r\n");
+				DELAY_US(UART2_DELAY);
+				
+				break;
+			case ST_MENU ://--参数查看画面
+
+				GpuSend("CLS(0);\r\n");
+				DELAY_US(UART2_DELAY);
+				MenuEditLook(cMenuSn);
+				break;
+			case ST_DATA_INPUT://--数据输入画面
+			break;
+			case ST_CODE_INPUT://--代码输入画面
+			case ST_Show_Err://--错误提示画面
+			break;
+			case ST_ADJ://--直接调参数画面
+			break;
+			case ST_WAIT_VER://--等待返校结果
+			break;
+			case ST_DISP_ERR://延时显示修改出错
+			break;
+			case ST_TEST://--测试参数设置  added by james for v19407
+			break;
+			case ST_LEARN://--学习模式
+			break;
+			case 0:
+			
+			break;
+		}
+	}	
 
 	if(!UpdateState)
 	{
@@ -2150,6 +2216,98 @@ static long StrToData(char *string,char len,char nType)
 	else
 	    return x;
 
+}
+void MenuEditLook(unsigned char cDisplayItemNum)
+{
+	
+	//unsigned char DisplayItemNum;
+	switch(cDisplayItemNum)
+	{
+		case 10:
+			GpuSend("SPG(31);\r\n");		
+		break;
+	
+		case 11:
+			GpuSend("SPG(32);\r\n");		
+		break;
+		
+		case 12:
+			GpuSend("SPG(33);\r\n");		
+		break;
+		
+		case 13:
+			GpuSend("SPG(34);\r\n");		
+		break;
+		
+		case 14:
+			GpuSend("SPG(35);\r\n");		
+		break;
+		
+		case 15:
+			GpuSend("SPG(36);\r\n");		
+		break;
+		
+		case 16:
+			GpuSend("SPG(37);\r\n");		
+		break;
+		
+		case 17:
+			GpuSend("SPG(38);\r\n");		
+		break;
+		
+		case 18:
+			GpuSend("SPG(39);\r\n");		
+		break;
+		
+		case 19:
+			GpuSend("SPG(40);\r\n");		
+		break;
+		
+		
+		case 20:
+			GpuSend("SPG(41);\r\n");		
+		break;
+		
+		
+		case 21:
+			GpuSend("SPG(42);\r\n");		
+		break;
+		
+		case 22:
+			GpuSend("SPG(43);\r\n");		
+		break;
+		
+		case 23:
+			GpuSend("SPG(44);\r\n");		
+		break;
+		
+		case 24:
+			GpuSend("SPG(45);\r\n");		
+		break;
+		
+		case 25:
+			GpuSend("SPG(46);\r\n");		
+		break;
+		
+		case 26:
+			GpuSend("SPG(47);\r\n");		
+		break;
+		
+		case 27:
+			GpuSend("SPG(48);\r\n");		
+		break;
+		
+		case 28:
+			GpuSend("SPG(49);\r\n");		
+		break;
+		
+		case 29:
+			GpuSend("SPG(50);\r\n");		
+		break;		
+	
+	}
+	
+	DELAY_US(UART1s_DELAY);
 }
 
 #endif

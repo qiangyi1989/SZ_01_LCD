@@ -1,10 +1,10 @@
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 1   
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
 OBJECT MODULE PLACED IN .\out\main.obj
-COMPILER INVOKED BY: D:\Program Files (x86)\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\main.lst) 
-                    -OBJECT(.\out\main.obj)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\main.lst) OBJECT(.\out\main.ob
+                    -j)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52          char start_com_flag = 0;             /* 操作板开始串口通信的标志: 1开始，0未开始 */
   53          
   54          unsigned int usLongDownFlag = 0;     /* 长按下标志: 0未按下，1已按下 */
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 2   
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 2   
 
   55          
   56          
@@ -126,7 +126,7 @@ line level    source
               //  AUXR &= 0x7f;                       //定时器0为12T模式
               
                   TMOD = 0x00;                    //设置定时器为模式0(16位自动重装载)
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 3   
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 3   
 
               
                       //TL0 = 0xfd;                     //初始化计时值
@@ -190,7 +190,7 @@ line level    source
  176          {
  177   1          AUXR |= 0x80;                       //定时器0为1T模式
  178   1      //  AUXR &= 0x7f;                       //定时器0为12T模式
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 4   
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 4   
 
  179   1      
  180   1          TMOD = 0x00;                    //设置定时器为模式0(16位自动重装载)
@@ -213,117 +213,121 @@ line level    source
  197   1      
  198   1              Timer0Init();
  199   1              uart_init();
- 200   1        
- 201   1      }
- 202          
- 203          
- 204          void GlobalInit()
- 205          {
- 206   1              memset(&public_val, 0, sizeof(public_val));     
- 207   1      
- 208   1              speed_mode = 1;  // 高速模式
- 209   1      }
- 210          
- 211          
- 212          
- 213          
- 214          ///踏板长按识别
+ 200   1              
+ 201   1      #ifndef LED_DISP
+ 202   1              uart2_init(); 
+ 203   1      #endif  
+ 204   1        
+ 205   1      }
+ 206          
+ 207          
+ 208          void GlobalInit()
+ 209          {
+ 210   1              memset(&public_val, 0, sizeof(public_val));     
+ 211   1      
+ 212   1              speed_mode = 1;  // 高速模式
+ 213   1      }
+ 214          
  215          
- 216          #if 1
- 217          void CheckKeyClick(_T_CHECK_EDGE2 *p)
- 218          {
- 219   1              switch(p->us_logStep)
- 220   1              {
- 221   2              case 0:
- 222   2                      
- 223   2                      p->us_finishFlag = 0;
- 224   2                      if( !(unKey.all & p->us_inMask) )                                                                               
- 225   2                      {
- 226   3                              p->us_logStep = 10;
- 227   3                              p->us_DownCnt = 0;
- 228   3                      }
- 229   2                      
- 230   2                      break;
- 231   2                      
- 232   2              case 10:
- 233   2      
- 234   2                      if( !(unKey.all & p->us_inMask) )                                                                               
- 235   2                      {
- 236   3                              p->us_DownCnt++;
- 237   3                              if(p->us_DownCnt > KEY_JIT_DELAY)                       ///<按下                                                
- 238   3                              {
- 239   4                                      //p->us_finishFlag = FOOT_DOWN_FLAG;   
- 240   4      
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 5   
+ 216          
+ 217          
+ 218          ///踏板长按识别
+ 219          
+ 220          #if 1
+ 221          void CheckKeyClick(_T_CHECK_EDGE2 *p)
+ 222          {
+ 223   1              switch(p->us_logStep)
+ 224   1              {
+ 225   2              case 0:
+ 226   2                      
+ 227   2                      p->us_finishFlag = 0;
+ 228   2                      if( !(unKey.all & p->us_inMask) )                                                                               
+ 229   2                      {
+ 230   3                              p->us_logStep = 10;
+ 231   3                              p->us_DownCnt = 0;
+ 232   3                      }
+ 233   2                      
+ 234   2                      break;
+ 235   2                      
+ 236   2              case 10:
+ 237   2      
+ 238   2                      if( !(unKey.all & p->us_inMask) )                                                                               
+ 239   2                      {
+ 240   3                              p->us_DownCnt++;
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 5   
 
- 241   4                                      p->us_logStep = 20;   
- 242   4                              }
- 243   3                      }
- 244   2                      else
- 245   2                      {
- 246   3                              p->us_DownCnt = 0;
- 247   3                              p->us_logStep = 0;
- 248   3                      }
- 249   2                      
- 250   2                      break;  
- 251   2                      
- 252   2              case 20:
+ 241   3                              if(p->us_DownCnt > KEY_JIT_DELAY)                       ///<按下                                                
+ 242   3                              {
+ 243   4                                      //p->us_finishFlag = FOOT_DOWN_FLAG;   
+ 244   4      
+ 245   4                                      p->us_logStep = 20;   
+ 246   4                              }
+ 247   3                      }
+ 248   2                      else
+ 249   2                      {
+ 250   3                              p->us_DownCnt = 0;
+ 251   3                              p->us_logStep = 0;
+ 252   3                      }
  253   2                      
- 254   2                      p->us_DownCnt++;
+ 254   2                      break;  
  255   2                      
- 256   2                      if (unKey.all & p->us_inMask)   
- 257   2                      {
- 258   3                              p->us_logStep = 30;
- 259   3                              p->us_UpCnt = 0;
- 260   3                      }
- 261   2      
- 262   2                      if (p->us_DownCnt > KEY_LONG_DELAY)
- 263   2                      {
- 264   3                              p->us_finishFlag = KEY_LONG_DOWN_FLAG;   /* 判为长按按下 */   
- 265   3      
- 266   3                              //p->us_logStep = 30;
- 267   3                      }
- 268   2                      
- 269   2                      break;
- 270   2      
- 271   2              case 30:
- 272   2      
- 273   2                      p->us_DownCnt++;
+ 256   2              case 20:
+ 257   2                      
+ 258   2                      p->us_DownCnt++;
+ 259   2                      
+ 260   2                      if (unKey.all & p->us_inMask)   
+ 261   2                      {
+ 262   3                              p->us_logStep = 30;
+ 263   3                              p->us_UpCnt = 0;
+ 264   3                      }
+ 265   2      
+ 266   2                      if (p->us_DownCnt > KEY_LONG_DELAY)
+ 267   2                      {
+ 268   3                              p->us_finishFlag = KEY_LONG_DOWN_FLAG;   /* 判为长按按下 */   
+ 269   3      
+ 270   3                              //p->us_logStep = 30;
+ 271   3                      }
+ 272   2                      
+ 273   2                      break;
  274   2      
- 275   2                      if (unKey.all & p->us_inMask)    
- 276   2                      {
- 277   3                              p->us_UpCnt++;
- 278   3                              if(p->us_UpCnt > KEY_JIT_DELAY)   /* 弹起 */                                                                    
- 279   3                              {
- 280   4                                      //if (p->us_DownCnt > KEY_LONG_DELAY)     
- 281   4                                      if (p->us_finishFlag == KEY_LONG_DOWN_FLAG)
- 282   4                                      {
- 283   5                                              p->us_finishFlag = KEY_LONG_UP_FLAG;   /* 判为长按抬起 */   
- 284   5                                      }
- 285   4                                      else
+ 275   2              case 30:
+ 276   2      
+ 277   2                      p->us_DownCnt++;
+ 278   2      
+ 279   2                      if (unKey.all & p->us_inMask)    
+ 280   2                      {
+ 281   3                              p->us_UpCnt++;
+ 282   3                              if(p->us_UpCnt > KEY_JIT_DELAY)   /* 弹起 */                                                                    
+ 283   3                              {
+ 284   4                                      //if (p->us_DownCnt > KEY_LONG_DELAY)     
+ 285   4                                      if (p->us_finishFlag == KEY_LONG_DOWN_FLAG)
  286   4                                      {
- 287   5                                              p->us_finishFlag = KEY_SHORT_UP_FLAG;  /* 判为短按 */
+ 287   5                                              p->us_finishFlag = KEY_LONG_UP_FLAG;   /* 判为长按抬起 */   
  288   5                                      }
- 289   4      
- 290   4                                      p->us_DownCnt = 0;                              
- 291   4                                      p->us_logStep = 888;                            
- 292   4                              }
- 293   3                      }
- 294   2                      else
- 295   2                      {
- 296   3                              p->us_UpCnt = 0;
- 297   3                              p->us_logStep = 20;
- 298   3                      }
- 299   2                      
- 300   2                      break;
- 301   2                      
- 302   2              }
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 6   
+ 289   4                                      else
+ 290   4                                      {
+ 291   5                                              p->us_finishFlag = KEY_SHORT_UP_FLAG;  /* 判为短按 */
+ 292   5                                      }
+ 293   4      
+ 294   4                                      p->us_DownCnt = 0;                              
+ 295   4                                      p->us_logStep = 888;                            
+ 296   4                              }
+ 297   3                      }
+ 298   2                      else
+ 299   2                      {
+ 300   3                              p->us_UpCnt = 0;
+ 301   3                              p->us_logStep = 20;
+ 302   3                      }
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 6   
 
- 303   1              
- 304   1      }
- 305          
- 306          #else
+ 303   2                      
+ 304   2                      break;
+ 305   2                      
+ 306   2              }
+ 307   1              
+ 308   1      }
+ 309          
+ 310          #else
               
               void CheckKeyClick(_T_CHECK_EDGE2 *p)
               {
@@ -378,12 +382,12 @@ line level    source
                                       p->us_UpCnt++;
                                       if(p->us_UpCnt > KEY_JIT_DELAY)   /* 弹起 */                                                                    
                                       {
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 7   
+
                                               p->us_finishFlag = KEY_LONG_UP_FLAG;   /* 判为长按抬起 */   
               
                                               p->us_UpCnt = 0;                                
                                               p->us_logStep = 888;                            
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 7   
-
                                       }
                               }
                               else
@@ -399,202 +403,202 @@ line level    source
               }
               
               #endif
- 380          
- 381          
- 382          void key_detect()
- 383          {       
- 384   1              CheckKeyClick(&t_PaperFwKey);
- 385   1              CheckKeyClick(&t_PaperBwKey);
- 386   1              //CheckKeyClick(&t_CutKey);     
- 387   1              CheckKeyClick(&t_PaperDownKey); 
- 388   1              CheckKeyClick(&t_RollKey);      
- 389   1              CheckKeyClick(&t_FzFwKey);              
- 390   1              CheckKeyClick(&t_FzBwKey);              
- 391   1      }
- 392          
- 393          void start_key_detect()
- 394          {
- 395   1              t_PaperFwKey.us_logStep = 0;
- 396   1              t_PaperBwKey.us_logStep = 0;
- 397   1              //t_CutKey.us_logStep = 0;
- 398   1              t_PaperDownKey.us_logStep = 0;
- 399   1              t_RollKey.us_logStep = 0;       
- 400   1              t_FzFwKey.us_logStep = 0;
- 401   1              t_FzBwKey.us_logStep = 0;       
- 402   1      }
- 403          
- 404          void judge_key()
- 405          {
- 406   1              // 发纸
- 407   1              if (t_FzFwKey.us_finishFlag != 0) 
- 408   1              {
- 409   2                      gsKeyVal = KEY_IO9;
- 410   2                      
- 411   2                      if (t_FzFwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 412   2                      {                       
- 413   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 414   3      
- 415   3                              if (usLongDownFlag == 0)
- 416   3                              {
- 417   4                                      usLongDownFlag = 1;
- 418   4      
- 419   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 420   4                              }
- 421   3                      }
- 422   2                      else if (t_FzFwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 423   2                      {
- 424   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 425   3      
- 426   3                              t_FzFwKey.us_finishFlag = 0;
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 8   
+ 384          
+ 385          
+ 386          void key_detect()
+ 387          {       
+ 388   1              CheckKeyClick(&t_PaperFwKey);
+ 389   1              CheckKeyClick(&t_PaperBwKey);
+ 390   1              //CheckKeyClick(&t_CutKey);     
+ 391   1              CheckKeyClick(&t_PaperDownKey); 
+ 392   1              CheckKeyClick(&t_RollKey);      
+ 393   1              CheckKeyClick(&t_FzFwKey);              
+ 394   1              CheckKeyClick(&t_FzBwKey);              
+ 395   1      }
+ 396          
+ 397          void start_key_detect()
+ 398          {
+ 399   1              t_PaperFwKey.us_logStep = 0;
+ 400   1              t_PaperBwKey.us_logStep = 0;
+ 401   1              //t_CutKey.us_logStep = 0;
+ 402   1              t_PaperDownKey.us_logStep = 0;
+ 403   1              t_RollKey.us_logStep = 0;       
+ 404   1              t_FzFwKey.us_logStep = 0;
+ 405   1              t_FzBwKey.us_logStep = 0;       
+ 406   1      }
+ 407          
+ 408          void judge_key()
+ 409          {
+ 410   1              // 发纸
+ 411   1              if (t_FzFwKey.us_finishFlag != 0) 
+ 412   1              {
+ 413   2                      gsKeyVal = KEY_IO9;
+ 414   2                      
+ 415   2                      if (t_FzFwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 416   2                      {                       
+ 417   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 418   3      
+ 419   3                              if (usLongDownFlag == 0)
+ 420   3                              {
+ 421   4                                      usLongDownFlag = 1;
+ 422   4      
+ 423   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 424   4                              }
+ 425   3                      }
+ 426   2                      else if (t_FzFwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 8   
 
- 427   3                              t_FzFwKey.us_logStep = 0;                       
- 428   3      
- 429   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 430   3      
- 431   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 432   3                      }
- 433   2                      else                                                       /* 长按抬起 */
- 434   2                      {
- 435   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 436   3      
- 437   3                              t_FzFwKey.us_finishFlag = 0;
- 438   3                              t_FzFwKey.us_logStep = 0;                       
- 439   3      
- 440   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 441   3      
- 442   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 443   3                      }       
- 444   2              }
- 445   1      
- 446   1              // 收纸
- 447   1              if (t_FzBwKey.us_finishFlag != 0) 
- 448   1              {
- 449   2                      gsKeyVal = KEY_RED;
- 450   2                      
- 451   2                      if (t_FzBwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 452   2                      {                       
- 453   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 454   3      
- 455   3                              if (usLongDownFlag == 0)
- 456   3                              {
- 457   4                                      usLongDownFlag = 1;
- 458   4      
- 459   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 460   4                              }
- 461   3                      }
- 462   2                      else if (t_FzBwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 463   2                      {
- 464   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 465   3      
- 466   3                              t_FzBwKey.us_finishFlag = 0;
- 467   3                              t_FzBwKey.us_logStep = 0;                       
- 468   3      
- 469   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 470   3      
- 471   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 472   3                      }
- 473   2                      else                                                       /* 长按抬起 */
- 474   2                      {
- 475   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 476   3      
- 477   3                              t_FzBwKey.us_finishFlag = 0;
- 478   3                              t_FzBwKey.us_logStep = 0;                       
- 479   3      
- 480   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 481   3      
- 482   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 483   3                      }       
- 484   2              }
- 485   1      
- 486   1      
- 487   1              
- 488   1              /* 进纸 */
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 9   
+ 427   2                      {
+ 428   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+ 429   3      
+ 430   3                              t_FzFwKey.us_finishFlag = 0;
+ 431   3                              t_FzFwKey.us_logStep = 0;                       
+ 432   3      
+ 433   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 434   3      
+ 435   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 436   3                      }
+ 437   2                      else                                                       /* 长按抬起 */
+ 438   2                      {
+ 439   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 440   3      
+ 441   3                              t_FzFwKey.us_finishFlag = 0;
+ 442   3                              t_FzFwKey.us_logStep = 0;                       
+ 443   3      
+ 444   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 445   3      
+ 446   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 447   3                      }       
+ 448   2              }
+ 449   1      
+ 450   1              // 收纸
+ 451   1              if (t_FzBwKey.us_finishFlag != 0) 
+ 452   1              {
+ 453   2                      gsKeyVal = KEY_RED;
+ 454   2                      
+ 455   2                      if (t_FzBwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 456   2                      {                       
+ 457   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 458   3      
+ 459   3                              if (usLongDownFlag == 0)
+ 460   3                              {
+ 461   4                                      usLongDownFlag = 1;
+ 462   4      
+ 463   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 464   4                              }
+ 465   3                      }
+ 466   2                      else if (t_FzBwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+ 467   2                      {
+ 468   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+ 469   3      
+ 470   3                              t_FzBwKey.us_finishFlag = 0;
+ 471   3                              t_FzBwKey.us_logStep = 0;                       
+ 472   3      
+ 473   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 474   3      
+ 475   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 476   3                      }
+ 477   2                      else                                                       /* 长按抬起 */
+ 478   2                      {
+ 479   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 480   3      
+ 481   3                              t_FzBwKey.us_finishFlag = 0;
+ 482   3                              t_FzBwKey.us_logStep = 0;                       
+ 483   3      
+ 484   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 485   3      
+ 486   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 487   3                      }       
+ 488   2              }
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 9   
 
- 489   1              if (t_PaperFwKey.us_finishFlag != 0) 
- 490   1              {
- 491   2                      gsKeyVal = KEY_IO1;
- 492   2                      
- 493   2                      if (t_PaperFwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 494   2                      {                       
- 495   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 496   3      
- 497   3                              if (usLongDownFlag == 0)
- 498   3                              {
- 499   4                                      usLongDownFlag = 1;
- 500   4      
- 501   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 502   4                              }
- 503   3                      }
- 504   2                      else if (t_PaperFwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 505   2                      {
- 506   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 507   3      
- 508   3                              t_PaperFwKey.us_finishFlag = 0;
- 509   3                              t_PaperFwKey.us_logStep = 0;                    
- 510   3      
- 511   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 512   3      
- 513   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 514   3                      }
- 515   2                      else                                                       /* 长按抬起 */
- 516   2                      {
- 517   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 518   3      
- 519   3                              t_PaperFwKey.us_finishFlag = 0;
- 520   3                              t_PaperFwKey.us_logStep = 0;                    
- 521   3      
- 522   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 523   3      
- 524   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 525   3                      }       
- 526   2              }
- 527   1      
- 528   1              /* 退纸 */      
- 529   1              if (t_PaperBwKey.us_finishFlag != 0) 
- 530   1              {
- 531   2                      gsKeyVal = KEY_IO2;
- 532   2                      
- 533   2                      if (t_PaperBwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 534   2                      {                       
- 535   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 536   3      
- 537   3                              if (usLongDownFlag == 0)
- 538   3                              {
- 539   4                                      usLongDownFlag = 1;
- 540   4      
- 541   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 542   4                              }
- 543   3                      }
- 544   2                      else if (t_PaperBwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 545   2                      {
- 546   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 547   3      
- 548   3                              t_PaperBwKey.us_finishFlag = 0;
- 549   3                              t_PaperBwKey.us_logStep = 0;                    
- 550   3      
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 10  
+ 489   1      
+ 490   1      
+ 491   1              
+ 492   1              /* 进纸 */
+ 493   1              if (t_PaperFwKey.us_finishFlag != 0) 
+ 494   1              {
+ 495   2                      gsKeyVal = KEY_IO1;
+ 496   2                      
+ 497   2                      if (t_PaperFwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 498   2                      {                       
+ 499   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 500   3      
+ 501   3                              if (usLongDownFlag == 0)
+ 502   3                              {
+ 503   4                                      usLongDownFlag = 1;
+ 504   4      
+ 505   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 506   4                              }
+ 507   3                      }
+ 508   2                      else if (t_PaperFwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+ 509   2                      {
+ 510   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+ 511   3      
+ 512   3                              t_PaperFwKey.us_finishFlag = 0;
+ 513   3                              t_PaperFwKey.us_logStep = 0;                    
+ 514   3      
+ 515   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 516   3      
+ 517   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 518   3                      }
+ 519   2                      else                                                       /* 长按抬起 */
+ 520   2                      {
+ 521   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 522   3      
+ 523   3                              t_PaperFwKey.us_finishFlag = 0;
+ 524   3                              t_PaperFwKey.us_logStep = 0;                    
+ 525   3      
+ 526   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 527   3      
+ 528   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 529   3                      }       
+ 530   2              }
+ 531   1      
+ 532   1              /* 退纸 */      
+ 533   1              if (t_PaperBwKey.us_finishFlag != 0) 
+ 534   1              {
+ 535   2                      gsKeyVal = KEY_IO2;
+ 536   2                      
+ 537   2                      if (t_PaperBwKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 538   2                      {                       
+ 539   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 540   3      
+ 541   3                              if (usLongDownFlag == 0)
+ 542   3                              {
+ 543   4                                      usLongDownFlag = 1;
+ 544   4      
+ 545   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 546   4                              }
+ 547   3                      }
+ 548   2                      else if (t_PaperBwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+ 549   2                      {
+ 550   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 10  
 
- 551   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 552   3      
- 553   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 554   3                      }
- 555   2                      else                                                       /* 长按抬起 */
- 556   2                      {
- 557   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 558   3      
- 559   3                              t_PaperBwKey.us_finishFlag = 0;
- 560   3                              t_PaperBwKey.us_logStep = 0;                    
- 561   3      
- 562   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 563   3      
- 564   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 565   3                      }       
- 566   2              }
- 567   1      
- 568   1              /* 切纸 */      
- 569   1      #if 0
+ 551   3      
+ 552   3                              t_PaperBwKey.us_finishFlag = 0;
+ 553   3                              t_PaperBwKey.us_logStep = 0;                    
+ 554   3      
+ 555   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 556   3      
+ 557   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 558   3                      }
+ 559   2                      else                                                       /* 长按抬起 */
+ 560   2                      {
+ 561   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 562   3      
+ 563   3                              t_PaperBwKey.us_finishFlag = 0;
+ 564   3                              t_PaperBwKey.us_logStep = 0;                    
+ 565   3      
+ 566   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 567   3      
+ 568   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 569   3                      }       
+ 570   2              }
+ 571   1      
+ 572   1              /* 切纸 */      
+ 573   1      #if 0
                       if (t_CutKey.us_finishFlag != 0) 
                       {
                               gsKeyVal = KEY_IO3;
@@ -634,170 +638,170 @@ line level    source
                               }       
                       }
               #endif
- 609   1      
- 610   1              /* 下料 */      
- 611   1              if (t_PaperDownKey.us_finishFlag != 0) 
- 612   1              {
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 11  
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 11  
 
- 613   2                      gsKeyVal = KEY_IO4;
- 614   2                      
- 615   2                      if (t_PaperDownKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 616   2                      {                       
- 617   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 618   3      
- 619   3                              if (usLongDownFlag == 0)
- 620   3                              {
- 621   4                                      usLongDownFlag = 1;
- 622   4      
- 623   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 624   4                              }
- 625   3                      }
- 626   2                      else if (t_PaperDownKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 627   2                      {
- 628   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 629   3      
- 630   3                              t_PaperDownKey.us_finishFlag = 0;
- 631   3                              t_PaperDownKey.us_logStep = 0;                  
- 632   3      
- 633   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 634   3      
- 635   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 636   3                      }
- 637   2                      else                                                       /* 长按抬起 */
- 638   2                      {
- 639   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 640   3      
- 641   3                              t_PaperDownKey.us_finishFlag = 0;
- 642   3                              t_PaperDownKey.us_logStep = 0;                  
- 643   3      
- 644   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 645   3      
- 646   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 647   3                      }       
- 648   2              }
- 649   1      
- 650   1              /* 搓条 */      
- 651   1              if (t_RollKey.us_finishFlag != 0) 
- 652   1              {
- 653   2                      gsKeyVal = KEY_IO5;
- 654   2                      
- 655   2                      if (t_RollKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
- 656   2                      {                       
- 657   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
- 658   3      
- 659   3                              if (usLongDownFlag == 0)
- 660   3                              {
- 661   4                                      usLongDownFlag = 1;
- 662   4      
- 663   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
- 664   4                              }
- 665   3                      }
- 666   2                      else if (t_RollKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
- 667   2                      {
- 668   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
- 669   3      
- 670   3                              t_RollKey.us_finishFlag = 0;
- 671   3                              t_RollKey.us_logStep = 0;                       
- 672   3      
- 673   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 674   3      
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 12  
+ 613   1      
+ 614   1              /* 下料 */      
+ 615   1              if (t_PaperDownKey.us_finishFlag != 0) 
+ 616   1              {
+ 617   2                      gsKeyVal = KEY_IO4;
+ 618   2                      
+ 619   2                      if (t_PaperDownKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 620   2                      {                       
+ 621   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 622   3      
+ 623   3                              if (usLongDownFlag == 0)
+ 624   3                              {
+ 625   4                                      usLongDownFlag = 1;
+ 626   4      
+ 627   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 628   4                              }
+ 629   3                      }
+ 630   2                      else if (t_PaperDownKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+ 631   2                      {
+ 632   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+ 633   3      
+ 634   3                              t_PaperDownKey.us_finishFlag = 0;
+ 635   3                              t_PaperDownKey.us_logStep = 0;                  
+ 636   3      
+ 637   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 638   3      
+ 639   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 640   3                      }
+ 641   2                      else                                                       /* 长按抬起 */
+ 642   2                      {
+ 643   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 644   3      
+ 645   3                              t_PaperDownKey.us_finishFlag = 0;
+ 646   3                              t_PaperDownKey.us_logStep = 0;                  
+ 647   3      
+ 648   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 649   3      
+ 650   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 651   3                      }       
+ 652   2              }
+ 653   1      
+ 654   1              /* 搓条 */      
+ 655   1              if (t_RollKey.us_finishFlag != 0) 
+ 656   1              {
+ 657   2                      gsKeyVal = KEY_IO5;
+ 658   2                      
+ 659   2                      if (t_RollKey.us_finishFlag == KEY_LONG_DOWN_FLAG)     /* 长按 */
+ 660   2                      {                       
+ 661   3                              gcKeyType = KEY_LONG_DOWN_FLAG;  
+ 662   3      
+ 663   3                              if (usLongDownFlag == 0)
+ 664   3                              {
+ 665   4                                      usLongDownFlag = 1;
+ 666   4      
+ 667   4                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
+ 668   4                              }
+ 669   3                      }
+ 670   2                      else if (t_RollKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
+ 671   2                      {
+ 672   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
+ 673   3      
+ 674   3                              t_RollKey.us_finishFlag = 0;
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 12  
 
- 675   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 676   3                      }
- 677   2                      else                                                       /* 长按抬起 */
- 678   2                      {
- 679   3                              gcKeyType = KEY_LONG_UP_FLAG;   
- 680   3      
- 681   3                              t_RollKey.us_finishFlag = 0;
- 682   3                              t_RollKey.us_logStep = 0;                       
- 683   3      
- 684   3                              usLongDownFlag = 0;   /* 清长按标志 */
- 685   3      
- 686   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
- 687   3                      }       
- 688   2              }
- 689   1              
- 690   1      }
- 691          
- 692          /*************定时器0中断***************
- 693          函数原型：void tm0_isr(void) interrupt 1 using 1
- 694          入口参数：无
- 695          出口参数：无
- 696          备注：
- 697          *******************************/
- 698          void tm0_isr() interrupt 1 using 1
- 699          {
- 700   1              public_val.ms_timer++;
- 701   1              
- 702   1              check_uart_rec();
- 703   1      
- 704   1              key_detect();
- 705   1      }
- 706          
- 707          
- 708          
- 709          void main()
- 710          {
- 711   1              eeprom_en = 0;
- 712   1      
- 713   1              /* 硬件初始化 */
- 714   1              sys_init();
- 715   1      
- 716   1              /* 全局变量初始化 */
- 717   1              GlobalInit();
- 718   1                      
- 719   1              InitLEDDisplay();
- 720   1      
- 721   1              cnt_read_state = public_val.ms_timer;   
- 722   1      
- 723   1              
- 724   1              while(1)
- 725   1              {       
- 726   2                      if (start_com_flag == 0)
- 727   2                      {
- 728   3                              if (public_val.ms_timer - cnt_read_state > 500)  /* 开机延迟500ms才开始通信 */
- 729   3                              //if (public_val.ms_timer - cnt_read_state > 1500)   //for test
- 730   3                              {
- 731   4                                      cnt_read_state = public_val.ms_timer;
- 732   4                                      cnt_read_param = public_val.ms_timer;
- 733   4      
- 734   4                                      /* 开始手动模式按键检测 */
- 735   4                                      start_key_detect();
- 736   4      
-C51 COMPILER V9.00   MAIN                                                                  04/09/2016 11:07:33 PAGE 13  
+ 675   3                              t_RollKey.us_logStep = 0;                       
+ 676   3      
+ 677   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 678   3      
+ 679   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 680   3                      }
+ 681   2                      else                                                       /* 长按抬起 */
+ 682   2                      {
+ 683   3                              gcKeyType = KEY_LONG_UP_FLAG;   
+ 684   3      
+ 685   3                              t_RollKey.us_finishFlag = 0;
+ 686   3                              t_RollKey.us_logStep = 0;                       
+ 687   3      
+ 688   3                              usLongDownFlag = 0;   /* 清长按标志 */
+ 689   3      
+ 690   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
+ 691   3                      }       
+ 692   2              }
+ 693   1              
+ 694   1      }
+ 695          
+ 696          /*************定时器0中断***************
+ 697          函数原型：void tm0_isr(void) interrupt 1 using 1
+ 698          入口参数：无
+ 699          出口参数：无
+ 700          备注：
+ 701          *******************************/
+ 702          void tm0_isr() interrupt 1 using 1
+ 703          {
+ 704   1              public_val.ms_timer++;
+ 705   1              
+ 706   1              check_uart_rec();
+ 707   1      
+ 708   1              key_detect();
+ 709   1      }
+ 710          
+ 711          
+ 712          
+ 713          void main()
+ 714          {
+ 715   1              eeprom_en = 0;
+ 716   1      
+ 717   1              /* 硬件初始化 */
+ 718   1              sys_init();
+ 719   1      
+ 720   1              /* 全局变量初始化 */
+ 721   1              GlobalInit();
+ 722   1                      
+ 723   1              InitLEDDisplay();
+ 724   1      
+ 725   1              cnt_read_state = public_val.ms_timer;   
+ 726   1      
+ 727   1              
+ 728   1              while(1)
+ 729   1              {       
+ 730   2                      if (start_com_flag == 0)
+ 731   2                      {
+ 732   3                              if (public_val.ms_timer - cnt_read_state > 500)  /* 开机延迟500ms才开始通信 */
+ 733   3                              //if (public_val.ms_timer - cnt_read_state > 1500)   //for test
+ 734   3                              {
+ 735   4                                      cnt_read_state = public_val.ms_timer;
+ 736   4                                      cnt_read_param = public_val.ms_timer;
+C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 13  
 
- 737   4                                      start_com_flag = 1;
- 738   4                              }
- 739   3                      }
- 740   2      
- 741   2                      if (start_com_flag == 1)
- 742   2                      {               
- 743   3                              LEDDisplay();
- 744   3      
- 745   3                              if(public_val.uart_rec_statu == 2)   /* 接收完毕，开始处理 */
- 746   3                              {                       
- 747   4                                      rec_data_func();
- 748   4                                      
- 749   4                                      public_val.uart_rec_statu = 3;   /* 置接收处理完毕状态 */
- 750   4                                      public_val.uart_rec_count = 0;   /* 清接收字节计数 */
- 751   4                              }
- 752   3      
- 753   3                              send_data_func();
- 754   3      
- 755   3                              judge_key();
+ 737   4      
+ 738   4                                      /* 开始手动模式按键检测 */
+ 739   4                                      start_key_detect();
+ 740   4      
+ 741   4                                      start_com_flag = 1;
+ 742   4                              }
+ 743   3                      }
+ 744   2      
+ 745   2                      if (start_com_flag == 1)
+ 746   2                      {               
+ 747   3                              LEDDisplay();
+ 748   3      
+ 749   3                              if(public_val.uart_rec_statu == 2)   /* 接收完毕，开始处理 */
+ 750   3                              {                       
+ 751   4                                      rec_data_func();
+ 752   4                                      
+ 753   4                                      public_val.uart_rec_statu = 3;   /* 置接收处理完毕状态 */
+ 754   4                                      public_val.uart_rec_count = 0;   /* 清接收字节计数 */
+ 755   4                              }
  756   3      
- 757   3                      }
- 758   2                      
- 759   2              }
- 760   1      }
- 761          
- 762          
+ 757   3                              send_data_func();
+ 758   3      
+ 759   3                              judge_key();
+ 760   3      
+ 761   3                      }
+ 762   2                      
+ 763   2              }
+ 764   1      }
+ 765          
+ 766          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1291    ----
+   CODE SIZE        =   1294    ----
    CONSTANT SIZE    =   ----    ----
    XDATA SIZE       =     98    ----
    PDATA SIZE       =   ----    ----

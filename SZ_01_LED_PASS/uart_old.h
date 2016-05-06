@@ -12,10 +12,10 @@
 #define DOWN_WRITE_PARAM  	   3  	  /* 下行写配置参数 */
 #define DOWN_WRITE_TEST_MODE   4      /* 下行写进入测试模式 */
 #define DOWN_WRITE_CLEAR_CNT   5      /* 下行写清除已出筒数 */
-#define DOWN_WRITE_KEY   	     6      /* 下行写按键操作 */
+#define DOWN_WRITE_KEY   	   6      /* 下行写按键操作 */
 #define DOWN_WRITE_LEARN_MODE  7      /* 下行写进入学习模式 */
 #define DOWN_WRITE_SPEED_MODE  8      /* 下行写切换速度模式 */
-#define DOWN_WRITE_WARNING_MSG  9     /* 下行写报警消息 */
+#define DOWN_WRITE_WARNING_MSG  9      /* 下行写报警消息 */
 
 /* 上行 */
 #define UP_WRITE_PARAM  	    10   	    /* 上行写参数 */
@@ -88,58 +88,6 @@
 #define ERR_NUM_COM 18 //通讯错误
 
 
-//add 0317
-#define S2_S     0x1
-
-#define S2RI 0x01
-#define S2TI 0x02
-#define S2RB8 0x04
-#define S2RT8 0x08
-
-//对应115200
-//一些说明文字显示有误
-//#define  UART2_DELAY		500 * 2			//500		//100				//2		//10				//100			//500 * 2
-//#define  UART1s_DELAY		1000
-
-
-//对应57600
-//一些说明文字显示有误
-//#define  UART2_DELAY		500
-
-/*
-U0: 2400
-U1: 4800
-U2: 9600
-U3: 19200
-U5: 57600
-U6: 115200
-*/
-
-
-//对应19200
-//一些说明文字显示有误
-//#define  UART2_DELAY		500/4
-
-/*
-//对应38400
-#define  UART2_DELAY		(500 * 2)/3			//500		//100				//2		//10				//100			//500 * 2
-#define  UART1s_DELAY		1000*10*4
-*/
-
-
-//对应9600
-//说明文字相对错误少一些
-#define  UART2_DELAY		(500 * 2)/12			//500		//100				//2		//10				//100			//500 * 2
-#define  UART1s_DELAY		1000*10
-
-
-//#define  LCD_UART_DOWN
-
-
-
-//add 0317
-
-
 
 void uart_init();
 void SendData(unsigned char dat);
@@ -147,11 +95,6 @@ void Send_UartBuf(char * buf);
 void check_uart_rec(void);
 void rec_data_func(void);
 void send_data_func(void);
-
-//add
-void uart2_init();
-void GpuSend(char *s);
-//
 
 #endif
 

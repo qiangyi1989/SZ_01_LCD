@@ -15,8 +15,15 @@ sfr P3M0 = 0xB2;
 
 sbit P12 = P1^2;   // IO7
 sbit P13 = P1^3;   // IO8
+
+//ADD
+sbit P14 = P1^4;							//打胶按键位
+//ADD
+
 sbit P16 = P1^6;   // IO9
 sbit P17 = P1^7;   // RED
+
+
 
 sbit P20 = P2^0;   // IO1
 sbit P21 = P2^1;   // K4
@@ -42,5 +49,10 @@ sbit P55 = P5^5;   // BLUE
 sfr T2H = 0xD6;               //定时器2高8位
 sfr T2L = 0xD7;               //定时器2低8位
 
+//add
+
+sfr P_SW2 = 0xBA;
+sfr S2CON = 0x9A;
+sfr S2BUF = 0x9B;
 
 #endif

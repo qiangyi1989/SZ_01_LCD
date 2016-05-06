@@ -1,0 +1,153 @@
+C51 COMPILER V9.00   LCD_UART                                                              05/05/2016 12:52:27 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE LCD_UART
+OBJECT MODULE PLACED IN .\out\LCD_Uart.obj
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE LCD_Uart.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\LCD_Uart.lst) OBJECT(.\out
+                    -\LCD_Uart.obj)
+
+line level    source
+
+   1          #include "sys.h"
+   2          #include "reg51.h"
+   3          #include "LCD_Uart.h"
+   4          
+   5          
+   6          typedef unsigned char BYTE;
+   7          
+   8          #define NONE_PARITY     0       //ÎÞÐ£Ñé
+   9          #define ODD_PARITY      1       //ÆæÐ£Ñé
+  10          #define EVEN_PARITY     2       //Å¼Ð£Ñé
+  11          #define MARK_PARITY     3       //±ê¼ÇÐ£Ñé
+  12          #define SPACE_PARITY    4       //¿Õ°×Ð£Ñé
+  13          
+  14          bit busy2;  /* 1ÕýÔÚ·¢ËÍ£¬0·¢ËÍÍê³É */
+  15          
+  16          #define  T9_6KHZ  65536-(FOSC/BAUD2/4)          //¶¨ÒåÎª1tÄ£Ê½Ê±,²»Òª³ý12
+  17          
+  18          
+  19          
+  20          void uart2_init()
+  21          {
+  22   1              //uart2 ³õÊ¼»¯¶¨Òå
+  23   1              //  P_SW2 &= ~ S2_S;    //Ñ¡ÔñÔÚp1.0,p1.1¿Ú
+  24   1              
+  25   1              //´®¿Ú2¿ØÖÆ¼Ä´æÆ÷
+  26   1              //S2CON
+  27   1              //S2SM0 - S2SM2 S2REN S2TB8 S2RB8 S2TI S2RI
+  28   1              //ÆäÖÐ, S2SM0Îª0,8Î»¿É±ä²¨ÌØÂÊ;Îª1,9Î»¿É±ä²¨ÌØÂÊ
+  29   1              //S2SM2ÔÊÐí·½Ê½1¶à»úÍ¨ÐÅ¿ØÖÆÎ»
+  30   1              //´®¿Ú2»º³åÇø
+  31   1              //S2BUF
+  32   1              //´®¿Ú2µÄÖÐ¶ÏÔÊÐíÎ»
+  33   1              //ES2   (IE2.0)   IE2:²»¿ÉÎ»Ñ°Ö·
+  34   1              
+  35   1                AUXR |= 0x04;                 //¶¨Ê±Æ÷2Îª1TÄ£Ê½
+  36   1              
+  37   1                S2CON = 0x50;
+  38   1              
+  39   1      /*      
+  40   1      #if (PARITYBIT2 == NONE_PARITY)
+  41   1          S2CON = 0x50;                //8Î»¿É±ä²¨ÌØÂÊ,·½Ê½1, Ê¹ÄÜ´®¿Ú2½ÓÊÕ
+  42   1                      #elif (PARITYBIT2 == ODD_PARITY) || (PARITYBIT == EVEN_PARITY) || (PARITYBIT == MARK_PARITY)   //MARK_PA
+             -RITY:±ê¼ÇÐ£Ñé
+  43   1          S2CON = 0xda;                //9Î»¿É±ä²¨ÌØÂÊ,Ð£ÑéÎ»³õÊ¼Îª1   Í¨ÐÅ·½Ê½3
+  44   1      #elif (PARITYBIT2 == SPACE_PARITY)  //¿Õ°×Ð£Ñé
+  45   1                S2CON = 0xd2;                //9Î»¿É±ä²¨ÌØÂÊ,Ð£ÑéÎ»³õÊ¼Îª0   Í¨ÐÅ·½Ê½3    (·½Ê½0:8Î»ÒÆÎ»¼Ä´æÆ÷·½Ê½, ·½Ê
+             -½2:9Î»,²¨ÌØÂÊ¹Ì¶¨)
+  46   1      #endif
+  47   1      */
+  48   1                      T2L = T9_6KHZ;                     //³õÊ¼»¯¼ÆÊ±Öµ
+*** ERROR C202 IN LINE 48 OF LCD_UART.C: 'FOSC': undefined identifier
+  49   1                      T2H = T9_6KHZ >> 8;                                     ////´®¿Ú2ÓÃT2×öÎªÆä²¨ÌØÂÊ·¢ÉúÆ÷,ÇÒT2¹¤×÷ÓÚÄ£Ê½0,Æä²¨ÌØÂÊ=T2µÄÒç³öÂÊ³ýÒÔ4.´®¿Ú2Ö»
+             -ÄÜÑ¡ÔñT2.
+*** ERROR C202 IN LINE 49 OF LCD_UART.C: 'FOSC': undefined identifier
+C51 COMPILER V9.00   LCD_UART                                                              05/05/2016 12:52:27 PAGE 2   
+
+  50   1                      
+  51   1                      AUXR |= 0x10;           //Æô¶¯T2ÔËÐÐ
+  52   1                      
+  53   1                      IE2 |= 0x1;             //Ê¹ÄÜ´®¿Ú2½ÓÊÕÖÐ¶Ï              //²»ÒªÊ¹ÓÃt2µÄÖÐ¶ÏET2 (ie2.2)
+  54   1                      
+  55   1                      EA = 1;
+  56   1      }
+  57          
+  58          /*----------------------------
+  59          UART ÖÐ¶Ï·þÎñ³ÌÐò
+  60          -----------------------------*/
+  61          
+  62          void Uart2RecIsr() interrupt 8 using 1
+  63          {
+  64   1          if (S2CON & S2RI)
+*** ERROR C202 IN LINE 64 OF LCD_UART.C: 'S2RI': undefined identifier
+  65   1          {
+  66   2                      S2CON &= ~S2RI; //Çå³ýRIÎ»
+*** ERROR C202 IN LINE 66 OF LCD_UART.C: 'S2RI': undefined identifier
+  67   2              
+  68   2                      // Uart2_RecBuf = S2BUF; //»ñÈ¡´®¿ÚÊý¾Ý
+  69   2              //public_val.uart_rec_statu = 1;
+  70   2              //public_val.uart_rec_start_timer = public_val.ms_timer;
+  71   2                      
+  72   2                      //add 0407
+  73   2                      //´®¿Ú1½ÓÊÕ£¬×ª·¢¸ø´®¿Ú2£¬´®¿Ú2ÊÕµ½ºó£¬·µ»Ø¸ø´®¿Ú1ÏÔÊ¾¡£²âÊÔOK.
+  74   2                      #ifdef  LCD_UART_DOWN
+                              SendData(S2BUF);
+                              #endif
+  77   2                      //add 0407
+  78   2          }
+  79   1          if (S2CON & S2TI)
+*** ERROR C202 IN LINE 79 OF LCD_UART.C: 'S2TI': undefined identifier
+  80   1          {
+  81   2              S2CON &= ~S2TI;                  //Çå³ýTIÎ»
+*** ERROR C202 IN LINE 81 OF LCD_UART.C: 'S2TI': undefined identifier
+  82   2              busy2 = 0;               //ÇåÃ¦±êÖ¾
+  83   2          }
+  84   1      }
+  85          
+  86          void GpuSend(char *s)
+  87          {
+  88   1      //½øÐÐÏÂÔØÊ±£¬ÐèÆÁ±Î
+  89   1      #ifndef LCD_UART_DOWN
+  90   1      //#if 0
+  91   1              while (*s)                  //¼ì²â×Ö·û´®½áÊø±êÖ¾
+  92   1          {
+  93   2              Uasrt2SendData(*s++);         //·¢ËÍµ±Ç°×Ö·û
+  94   2          }
+  95   1      #endif  
+  96   1      }
+  97          
+  98          
+  99          void Uasrt2SendData(BYTE dat)
+ 100          {
+ 101   1              //del 0407
+ 102   1      #ifndef LCD_UART_DOWN
+ 103   1              while (busy2);               //    //ÏÂÔØÒ³ÃæÐÅÏ¢Ê±£¬while (busy2) Óï¾äÐèÆÁ±Î; //ÔÚ±¾»úÔËÐÐÍ¨ÐÅ(·ÇÓëPC»úÍ
+             -¨ÐÅ)Ê±,while (busy2) Óï¾ä²»ÄÜÆÁ±Î  //µÈ´ýÇ°ÃæµÄÊý¾Ý·¢ËÍÍê³É
+ 104   1      #endif  
+ 105   1              //del 0407
+ 106   1          ACC = dat;                  //»ñÈ¡Ð£ÑéÎ»P (PSW.0)
+C51 COMPILER V9.00   LCD_UART                                                              05/05/2016 12:52:27 PAGE 3   
+
+ 107   1      
+ 108   1          if (P)                      //¸ù¾ÝPÀ´ÉèÖÃÐ£ÑéÎ»
+ 109   1          {
+ 110   2      #if (PARITYBIT2 == ODD_PARITY)
+                      S2TB8 = 0;                //ÉèÖÃÐ£ÑéÎ»Îª0
+              #elif (PARITYBIT2 == EVEN_PARITY)
+                      S2TB8 = 1;                //ÉèÖÃÐ£ÑéÎ»Îª1
+              #endif
+ 115   2          }
+ 116   1          else
+ 117   1          {
+ 118   2      #if (PARITYBIT2 == ODD_PARITY)
+                      S2TB8 = 1;                //ÉèÖÃÐ£ÑéÎ»Îª1
+              #elif (PARITYBIT2 == EVEN_PARITY)
+                      S2TB8 = 0;                //ÉèÖÃÐ£ÑéÎ»Îª0
+              #endif
+ 123   2          }
+ 124   1              
+ 125   1          busy2 = 1;
+ 126   1          S2BUF = ACC;                 //Ð´Êý¾Ýµ½UARTÊý¾Ý¼Ä´æÆ÷
+ 127   1      }
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  6 ERROR(S)

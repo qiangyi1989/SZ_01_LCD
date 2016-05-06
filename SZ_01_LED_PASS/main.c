@@ -197,6 +197,10 @@ void sys_init(void)		   //系统初始化函数
 
 	Timer0Init();
 	uart_init();
+	
+#ifndef LED_DISP
+	uart2_init(); 
+#endif	
   
 }
 

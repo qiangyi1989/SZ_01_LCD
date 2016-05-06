@@ -435,7 +435,7 @@ extern xdata char Menu_Number[MENU_NUM];
 extern xdata _U_BIT_PARAM unKey;
 extern xdata char speed_mode;
 
-
+extern xdata char Menu0_Number;
 
 void InitLEDDisplay(void);
 void LEDDisplay(void);
@@ -444,6 +444,6 @@ void  LEDShowCaption(char num);
 void func_menu_update(int menu_id);
 
 void update_menu_to_com(void);
-
-
+//add by yq
+void MenuEditLook(unsigned char cDisplayItemNum);
 #endif
