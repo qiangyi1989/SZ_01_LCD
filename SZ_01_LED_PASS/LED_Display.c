@@ -1019,6 +1019,72 @@ void LEDDisplay(void)
 					}
 			break;
 		}
+		
+	//按键状态显示  add by yq
+	if(LCDChildDisplayState != 8)
+	switch(Key_Val)
+	{
+		case 0xFFFF://无按键
+			break;
+		case KEY_K1: //选择
+			if(LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3)
+			{
+				LCDDisplayState	= 0x00;
+				LCDChildDisplayState = 0;
+			}
+			break;
+		case KEY_K4:           /* 确认 */
+			if(LCDChildDisplayState == 2 || LCDChildDisplayState == 3 && DisplayState == ST_MAIN)//如果处于主界面的子界面有按键就返回
+			{			
+				LCDChildDisplayState =0;
+				LCDDisplayState	= 0x00;
+			}
+			else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
+				LCDChildDisplayState = 1;
+				
+			break;
+		case KEY_IO1:          /* 进纸 */
+			g_pcStatus = "进纸";
+			break;
+		case KEY_IO2: 		   /* 退纸 */
+			g_pcStatus = "退纸";
+			break;
+		case KEY_IO3:          /* 切纸 */
+			//g_pcStatus = "切纸";
+			LCDChildDisplayState =8;
+			break;
+		case KEY_IO4: 		   /* 下料 */
+			g_pcStatus = "下料";
+			break;
+		case KEY_IO5:          /* 搓条 */
+			g_pcStatus = "搓条";
+			break;
+		case KEY_IO6:          /* 停止送纸 */
+			g_pcStatus = "停纸";	
+			break;
+		case KEY_IO7:          /* 启动 */
+			g_pcStatus = "启动";
+			break;
+		case KEY_IO8: 	       /* 停止 */
+			g_pcStatus = "停止";
+			break;
+		case KEY_IO9:          /* 发纸 */
+			g_pcStatus = "发纸";
+			break;
+		case KEY_RED:          /* 收纸 */
+			g_pcStatus = "收纸";
+			break;
+		case KEY_GREEN: 	   /* 纸长 */
+			break;
+		case KEY_BLUE:         /* 捆数 */
+			break;
+		case KEY_DJ:        /* 打胶 */
+			g_pcStatus= "打胶";
+			break;
+		default:
+			
+			break;
+	}
     switch(DisplayState)
 	{
 	    case ST_MAIN:   /* 主界面 */
@@ -2161,68 +2227,7 @@ void LEDDisplay(void)
 		
 		
 	}
-	//按键状态显示
-	if(LCDChildDisplayState != 8)
-	switch(Key_Val)
-	{
-		case 0xFFFF://无按键
-			break;
-		case KEY_K1: //选择
-			if(LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3)
-				LCDChildDisplayState = 0;
-			break;
-		case KEY_K4:           /* 确认 */
-			if(LCDChildDisplayState == 2 || LCDChildDisplayState == 3)//如果处于主界面的子界面有按键就返回
-			{			
-				LCDChildDisplayState =0;
-				LCDDisplayState	= 0x00;
-			}
-			else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
-				LCDChildDisplayState = 1;
-				
-			break;
-		case KEY_IO1:          /* 进纸 */
-			g_pcStatus = "进纸";
-			break;
-		case KEY_IO2: 		   /* 退纸 */
-			g_pcStatus = "退纸";
-			break;
-		case KEY_IO3:          /* 切纸 */
-			//g_pcStatus = "切纸";
-			LCDChildDisplayState =8;
-			break;
-		case KEY_IO4: 		   /* 下料 */
-			g_pcStatus = "下料";
-			break;
-		case KEY_IO5:          /* 搓条 */
-			g_pcStatus = "搓条";
-			break;
-		case KEY_IO6:          /* 停止送纸 */
-			g_pcStatus = "停纸";	
-			break;
-		case KEY_IO7:          /* 启动 */
-			g_pcStatus = "启动";
-			break;
-		case KEY_IO8: 	       /* 停止 */
-			g_pcStatus = "停止";
-			break;
-		case KEY_IO9:          /* 发纸 */
-			g_pcStatus = "发纸";
-			break;
-		case KEY_RED:          /* 收纸 */
-			g_pcStatus = "收纸";
-			break;
-		case KEY_GREEN: 	   /* 纸长 */
-			break;
-		case KEY_BLUE:         /* 捆数 */
-			break;
-		case KEY_DJ:        /* 打胶 */
-			g_pcStatus= "打胶";
-			break;
-		default:
-			
-			break;
-	}
+	
 	switch(DisplayState)//数据更新以及显示
 	{
 		case ST_MAIN:
