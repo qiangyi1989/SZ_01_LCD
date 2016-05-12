@@ -45,7 +45,7 @@ typedef unsigned int WORD;
 #define UART_REC_FRAME_DELAY 10
 
 extern xdata public_stru public_val;
-extern xdata char uart_send_buf[10 + (MENU_ID_00000_MAX_ITEM << 1)];
+extern xdata char uart_send_buf[100];
 extern code MENU_ITEM MenuItem[];
 extern xdata MENU_CHANG now_menu;
 
@@ -67,11 +67,11 @@ bit busy;  /* 1正在发送，0发送完成 */
 
 //void SendString(char *s);
 
-xdata unsigned char Uart_RecBuf[10 + (MENU_ID_00000_MAX_ITEM << 2)];
+xdata unsigned char Uart_RecBuf[100];
 void * com_data = Uart_RecBuf;
 
 //add
-xdata unsigned char Uart2_RecBuf[10 + (MENU_ID_00000_MAX_ITEM << 2)];
+xdata unsigned char Uart2_RecBuf[10];
 void * com2_data = Uart2_RecBuf;
 
 bit busy2;  /* 1正在发送，0发送完成 */
@@ -167,11 +167,11 @@ void UartRecIsr() interrupt 4 using 1
 		
 		//test 0407
 		//使用串口1，定义LCD_UART_DOWN时，测试OK.
-		//SendData(SBUF);
+		SendData(SBUF);
 		//test 0407		
 		
 		//在串口1接收，转发给串口2，定义LCD_UART_DOWN时，测试OK.
-        Uasrt2SendData(SBUF);		
+        //Uasrt2SendData(SBUF);		
     }
     if (TI)
     {
@@ -342,8 +342,12 @@ void GpuSend(char *s)
 //#if 0
 	while (*s)                  //检测字符串结束标志
     {
-        Uasrt2SendData(*s++);         //发送当前字符
-    }
+        Uasrt2SendData(*s);         //发送当前字符
+		*s='\0';
+		s++;
+		while(busy2);
+//		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET){}; //等待发送结束
+	}
 #endif	
 }
 
@@ -538,19 +542,18 @@ void rec_data_func(void)
 
 			/* 获取参数个数 */
 			//Menu_Number[0] = Uart_RecBuf[1] >> 1;    /* 载荷长度除以2为参数个数 */
-			Menu_Number[0] = (Uart_RecBuf[1] + Uart_RecBuf[2]) >> 1;  //所有参数个数
-			Menu0_Number = Uart_RecBuf[1] >> 1;  					  //菜单0参数个数
+//			Menu_Number[0] = (Uart_RecBuf[1] + Uart_RecBuf[2]) >> 1;  //所有参数个数
+//			Menu0_Number = Uart_RecBuf[1] >> 1;  					  //菜单0参数个数
 
-			/* 提取下发的参数 */  //将下发的参数备份一份,并保存到public_val.menu_parm[0]菜单参数缓冲区
+			/* 提取下发的参数 */
 			pcTemp = (char *)&public_val.menu_parm[0];
 			
-			for (i = 0; i < (Menu_Number[0] << 1); i++)
+			for (i = 0; i < (COM_MENU_MAX_ITEM << 1); i++)
 			{
 				//pcTemp[i] = Uart_RecBuf[2 + i];
 				pcTemp[i] = Uart_RecBuf[3 + i];
 			}
-      
-			//操作板下发设置参数,主控板收到后返回
+
 			already_read_param = 1;  /* 置为已读到配置参数 */
 
 			send_frame_type = UP_REPLY_DONE;  /* 可以发送下一帧 */
@@ -558,29 +561,28 @@ void rec_data_func(void)
 		break;
 
 		/* 上行写状态帧 */
-		//主控板返回版本号,io口传感器状态,错误标志,搓条根数
 		case UP_WRITE_STATE:
+
+			for(i = 0; i < PASS_LOCK_COUNT; i++)
+				{
+					if( (public_val.Disp_Dz_10104[i] > 0)
+						&& (public_val.work_count > ((unsigned long)public_val.Disp_Dz_10104[i] * LOCK_UNIT))
+						)
+						{
+							public_val.Lock_Flag = i + 1;
+						}
+				}
+			if(public_val.Disp_Dz_10104[PASS_LOCK_COUNT - 1] == 0) //完全解锁
+				{
+					public_val.Lock_Flag = 0;
+				}
 			
 			public_val.version 
-				= ((unsigned int)Uart_RecBuf[3] << 8) | (unsigned int)Uart_RecBuf[2];
-
-			//add 
-			unDownVerNum = public_val.version;		//主版本号		//主控板版本号
-		    if (unDownVerNum == 0)
-				unDownVerNum = 12345;
-			//add 0323
-		
+				= ((unsigned int)Uart_RecBuf[3] << 8) | (unsigned int)Uart_RecBuf[2];			
 			
-		  //主控板返回io口状态
 			public_val.io_read
-			 	= ((unsigned int)Uart_RecBuf[5] << 8) | (unsigned int)Uart_RecBuf[4];  //传感器状态(可以返回16bit对应16个传感器状态)
-		  //add 0320
-		  //public_val.io_read = 23456;
-			unIoStatus = public_val.io_read;
-			//if (unIoStatus == 0)
-				//unIoStatus = 1;
-			//add 0320
-		
+				= ((unsigned int)Uart_RecBuf[5] << 8) | (unsigned int)Uart_RecBuf[4];
+					
 			//if ((Uart_RecBuf[7] != 0) || (Uart_RecBuf[6] != 0))
 			//{
 			public_val.Err_Flag 
@@ -588,32 +590,23 @@ void rec_data_func(void)
 			//}
 
 			//public_val.disp_cnt_upload
-		//上行写搓条根数,在这里更新: public_val.cnt_after_powered  (开机后的搓条根数),
-		//并将开机后的搓条根数与开机前的搓条根数相加，保存到eeprom. call save_xt_num().
 			uiCnt
 				= ((unsigned long)Uart_RecBuf[9] << 8) | (unsigned long)Uart_RecBuf[8]
-				| ((unsigned long)Uart_RecBuf[11] << 24) | ((unsigned long)Uart_RecBuf[10] << 16);		//返回搓条根数
-				
-			
-			//add
-				TotalNum = uiCnt;				//其余，可直接使用结构public_val的成员赋值,如: public_val.io_read,  public_val.version
-				//这里给unRow3Data赋值,有可能引起其他的查看数值变化
-				//unRow3Data = uiCnt;
-					//TotalNum = 1;
-				//add 0324 20:33
+				| ((unsigned long)Uart_RecBuf[11] << 24) | ((unsigned long)Uart_RecBuf[10] << 16);
 
-			if (main_borad_finish_clear != 0)  /* 不需要清除筒数时才保存更新 */
+			if (uiCnt != public_val.cnt_after_powered)  /* 如果筒数有更新，则保存更新 */
 			{
-				if (uiCnt != public_val.cnt_after_powered)  /* 如果筒数有更新，则保存更新 */
-				{
-					public_val.cnt_after_powered = uiCnt;
-
-					save_xt_num();
-				}
+				public_val.cnt_after_powered = uiCnt;
+		   		public_val.work_count++;
+				if(public_val.work_count - public_val.work_count_user > 99999)
+					{
+						public_val.work_count_user = public_val.work_count;
+						save_user_count();
+					}
+								
+				save_sys_lock();
 			}
-			
-			
-
+#if 0
 			if ((public_val.version == 11111) && (ucSaveLearn1 == 0))
 			{
 				public_val.menu_parm[PARAM_FZ_START_PWM_SCALE] = (int)(uiCnt & 0xFFFF);
@@ -633,7 +626,7 @@ void rec_data_func(void)
 
 				ucSaveLearn2 = 1;
 			}
-			
+#endif			
 			send_frame_type = UP_REPLY_DONE;  /* 可以发送下一帧 */
 			
 		break;
@@ -769,84 +762,81 @@ void send_data_func(void)
 	{
 		//if (public_val.ms_timer - cnt_read_param > 100)
 		{		
+#if 1
 			if (send_frame_type == UP_REPLY_DONE)  /* 上一帧已收到回复，则发送读参数帧 */
 			{
-
 				//send_frame_type = DOWN_READ_PARAM;				
 
 				// 写默认参数
-				Menu_Number[0] = MACHINE_PARAM_NUM;     //机器参数个数  22, Menu_Number[]最大存储30个
-				Menu0_Number = USER_PARAM_NUM;					//用户参数个数  2,  Menu0_Number  默认10. Menu1_Number 默认20
-
 				// 最后一个参数不是0x55aa则写一次默认参数
-				if (public_val.menu_parm[MENU_ID_00000_MAX_ITEM - 1] != 0x55aa)
+				if (public_val.Disp_Dz_10101[MENU_ID_10101_MAX_ITEM] != 0x55aa)
 				{
-					public_val.menu_parm[0] = 310;   //纸长					
-					public_val.menu_parm[1] = 300;   /* 设定筒数 */
+					public_val.Disp_Dz_00000[0] = 310;   //纸长					
+					public_val.Disp_Dz_00000[1] = 300;   /* 设定筒数 */
 					
-					public_val.menu_parm[2] = 2;     /* 1、报警持续时间:s */
-					public_val.menu_parm[3] = 15;    /* 2、堵筒检测时间1, 时基感应到堵筒检测1感应报警的延迟时间:0.1s */
-					public_val.menu_parm[4] = 15;    /* 3、堵筒检测时间2, 时基感应到堵筒检测2感应报警的延迟时间:0.1s */
-					public_val.menu_parm[5] = 0;     /* 4、步进电机方向 */
-					public_val.menu_parm[6] = 0;     // 5、送纸速度增益
-					public_val.menu_parm[7] = 320;   /* 6、步进电机脉冲当量:0.1个/mm (4000*2 /(2*3.14*40)) 减速比2 */
-					public_val.menu_parm[8] = 89;    /* 7、发纸电机链轮减速比 */
-					public_val.menu_parm[9] = 400;   /* 8、发纸压轮半径:0.1mm */
-					public_val.menu_parm[10] = 20;   /* 9、发纸电机PID调速的比例系数*100 */
+					public_val.Disp_Dz_10101[0] = 2;     /* 1、报警持续时间:s */
+					public_val.Disp_Dz_10101[1] = 15;    /* 2、堵筒检测时间1, 时基感应到堵筒检测1感应报警的延迟时间:0.1s */
+					public_val.Disp_Dz_10101[2] = 15;    /* 3、堵筒检测时间2, 时基感应到堵筒检测2感应报警的延迟时间:0.1s */
+					public_val.Disp_Dz_10101[3] = 0;     /* 4、步进电机方向 */
+					public_val.Disp_Dz_10101[4] = 0;     // 5、送纸速度增益
+					public_val.Disp_Dz_10101[5] = 320;   /* 6、步进电机脉冲当量:0.1个/mm (4000*2 /(2*3.14*40)) 减速比2 */
+					public_val.Disp_Dz_10101[6] = 89;    /* 7、发纸电机链轮减速比 */
+					public_val.Disp_Dz_10101[7] = 400;   /* 8、发纸压轮半径:0.1mm */
+					public_val.Disp_Dz_10101[8] = 20;   /* 9、发纸电机PID调速的比例系数*100 */
 				#ifdef SZ_01    // SZ_01
-					public_val.menu_parm[11] = 85;   /* 10、发纸电机启动PWM占空比 */
-					public_val.menu_parm[12] = 85;   /* 11、切纸电机启动PWM占空比 */
-					public_val.menu_parm[13] = 70;   /* 12、切纸电机目标PWM占空比 */
-					public_val.menu_parm[14] = 10;   /* 13、发纸最高速度 */
-					public_val.menu_parm[15] = 1;    /* 14、发纸最低速度 */
-					public_val.menu_parm[16] = 40;   /* 15、送纸角度 */
-					public_val.menu_parm[17] = 3;    /* 16、切刀控制模式 3:七段调速 */
-					public_val.menu_parm[18] = 84;   /* 17、切纸停止速度 */
-					public_val.menu_parm[19] = 1;    /* 18、备用 */
-					public_val.menu_parm[20] = 1;    /* 19、备用 */
-					public_val.menu_parm[21] = 60;   /* 20、调速最高速度 */
+					public_val.Disp_Dz_10101[9] = 85;   /* 10、发纸电机启动PWM占空比 */
+					public_val.Disp_Dz_10101[10] = 85;   /* 11、切纸电机启动PWM占空比 */
+					public_val.Disp_Dz_10101[12] = 70;   /* 12、切纸电机目标PWM占空比 */
+					public_val.Disp_Dz_10101[13] = 10;   /* 13、发纸最高速度 */
+					public_val.Disp_Dz_10101[14] = 1;    /* 14、发纸最低速度 */
+					public_val.Disp_Dz_10101[15] = 40;   /* 15、送纸角度 */
+					public_val.Disp_Dz_10101[16] = 3;    /* 16、切刀控制模式 3:七段调速 */
+					public_val.Disp_Dz_10101[17] = 84;   /* 17、切纸停止速度 */
+					public_val.Disp_Dz_10101[18] = 1;    /* 18、备用 */
+					public_val.Disp_Dz_10101[19] = 1;    /* 19、备用 */
+					public_val.Disp_Dz_10101[20] = 60;   /* 20、调速最高速度 */
 				#endif
 					
 				#ifdef SZ_02            // SZ_02
-					public_val.menu_parm[11] = 84;   /* 10、发纸电机启动PWM占空比 */				
-					public_val.menu_parm[12] = 2;    /* 11、切纸电机链轮减速比 */
-					public_val.menu_parm[13] = 120;  /* 12、切纸电机目标速度:0.1khz */
-					public_val.menu_parm[14] = 10;   /* 13、发纸最高速度 */
-					public_val.menu_parm[15] = 1;    /* 14、发纸最低速度 */
-					public_val.menu_parm[16] = 73;   /* 15、送纸角度:0.1k脉冲 */
-					public_val.menu_parm[17] = 1;    /* 16、备用 */
-					public_val.menu_parm[18] = 1;    /* 17、备用 */
-					public_val.menu_parm[19] = 1;    /* 18、备用 */
-					public_val.menu_parm[20] = 1;    /* 19、备用 */					
-					public_val.menu_parm[21] = 1;    /* 20、备用 */					
+					public_val.Disp_Dz_10101[9] = 84;   /* 10、发纸电机启动PWM占空比 */				
+					public_val.Disp_Dz_10101[10] = 2;    /* 11、切纸电机链轮减速比 */
+					public_val.Disp_Dz_10101[11] = 120;  /* 12、切纸电机目标速度:0.1khz */
+					public_val.Disp_Dz_10101[12] = 10;   /* 13、发纸最高速度 */
+					public_val.Disp_Dz_10101[13] = 1;    /* 14、发纸最低速度 */
+					public_val.Disp_Dz_10101[14] = 73;   /* 15、送纸角度:0.1k脉冲 */
+					public_val.Disp_Dz_10101[15] = 80;    /* 16、备用 */
+					public_val.Disp_Dz_10101[16] = 1;    /* 16、备用 */
+					public_val.Disp_Dz_10101[17] = 1;   /* 17、备用 */
+					public_val.Disp_Dz_10101[18] = 1;    /* 18、备用 */
+					public_val.Disp_Dz_10101[19] = 1;    /* 19、备用 */
+					public_val.Disp_Dz_10101[20] = 1;   /* 20、备用 */
 				#endif
 
 				#ifdef SZ_03
-					public_val.menu_parm[3] = 30;    /* 2、堵筒检测时间1, 时基感应到堵筒检测1感应报警的延迟时间:0.1s */
-					public_val.menu_parm[4] = 30;    /* 3、堵筒检测时间2, 时基感应到堵筒检测2感应报警的延迟时间:0.1s */
-					public_val.menu_parm[5] = 1;     /* 4、步进电机方向 */
-					public_val.menu_parm[6] = 20;    // 5、送纸速度增益					
-					public_val.menu_parm[7] = 490;   /* 6、 送纸步进电机脉冲当量:0.1个/mm (4000*(36/12) /(2*3.14*39)) 减速比36/12 */
-					public_val.menu_parm[8] = 1;     /* 7、切纸电机链轮减速比 */
-					public_val.menu_parm[9] = 150;   /* 8、切纸电机目标速度:0.1khz */
-					public_val.menu_parm[10] = 37;   /* 9、送纸角度:0.1k脉冲 */
-					public_val.menu_parm[11] = 1;    /* 10、备用 */
-					public_val.menu_parm[12] = 1;    /* 11、备用 */
-					public_val.menu_parm[13] = 1;    /* 12、备用 */
-					public_val.menu_parm[14] = 1;    /* 13、备用 */	
-					public_val.menu_parm[15] = 1;    /* 14、备用 */
-					public_val.menu_parm[16] = 1;    /* 15、备用 */	
-					public_val.menu_parm[17] = 1;    /* 16、备用 */
-					public_val.menu_parm[18] = 1;    /* 17、备用 */
-					public_val.menu_parm[19] = 1;    /* 18、备用 */
-					public_val.menu_parm[20] = 1;    /* 19、备用 */	
-					public_val.menu_parm[21] = 1;    /* 20、备用 */						//public_val.menu_parm:默认参数
+					public_val.Disp_Dz_10101[1] = 30;    /* 2、堵筒检测时间1, 时基感应到堵筒检测1感应报警的延迟时间:0.1s */
+					public_val.Disp_Dz_10101[2] = 30;    /* 3、堵筒检测时间2, 时基感应到堵筒检测2感应报警的延迟时间:0.1s */
+					public_val.Disp_Dz_10101[3] = 1;     /* 4、步进电机方向 */
+					public_val.Disp_Dz_10101[4] = 20;    // 5、送纸速度增益					
+					public_val.Disp_Dz_10101[5] = 490;   /* 6、 送纸步进电机脉冲当量:0.1个/mm (4000*(36/12) /(2*3.14*39)) 减速比36/12 */
+					public_val.Disp_Dz_10101[6] = 1;     /* 7、切纸电机链轮减速比 */
+					public_val.Disp_Dz_10101[7] = 150;   /* 8、切纸电机目标速度:0.1khz */
+					public_val.Disp_Dz_10101[8] = 37;   /* 9、送纸角度:0.1k脉冲 */
+					public_val.Disp_Dz_10101[11] = 1;    /* 10、备用 */
+					public_val.Disp_Dz_10101[12] = 1;    /* 11、备用 */
+					public_val.Disp_Dz_10101[13] = 1;    /* 12、备用 */
+					public_val.Disp_Dz_10101[14] = 1;    /* 13、备用 */	
+					public_val.Disp_Dz_10101[15] = 1;    /* 14、备用 */
+					public_val.Disp_Dz_10101[16] = 1;    /* 16、备用 */
+					public_val.Disp_Dz_10101[17] = 1;   /* 17、备用 */
+					public_val.Disp_Dz_10101[18] = 1;    /* 18、备用 */
+					public_val.Disp_Dz_10101[19] = 1;    /* 19、备用 */
+					public_val.Disp_Dz_10101[20] = 1;   /* 20、备用 */
 				#endif
 
+					public_val.Disp_Dz_10101[MENU_ID_10101_MAX_ITEM] = 0x55aa;					
 
-					public_val.menu_parm[MENU_ID_00000_MAX_ITEM - 1] = 0x55aa;					
-
-					func_menu_update(0);            ////更新默认参数
+					func_menu_update(MENU_ID_00000);
+					func_menu_update(MENU_ID_10101);
 					
 				}
 
@@ -857,7 +847,7 @@ void send_data_func(void)
 				send_frame_type = UP_REPLY_DONE;  /* 可以发送下一帧 */				
 				
 			}
-
+#endif
 			//cnt_read_param = public_val.ms_timer;
 		}
 	}
@@ -1014,13 +1004,13 @@ void send_data_func(void)
 			memset(uart_send_buf, 0, sizeof(uart_send_buf));			
 
 			uart_send_buf[0] = DOWN_WRITE_PARAM;
-			uart_send_buf[1] = Menu_Number[0] << 1;	
+			uart_send_buf[1] = COM_MENU_MAX_ITEM << 1;	
 
 			pcTemp = (char *)&public_val.menu_parm[0];   //将所有参数进行一次更新
 
 			sum_byte = uart_send_buf[0] + uart_send_buf[1];			
 			
-			for (i = 0; i < (Menu_Number[0] << 1); i++)
+			for (i = 0; i < (COM_MENU_MAX_ITEM << 1); i++)
 			{
 				uart_send_buf[2 + i] = pcTemp[i];
 
@@ -1030,7 +1020,7 @@ void send_data_func(void)
 			
 			//sum_byte &= 0xff;
 			
-			uart_send_buf[2 + (Menu_Number[0] << 1)] = sum_byte;
+			uart_send_buf[2 + (COM_MENU_MAX_ITEM << 1)] = sum_byte;
 	
 			Send_UartBuf(uart_send_buf);
 

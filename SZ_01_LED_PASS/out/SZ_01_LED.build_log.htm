@@ -4,60 +4,28 @@
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
 F:\git_SZ_01_LCD\SZ_01_LED_PASS\SZ_01_LED_PASS.uvproj
-Project File Date:  05/05/2016
+Project File Date:  05/09/2016
 
 <h2>Output:</h2>
 Build target 'Target 1'
 compiling LED_Display.c...
+LED_DISPLAY.C(840): warning C280: 'iTatol': unreferenced local variable
+LED_DISPLAY.C(2731): warning C280: 'text': unreferenced local variable
 linking...
-*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
-    SYMBOL:  UNIOSTATUS
-    MODULE:  .\out\uart.obj (UART)
-*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
-    SYMBOL:  SAVE_XT_NUM
-    MODULE:  .\out\uart.obj (UART)
-*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
-    SYMBOL:  TOTALNUM
-    MODULE:  .\out\uart.obj (UART)
-*** WARNING L1: UNRESOLVED EXTERNAL SYMBOL
-    SYMBOL:  UNDOWNVERNUM
-    MODULE:  .\out\uart.obj (UART)
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  UNDOWNVERNUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 261CH
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  UNDOWNVERNUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 2627H
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  UNIOSTATUS
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 2645H
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  TOTALNUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 26E4H
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  SAVE_XT_NUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 2718H
-Program Size: data=120.2 xdata=1189 code=18171
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?TM1637_WRITE?I2C
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_TEXTOUT?LED_DISPLAY
+Program Size: data=23.3 xdata=1625 code=25612
+creating hex file from ".\out\SZ_01_LED"...
+".\out\SZ_01_LED" - 0 Error(s), 4 Warning(s).
+T.C(516): warning C280: 'ucSaveLearn1': unreferenced local variable
+UART.C(516): warning C280: 'ucSaveLearn2': unreferenced local variable
+linking...
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?TM1637_WRITE?I2C
+*** WARNING L16: UNCALLED SEGMENT, IGNORED FOR OVERLAY PROCESS
+    SEGMENT: ?PR?_TEXTOUT?LED_DISPLAY
+Program Size: data=23.3 xdata=1616 code=24533
 creating hex file from ".\out\SZ_01_LED"...
 ".\out\SZ_01_LED" - 0 Error(s), 9 Warning(s).
-UNIOSTATUS
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 25F4H
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  TOTALNUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 2693H
-*** WARNING L2: REFERENCE MADE TO UNRESOLVED EXTERNAL
-    SYMBOL:  SAVE_XT_NUM
-    MODULE:  .\out\uart.obj (UART)
-    ADDRESS: 26C7H
-Program Size: data=120.2 xdata=1188 code=18090
-creating hex file from ".\out\SZ_01_LED"...
-".\out\SZ_01_LED" - 0 Error(s), 14 Warning(s).
-g hex file from ".\out\SZ_01_LED"...
-".\out\SZ_01_LED" - 0 Error(s), 15 Warning(s).

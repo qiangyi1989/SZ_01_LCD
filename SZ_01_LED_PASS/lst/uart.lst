@@ -1,10 +1,10 @@
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 1   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE UART
 OBJECT MODULE PLACED IN .\out\uart.obj
-COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uart.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\uart.lst) OBJECT(.\out\uart.ob
-                    -j)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE uart.c LARGE BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\uart.lst) OBJECT(.\out\u
+                    -art.obj)
 
 line level    source
 
@@ -55,14 +55,14 @@ line level    source
   45          #define UART_REC_FRAME_DELAY 10
   46          
   47          extern xdata public_stru public_val;
-  48          extern xdata char uart_send_buf[10 + (MENU_ID_00000_MAX_ITEM << 1)];
+  48          extern xdata char uart_send_buf[100];
   49          extern code MENU_ITEM MenuItem[];
   50          extern xdata MENU_CHANG now_menu;
   51          
   52          
   53          extern xdata unsigned int  unUpVerNum;
   54          extern xdata unsigned int  unDownVerNum;
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 2   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 2   
 
   55          extern xdata unsigned int  unIoStatus;
   56          
@@ -79,11 +79,11 @@ line level    source
   67          
   68          //void SendString(char *s);
   69          
-  70          xdata unsigned char Uart_RecBuf[10 + (MENU_ID_00000_MAX_ITEM << 2)];
+  70          xdata unsigned char Uart_RecBuf[100];
   71          void * com_data = Uart_RecBuf;
   72          
   73          //add
-  74          xdata unsigned char Uart2_RecBuf[10 + (MENU_ID_00000_MAX_ITEM << 2)];
+  74          xdata unsigned char Uart2_RecBuf[10];
   75          void * com2_data = Uart2_RecBuf;
   76          
   77          bit busy2;  /* 1ÕýÔÚ·¢ËÍ£¬0·¢ËÍÍê³É */
@@ -126,7 +126,7 @@ line level    source
  112   1              //ÉèÖÃ´®¿Ú1Îª¸ßÓÅÏÈ¼¶ÖÐ¶Ï    //¸ù¾ÝÏàÍ¬ÓÅÏÈ¼¶µÄÄÚ²¿²éÑ¯Ë³´Î: usart1¸ßÓÚusart2, t1¸ßÓÚt2.
  113   1              //µ±Ê¹ÓÃcÓïÑÔ±à³ÌÊ±,ÖÐ¶Ï²éÑ¯Ë³´ÎºÅ,¾ÍÊÇÖÐ¶ÏºÅ.
  114   1              PS = 1;         //add 0331
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 3   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 3   
 
  115   1      }
  116          
@@ -186,13 +186,13 @@ line level    source
                               
                               //test 0407
                               //Ê¹ÓÃ´®¿Ú1£¬¶¨ÒåLCD_UART_DOWNÊ±£¬²âÊÔOK.
-                              //SendData(SBUF);
+                              SendData(SBUF);
                               //test 0407             
                               
                               //ÔÚ´®¿Ú1½ÓÊÕ£¬×ª·¢¸ø´®¿Ú2£¬¶¨ÒåLCD_UART_DOWNÊ±£¬²âÊÔOK.
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 4   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 4   
 
-                      Uasrt2SendData(SBUF);           
+                      //Uasrt2SendData(SBUF);         
                   }
                   if (TI)
                   {
@@ -254,7 +254,7 @@ line level    source
  233   2          }
  234   1      }
  235          
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 5   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 5   
 
  236          
  237          
@@ -318,7 +318,7 @@ line level    source
  294          ·µ»ØÖµ£ºÎÞ
  295          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
  296          void Send_UartBuf(char * buf)
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 6   
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 6   
 
  297          {
  298   1              int i;
@@ -368,47 +368,51 @@ line level    source
  342   1      //#if 0
  343   1              while (*s)                  //¼ì²â×Ö·û´®½áÊø±êÖ¾
  344   1          {
- 345   2              Uasrt2SendData(*s++);         //·¢ËÍµ±Ç°×Ö·û
- 346   2          }
- 347   1      #endif  
- 348   1      }
- 349          
- 350          
- 351          void Uasrt2SendData(BYTE dat)
- 352          {
- 353   1              //del 0407
- 354   1      #ifndef LCD_UART_DOWN
- 355   1              while (busy2);               //    //ÏÂÔØÒ³ÃæÐÅÏ¢Ê±£¬while (busy2) Óï¾äÐèÆÁ±Î; //ÔÚ±¾»úÔËÐÐÍ¨ÐÅ(·ÇÓëPC»úÍ
-             -¨ÐÅ)Ê±,while (busy2) Óï¾ä²»ÄÜÆÁ±Î  //µÈ´ýÇ°ÃæµÄÊý¾Ý·¢ËÍÍê³É
- 356   1      #endif  
+ 345   2              Uasrt2SendData(*s);         //·¢ËÍµ±Ç°×Ö·û
+ 346   2                      *s='\0';
+ 347   2                      s++;
+ 348   2                      while(busy2);
+ 349   2      //              while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET){}; //µÈ´ý·¢ËÍ½áÊø
+ 350   2              }
+ 351   1      #endif  
+ 352   1      }
+ 353          
+ 354          
+ 355          void Uasrt2SendData(BYTE dat)
+ 356          {
  357   1              //del 0407
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 7   
+ 358   1      #ifndef LCD_UART_DOWN
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 7   
 
- 358   1          ACC = dat;                  //»ñÈ¡Ð£ÑéÎ»P (PSW.0)
- 359   1      
- 360   1          if (P)                      //¸ù¾ÝPÀ´ÉèÖÃÐ£ÑéÎ»
- 361   1          {
- 362   2      #if (PARITYBIT2 == ODD_PARITY)
+ 359   1              while (busy2);               //    //ÏÂÔØÒ³ÃæÐÅÏ¢Ê±£¬while (busy2) Óï¾äÐèÆÁ±Î; //ÔÚ±¾»úÔËÐÐÍ¨ÐÅ(·ÇÓëPC»úÍ
+             -¨ÐÅ)Ê±,while (busy2) Óï¾ä²»ÄÜÆÁ±Î  //µÈ´ýÇ°ÃæµÄÊý¾Ý·¢ËÍÍê³É
+ 360   1      #endif  
+ 361   1              //del 0407
+ 362   1          ACC = dat;                  //»ñÈ¡Ð£ÑéÎ»P (PSW.0)
+ 363   1      
+ 364   1          if (P)                      //¸ù¾ÝPÀ´ÉèÖÃÐ£ÑéÎ»
+ 365   1          {
+ 366   2      #if (PARITYBIT2 == ODD_PARITY)
                       S2TB8 = 0;                //ÉèÖÃÐ£ÑéÎ»Îª0
               #elif (PARITYBIT2 == EVEN_PARITY)
                       S2TB8 = 1;                //ÉèÖÃÐ£ÑéÎ»Îª1
               #endif
- 367   2          }
- 368   1          else
- 369   1          {
- 370   2      #if (PARITYBIT2 == ODD_PARITY)
+ 371   2          }
+ 372   1          else
+ 373   1          {
+ 374   2      #if (PARITYBIT2 == ODD_PARITY)
                       S2TB8 = 1;                //ÉèÖÃÐ£ÑéÎ»Îª1
               #elif (PARITYBIT2 == EVEN_PARITY)
                       S2TB8 = 0;                //ÉèÖÃÐ£ÑéÎ»Îª0
               #endif
- 375   2          }
- 376   1              
- 377   1          busy2 = 1;
- 378   1          S2BUF = ACC;                 //Ð´Êý¾Ýµ½UARTÊý¾Ý¼Ä´æÆ÷
- 379   1      }
- 380          
- 381          
- 382          #if 0
+ 379   2          }
+ 380   1              
+ 381   1          busy2 = 1;
+ 382   1          S2BUF = ACC;                 //Ð´Êý¾Ýµ½UARTÊý¾Ý¼Ä´æÆ÷
+ 383   1      }
+ 384          
+ 385          
+ 386          #if 0
               /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
               Ãû³Æ:   void frame_par_func(void)
               ¹¦ÄÜ£º  ²ÎÊý×Ö»ØÖ¡´¦Àí
@@ -442,12 +446,12 @@ line level    source
                       switch(((get_ver_stru *)com_data)->cmd_type)
                               {
                                       case GET_VER_CMD:
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 8   
+
                                               public_val.drive_type_com = ((get_ver_stru *)com_data)->ver;
                                               public_val.drive_index_com = ((get_ver_stru *)com_data)->drive_indx;
                                               if(public_val.drive_type_com != public_val.drive_type)
                                                       {
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 8   
-
                                                               public_val.com_log_step = COMD_LOG_STEP_GET_CFG;
                                                       }
                                               else
@@ -506,12 +510,12 @@ line level    source
                                                       }
                                               //±£´æ²Ëµ¥Êý¾ÝÖµµ½EEPROM
                                               func_menu_update(menu_id);
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 9   
+
                                       break;
                                       case GET_STATU_INFO:
                                               public_val.Err_Flag &= 0xf0;
                                               public_val.Err_Flag |= (((rec_statu_stru *)com_data)->err_flag) & 0x0f;
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 9   
-
                                               public_val.Work_Statu = ((rec_statu_stru *)com_data)->statu_num;
                                               public_val.Work_Pause_Flag = ((rec_statu_stru *)com_data)->pass_flag;
                                               public_val.Other_Bit_Flag = ((rec_statu_stru *)com_data)->other_bit_flag;
@@ -531,726 +535,715 @@ line level    source
               }
               
               #endif
- 501          
- 502          
- 503          
- 504          //Óësend_data_funcº¯ÊýÅäºÏÀ´¿´
- 505          void rec_data_func(void)
- 506          {
- 507   1              char i;
- 508   1              char sum_byte;
- 509   1          char *pcTemp = 0;
- 510   1              unsigned long uiCnt;
- 511   1      
- 512   1              static char ucSaveLearn1 = 0, ucSaveLearn2 = 0;
- 513   1      
- 514   1              /* ¶ÔÖ÷°å·´À¡µÄÆäËûÖ¡×÷Ð£Ñé */
- 515   1              sum_byte = Uart_RecBuf[0];
- 516   1              for(i = 1; i < public_val.uart_rec_count - 1; i++)
- 517   1              {
- 518   2                      sum_byte += Uart_RecBuf[i];
- 519   2              }
- 520   1      
- 521   1              /* Ð£ÑéÊ§°Ü±¨´í·µ»Ø */
- 522   1              if(sum_byte != Uart_RecBuf[public_val.uart_rec_count - 1])
- 523   1              {
- 524   2                      //public_val.Err_Flag = ERR_NUM_ZK_COM_ERR;             
- 525   2                      public_val.Err_Flag = LED_CHECK_ERROR;       /* ½ÓÊÕµ½Ð£Ñé´íÎóÖ¡ºó²»·¢ËÍºóÐøÖ¡ */
- 526   2      
- 527   2                      send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 528   2                      
- 529   2                      return;                 
- 530   2              }
- 531   1      
- 532   1      
- 533   1              /* Ð£Ñé³É¹¦£¬¶Ô½ÓÊÕÖ¡½øÐÐ´¦Àí */        
- 534   1              switch(Uart_RecBuf[0])
- 535   1              {
- 536   2                      /* ÉÏÐÐÐ´²ÎÊýÖ¡ */
- 537   2                      case UP_WRITE_PARAM:
- 538   2      
- 539   2                              /* »ñÈ¡²ÎÊý¸öÊý */
- 540   2                              //Menu_Number[0] = Uart_RecBuf[1] >> 1;    /* ÔØºÉ³¤¶È³ýÒÔ2Îª²ÎÊý¸öÊý */
- 541   2                              Menu_Number[0] = (Uart_RecBuf[1] + Uart_RecBuf[2]) >> 1;  //ËùÓÐ²ÎÊý¸öÊý
- 542   2                              Menu0_Number = Uart_RecBuf[1] >> 1;                                       //²Ëµ¥0²ÎÊý¸öÊý
- 543   2      
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 10  
+ 505          
+ 506          
+ 507          
+ 508          //Óësend_data_funcº¯ÊýÅäºÏÀ´¿´
+ 509          void rec_data_func(void)
+ 510          {
+ 511   1              char i;
+ 512   1              char sum_byte;
+ 513   1          char *pcTemp = 0;
+ 514   1              unsigned long uiCnt;
+ 515   1      
+ 516   1              static char ucSaveLearn1 = 0, ucSaveLearn2 = 0;
+ 517   1      
+ 518   1              /* ¶ÔÖ÷°å·´À¡µÄÆäËûÖ¡×÷Ð£Ñé */
+ 519   1              sum_byte = Uart_RecBuf[0];
+ 520   1              for(i = 1; i < public_val.uart_rec_count - 1; i++)
+ 521   1              {
+ 522   2                      sum_byte += Uart_RecBuf[i];
+ 523   2              }
+ 524   1      
+ 525   1              /* Ð£ÑéÊ§°Ü±¨´í·µ»Ø */
+ 526   1              if(sum_byte != Uart_RecBuf[public_val.uart_rec_count - 1])
+ 527   1              {
+ 528   2                      //public_val.Err_Flag = ERR_NUM_ZK_COM_ERR;             
+ 529   2                      public_val.Err_Flag = LED_CHECK_ERROR;       /* ½ÓÊÕµ½Ð£Ñé´íÎóÖ¡ºó²»·¢ËÍºóÐøÖ¡ */
+ 530   2      
+ 531   2                      send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
+ 532   2                      
+ 533   2                      return;                 
+ 534   2              }
+ 535   1      
+ 536   1      
+ 537   1              /* Ð£Ñé³É¹¦£¬¶Ô½ÓÊÕÖ¡½øÐÐ´¦Àí */        
+ 538   1              switch(Uart_RecBuf[0])
+ 539   1              {
+ 540   2                      /* ÉÏÐÐÐ´²ÎÊýÖ¡ */
+ 541   2                      case UP_WRITE_PARAM:
+ 542   2      
+ 543   2                              /* »ñÈ¡²ÎÊý¸öÊý */
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 10  
 
- 544   2                              /* ÌáÈ¡ÏÂ·¢µÄ²ÎÊý */  //½«ÏÂ·¢µÄ²ÎÊý±¸·ÝÒ»·Ý,²¢±£´æµ½public_val.menu_parm[0]²Ëµ¥²ÎÊý»º³åÇø
- 545   2                              pcTemp = (char *)&public_val.menu_parm[0];
- 546   2                              
- 547   2                              for (i = 0; i < (Menu_Number[0] << 1); i++)
- 548   2                              {
- 549   3                                      //pcTemp[i] = Uart_RecBuf[2 + i];
- 550   3                                      pcTemp[i] = Uart_RecBuf[3 + i];
- 551   3                              }
- 552   2            
- 553   2                              //²Ù×÷°åÏÂ·¢ÉèÖÃ²ÎÊý,Ö÷¿Ø°åÊÕµ½ºó·µ»Ø
- 554   2                              already_read_param = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý */
- 555   2      
- 556   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 557   2                              
- 558   2                      break;
- 559   2      
- 560   2                      /* ÉÏÐÐÐ´×´Ì¬Ö¡ */
- 561   2                      //Ö÷¿Ø°å·µ»Ø°æ±¾ºÅ,io¿Ú´«¸ÐÆ÷×´Ì¬,´íÎó±êÖ¾,´êÌõ¸ùÊý
- 562   2                      case UP_WRITE_STATE:
- 563   2                              
- 564   2                              public_val.version 
- 565   2                                      = ((unsigned int)Uart_RecBuf[3] << 8) | (unsigned int)Uart_RecBuf[2];
- 566   2      
- 567   2                              //add 
- 568   2                              unDownVerNum = public_val.version;              //Ö÷°æ±¾ºÅ              //Ö÷¿Ø°å°æ±¾ºÅ
- 569   2                          if (unDownVerNum == 0)
- 570   2                                      unDownVerNum = 12345;
- 571   2                              //add 0323
- 572   2                      
- 573   2                              
- 574   2                        //Ö÷¿Ø°å·µ»Øio¿Ú×´Ì¬
- 575   2                              public_val.io_read
- 576   2                                      = ((unsigned int)Uart_RecBuf[5] << 8) | (unsigned int)Uart_RecBuf[4];  //´«¸ÐÆ÷×´Ì¬(¿ÉÒÔ·µ»Ø16bit¶ÔÓ¦
-             -16¸ö´«¸ÐÆ÷×´Ì¬)
- 577   2                        //add 0320
- 578   2                        //public_val.io_read = 23456;
- 579   2                              unIoStatus = public_val.io_read;
- 580   2                              //if (unIoStatus == 0)
- 581   2                                      //unIoStatus = 1;
- 582   2                              //add 0320
- 583   2                      
- 584   2                              //if ((Uart_RecBuf[7] != 0) || (Uart_RecBuf[6] != 0))
- 585   2                              //{
- 586   2                              public_val.Err_Flag 
- 587   2                                      = ((unsigned int)Uart_RecBuf[7] << 8) | (unsigned int)Uart_RecBuf[6];
- 588   2                              //}
- 589   2      
- 590   2                              //public_val.disp_cnt_upload
- 591   2                      //ÉÏÐÐÐ´´êÌõ¸ùÊý,ÔÚÕâÀï¸üÐÂ: public_val.cnt_after_powered  (¿ª»úºóµÄ´êÌõ¸ùÊý),
- 592   2                      //²¢½«¿ª»úºóµÄ´êÌõ¸ùÊýÓë¿ª»úÇ°µÄ´êÌõ¸ùÊýÏà¼Ó£¬±£´æµ½eeprom. call save_xt_num().
+ 544   2                              //Menu_Number[0] = Uart_RecBuf[1] >> 1;    /* ÔØºÉ³¤¶È³ýÒÔ2Îª²ÎÊý¸öÊý */
+ 545   2      //                      Menu_Number[0] = (Uart_RecBuf[1] + Uart_RecBuf[2]) >> 1;  //ËùÓÐ²ÎÊý¸öÊý
+ 546   2      //                      Menu0_Number = Uart_RecBuf[1] >> 1;                                       //²Ëµ¥0²ÎÊý¸öÊý
+ 547   2      
+ 548   2                              /* ÌáÈ¡ÏÂ·¢µÄ²ÎÊý */
+ 549   2                              pcTemp = (char *)&public_val.menu_parm[0];
+ 550   2                              
+ 551   2                              for (i = 0; i < (COM_MENU_MAX_ITEM << 1); i++)
+ 552   2                              {
+ 553   3                                      //pcTemp[i] = Uart_RecBuf[2 + i];
+ 554   3                                      pcTemp[i] = Uart_RecBuf[3 + i];
+ 555   3                              }
+ 556   2      
+ 557   2                              already_read_param = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý */
+ 558   2      
+ 559   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
+ 560   2                              
+ 561   2                      break;
+ 562   2      
+ 563   2                      /* ÉÏÐÐÐ´×´Ì¬Ö¡ */
+ 564   2                      case UP_WRITE_STATE:
+ 565   2      
+ 566   2                              for(i = 0; i < PASS_LOCK_COUNT; i++)
+ 567   2                                      {
+ 568   3                                              if( (public_val.Disp_Dz_10104[i] > 0)
+ 569   3                                                      && (public_val.work_count > ((unsigned long)public_val.Disp_Dz_10104[i] * LOCK_UNIT))
+ 570   3                                                      )
+ 571   3                                                      {
+ 572   4                                                              public_val.Lock_Flag = i + 1;
+ 573   4                                                      }
+ 574   3                                      }
+ 575   2                              if(public_val.Disp_Dz_10104[PASS_LOCK_COUNT - 1] == 0) //ÍêÈ«½âËø
+ 576   2                                      {
+ 577   3                                              public_val.Lock_Flag = 0;
+ 578   3                                      }
+ 579   2                              
+ 580   2                              public_val.version 
+ 581   2                                      = ((unsigned int)Uart_RecBuf[3] << 8) | (unsigned int)Uart_RecBuf[2];                   
+ 582   2                              
+ 583   2                              public_val.io_read
+ 584   2                                      = ((unsigned int)Uart_RecBuf[5] << 8) | (unsigned int)Uart_RecBuf[4];
+ 585   2                                              
+ 586   2                              //if ((Uart_RecBuf[7] != 0) || (Uart_RecBuf[6] != 0))
+ 587   2                              //{
+ 588   2                              public_val.Err_Flag 
+ 589   2                                      = ((unsigned int)Uart_RecBuf[7] << 8) | (unsigned int)Uart_RecBuf[6];
+ 590   2                              //}
+ 591   2      
+ 592   2                              //public_val.disp_cnt_upload
  593   2                              uiCnt
  594   2                                      = ((unsigned long)Uart_RecBuf[9] << 8) | (unsigned long)Uart_RecBuf[8]
- 595   2                                      | ((unsigned long)Uart_RecBuf[11] << 24) | ((unsigned long)Uart_RecBuf[10] << 16);              //·µ»Ø´êÌõ¸ùÊý
- 596   2                                      
- 597   2                              
- 598   2                              //add
- 599   2                                      TotalNum = uiCnt;                               //ÆäÓà£¬¿ÉÖ±½ÓÊ¹ÓÃ½á¹¹public_valµÄ³ÉÔ±¸³Öµ,Èç: public_val.io_read,  public_val.ve
-             -rsion
- 600   2                                      //ÕâÀï¸øunRow3Data¸³Öµ,ÓÐ¿ÉÄÜÒýÆðÆäËûµÄ²é¿´ÊýÖµ±ä»¯
- 601   2                                      //unRow3Data = uiCnt;
- 602   2                                              //TotalNum = 1;
- 603   2                                      //add 0324 20:33
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 11  
+ 595   2                                      | ((unsigned long)Uart_RecBuf[11] << 24) | ((unsigned long)Uart_RecBuf[10] << 16);
+ 596   2      
+ 597   2                              if (uiCnt != public_val.cnt_after_powered)  /* Èç¹ûÍ²ÊýÓÐ¸üÐÂ£¬Ôò±£´æ¸üÐÂ */
+ 598   2                              {
+ 599   3                                      public_val.cnt_after_powered = uiCnt;
+ 600   3                                      public_val.work_count++;
+ 601   3                                      if(public_val.work_count - public_val.work_count_user > 99999)
+ 602   3                                              {
+ 603   4                                                      public_val.work_count_user = public_val.work_count;
+ 604   4                                                      save_user_count();
+ 605   4                                              }
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 11  
 
- 604   2      
- 605   2                              if (main_borad_finish_clear != 0)  /* ²»ÐèÒªÇå³ýÍ²ÊýÊ±²Å±£´æ¸üÐÂ */
- 606   2                              {
- 607   3                                      if (uiCnt != public_val.cnt_after_powered)  /* Èç¹ûÍ²ÊýÓÐ¸üÐÂ£¬Ôò±£´æ¸üÐÂ */
- 608   3                                      {
- 609   4                                              public_val.cnt_after_powered = uiCnt;
- 610   4      
- 611   4                                              save_xt_num();
-*** WARNING C206 IN LINE 611 OF UART.C: 'save_xt_num': missing function-prototype
- 612   4                                      }
- 613   3                              }
- 614   2                              
- 615   2                              
- 616   2      
- 617   2                              if ((public_val.version == 11111) && (ucSaveLearn1 == 0))
- 618   2                              {
- 619   3                                      public_val.menu_parm[PARAM_FZ_START_PWM_SCALE] = (int)(uiCnt & 0xFFFF);
- 620   3                                      //public_val.menu_parm[PARAM_QZ_START_PWM_SCALE] = (int)((uiCnt >> 16) & 0xFFFF);
- 621   3                                      
- 622   3                                      func_menu_update(0);
- 623   3      
- 624   3                                      ucSaveLearn1 = 1;
- 625   3                              }
- 626   2      
- 627   2                              if ((public_val.version == 22222) && (ucSaveLearn2 == 0))
- 628   2                              {
- 629   3                                      public_val.menu_parm[PARAM_FZ_START_PWM_SCALE] = (int)(uiCnt & 0xFFFF);
- 630   3                                      //public_val.menu_parm[PARAM_QZ_START_PWM_SCALE] = (int)((uiCnt >> 16) & 0xFFFF);
- 631   3                                      
- 632   3                                      func_menu_update(0);
- 633   3      
- 634   3                                      ucSaveLearn2 = 1;
- 635   3                              }
- 636   2                              
- 637   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 638   2                              
- 639   2                      break;
- 640   2      
- 641   2                      /* ÉÏÐÐÐ´²ÎÊý·¶Î§Ö¡ */    //Ö÷¿Ø°å·µ»Ø²ÎÊý·¶Î§
- 642   2                      case UP_WRITE_PARAM_RANGE:
- 643   2      
- 644   2                      //´æ·ÅÔÚ²Ëµ¥ÅäÖÃ»º³å: ×î´óÖµ£¬×îÐ¡Öµµ¥Ôª
- 645   2                              for (i = 0; i < (Uart_RecBuf[1] >> 2); i++)  /* ²ÎÊý¸öÊýÎªÔØºÉ³¤¶È³ýÒÔ4 */
- 646   2                              {
- 647   3                                      MenuItem[MENU_ID_00000].m_pcfg[i].m_min 
- 648   3                                              = ((short)Uart_RecBuf[2 + (i << 2)] << 8)    /* ÏÈÊÕµÍµØÖ·×Ö½Ú */
- 649   3                                                      | (short)Uart_RecBuf[2 + (i << 2) + 1]; 
- 650   3                                      
- 651   3                                      MenuItem[MENU_ID_00000].m_pcfg[i].m_max 
- 652   3                                              = ((short)Uart_RecBuf[2 + (i << 2) + 2] << 8) 
- 653   3                                                      | (short)Uart_RecBuf[2 + (i << 2) + 3];                         
- 654   3                              }
- 655   2      
- 656   2                              //Menu_Number[0] = (Uart_RecBuf[1] >> 2);  
- 657   2      
- 658   2                              already_read_param_range = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý·¶Î§ */     
+ 606   3                                                                      
+ 607   3                                      save_sys_lock();
+ 608   3                              }
+ 609   2      #if 0
+                                      if ((public_val.version == 11111) && (ucSaveLearn1 == 0))
+                                      {
+                                              public_val.menu_parm[PARAM_FZ_START_PWM_SCALE] = (int)(uiCnt & 0xFFFF);
+                                              //public_val.menu_parm[PARAM_QZ_START_PWM_SCALE] = (int)((uiCnt >> 16) & 0xFFFF);
+                                              
+                                              func_menu_update(0);
+              
+                                              ucSaveLearn1 = 1;
+                                      }
+              
+                                      if ((public_val.version == 22222) && (ucSaveLearn2 == 0))
+                                      {
+                                              public_val.menu_parm[PARAM_FZ_START_PWM_SCALE] = (int)(uiCnt & 0xFFFF);
+                                              //public_val.menu_parm[PARAM_QZ_START_PWM_SCALE] = (int)((uiCnt >> 16) & 0xFFFF);
+                                              
+                                              func_menu_update(0);
+              
+                                              ucSaveLearn2 = 1;
+                                      }
+              #endif                  
+ 630   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
+ 631   2                              
+ 632   2                      break;
+ 633   2      
+ 634   2                      /* ÉÏÐÐÐ´²ÎÊý·¶Î§Ö¡ */    //Ö÷¿Ø°å·µ»Ø²ÎÊý·¶Î§
+ 635   2                      case UP_WRITE_PARAM_RANGE:
+ 636   2      
+ 637   2                      //´æ·ÅÔÚ²Ëµ¥ÅäÖÃ»º³å: ×î´óÖµ£¬×îÐ¡Öµµ¥Ôª
+ 638   2                              for (i = 0; i < (Uart_RecBuf[1] >> 2); i++)  /* ²ÎÊý¸öÊýÎªÔØºÉ³¤¶È³ýÒÔ4 */
+ 639   2                              {
+ 640   3                                      MenuItem[MENU_ID_00000].m_pcfg[i].m_min 
+ 641   3                                              = ((short)Uart_RecBuf[2 + (i << 2)] << 8)    /* ÏÈÊÕµÍµØÖ·×Ö½Ú */
+ 642   3                                                      | (short)Uart_RecBuf[2 + (i << 2) + 1]; 
+ 643   3                                      
+ 644   3                                      MenuItem[MENU_ID_00000].m_pcfg[i].m_max 
+ 645   3                                              = ((short)Uart_RecBuf[2 + (i << 2) + 2] << 8) 
+ 646   3                                                      | (short)Uart_RecBuf[2 + (i << 2) + 3];                         
+ 647   3                              }
+ 648   2      
+ 649   2                              //Menu_Number[0] = (Uart_RecBuf[1] >> 2);  
+ 650   2      
+ 651   2                              already_read_param_range = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý·¶Î§ */     
+ 652   2      
+ 653   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */  
+ 654   2      
+ 655   2                      break;
+ 656   2      
+ 657   2                      /* ÉÏÐÐÐ´½ÓÊÕ²ÎÊýÍê³É */
+ 658   2                      case UP_WRITE_REC_PARAM_DONE:
  659   2      
- 660   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */  
+ 660   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  661   2      
  662   2                      break;
  663   2      
- 664   2                      /* ÉÏÐÐÐ´½ÓÊÕ²ÎÊýÍê³É */
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 12  
-
- 665   2                      case UP_WRITE_REC_PARAM_DONE:
+ 664   2                      /* ÉÏÐÐÐ´½øÈë²âÊÔÄ£Ê½³É¹¦ */
+ 665   2                      case UP_WRITE_TEST_MODE_DONE:
  666   2      
  667   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 12  
+
  668   2      
  669   2                      break;
  670   2      
- 671   2                      /* ÉÏÐÐÐ´½øÈë²âÊÔÄ£Ê½³É¹¦ */
- 672   2                      case UP_WRITE_TEST_MODE_DONE:
+ 671   2                      /* ÉÏÐÐÐ´½øÈëÑ§Ï°Ä£Ê½³É¹¦ */
+ 672   2                      case UP_WRITE_LEARN_MODE_DONE:
  673   2      
  674   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  675   2      
  676   2                      break;
  677   2      
- 678   2                      /* ÉÏÐÐÐ´½øÈëÑ§Ï°Ä£Ê½³É¹¦ */
- 679   2                      case UP_WRITE_LEARN_MODE_DONE:
+ 678   2                      /* ÉÏÐÐÐ´ÇÐ»»ËÙ¶ÈÄ£Ê½³É¹¦ */
+ 679   2                      case UP_WRITE_SPEED_MODE_DONE:
  680   2      
  681   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  682   2      
  683   2                      break;
  684   2      
- 685   2                      /* ÉÏÐÐÐ´ÇÐ»»ËÙ¶ÈÄ£Ê½³É¹¦ */
- 686   2                      case UP_WRITE_SPEED_MODE_DONE:
+ 685   2                      /* ÉÏÐÐÐ´±¨¾¯ÏûÏ¢³É¹¦ */
+ 686   2                      case UP_WRITE_WARNING_MSG_DONE:
  687   2      
  688   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  689   2      
  690   2                      break;
  691   2      
- 692   2                      /* ÉÏÐÐÐ´±¨¾¯ÏûÏ¢³É¹¦ */
- 693   2                      case UP_WRITE_WARNING_MSG_DONE:
- 694   2      
- 695   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 696   2      
- 697   2                      break;
- 698   2      
+ 692   2      
+ 693   2                      /* ÉÏÐÐÐ´Çå³ýÒÑ³öÍ²Êý³É¹¦ */
+ 694   2                      case UP_WRITE_CLEAR_CNT_DONE:
+ 695   2      
+ 696   2                              main_borad_finish_clear = 1;      /* Ö÷°åÒÑÍê³ÉÇå³ý¼ÆÊý */
+ 697   2      
+ 698   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  699   2      
- 700   2                      /* ÉÏÐÐÐ´Çå³ýÒÑ³öÍ²Êý³É¹¦ */
- 701   2                      case UP_WRITE_CLEAR_CNT_DONE:
- 702   2      
- 703   2                              main_borad_finish_clear = 1;      /* Ö÷°åÒÑÍê³ÉÇå³ý¼ÆÊý */
+ 700   2                      break;          
+ 701   2      
+ 702   2                      /* ÉÏÐÐÐ´°´¼ü³É¹¦ */
+ 703   2                      case UP_WRITE_KEY_DONE:
  704   2      
  705   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
  706   2      
- 707   2                      break;          
+ 707   2                      break;  
  708   2      
- 709   2                      /* ÉÏÐÐÐ´°´¼ü³É¹¦ */
- 710   2                      case UP_WRITE_KEY_DONE:
- 711   2      
- 712   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 713   2      
- 714   2                      break;  
+ 709   2      
+ 710   2                      /* Ð£ÑéÊ§°ÜÖ¡£¬±¨´í */
+ 711   2                      case UP_WRITE_CHECK_FAIL:  
+ 712   2                              
+ 713   2                              //public_val.Err_Flag = ERR_NUM_ZK_COM_ERR;     
+ 714   2                              public_val.Err_Flag = MAIN_CHECK_ERROR;           /* ½ÓÊÕµ½Ð£Ñé´íÎóÖ¡ºó²»·¢ËÍºóÐøÖ¡ */  
  715   2      
- 716   2      
- 717   2                      /* Ð£ÑéÊ§°ÜÖ¡£¬±¨´í */
- 718   2                      case UP_WRITE_CHECK_FAIL:  
- 719   2                              
- 720   2                              //public_val.Err_Flag = ERR_NUM_ZK_COM_ERR;     
- 721   2                              public_val.Err_Flag = MAIN_CHECK_ERROR;           /* ½ÓÊÕµ½Ð£Ñé´íÎóÖ¡ºó²»·¢ËÍºóÐøÖ¡ */  
- 722   2      
- 723   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
- 724   2                              
- 725   2                      break;
- 726   2      
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 13  
+ 716   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
+ 717   2                              
+ 718   2                      break;
+ 719   2      
+ 720   2                      default:
+ 721   2                              
+ 722   2                              break;
+ 723   2              }
+ 724   1              
+ 725   1      }
+*** WARNING C280 IN LINE 516 OF UART.C: 'ucSaveLearn1': unreferenced local variable
+*** WARNING C280 IN LINE 516 OF UART.C: 'ucSaveLearn2': unreferenced local variable
+ 726          
+ 727          /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 13  
 
- 727   2                      default:
- 728   2                              
- 729   2                              break;
- 730   2              }
- 731   1              
- 732   1      }
- 733          
- 734          /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 735          Ãû³Æ:   send_data_func(void)
- 736          ¹¦ÄÜ£º  Í¨Ñ¶´¦Àí¹ý³Ì ÓÉÖ÷³ÌÐòµ÷ÓÃ
- 737          ²ÎÊý£º  ÎÞ
- 738          ·µ»ØÖµ£ºÎÞ
- 739          ËµÃ÷: °æ±¾²»Æ¥Åä: »ñÈ¡²Ëµ¥ÅäÖÃÐÅÏ¢->»ñÈ¡Ä¬ÈÏ²ÎÊý->ÏÂ·¢²Ëµ¥²ÎÊý
- 740                °æ±¾Æ¥Åä: ÏÂ·¢²Ëµ¥²ÎÊý
- 741          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
- 742          void send_data_func(void)
- 743          {
- 744   1              int i;
- 745   1      
- 746   1        char *pcTemp = 0;
- 747   1              unsigned char sum_byte;
- 748   1              
- 749   1      
- 750   1              /* Ã¿1s¶ÁÈ¡Ò»´ÎÖ÷°å×´Ì¬ */   //¼´io¿ÚµÄ´«¸ÐÆ÷×´Ì¬
- 751   1      #if 1
- 752   1              if(public_val.ms_timer - cnt_read_state > READ_STATE_PERIOD)
- 753   1              {       
- 754   2                      if (write_param_flag == 0)
- 755   2                      {
- 756   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á×´Ì¬Ö¡ */
- 757   3                              {
- 758   4                                      send_frame_type = DOWN_READ_STATE;
- 759   4                              }
- 760   3                      }
- 761   2      
- 762   2                      cnt_read_state = public_val.ms_timer;
- 763   2              }
- 764   1      #endif
- 765   1      
- 766   1              /* ÒÑ¶Áµ½Ö÷°å×´Ì¬£¬ÇÒÎ´¶ÁÅäÖÃ²ÎÊý£¬Ôò¶ÁÈ¡Ò»´ÎÅäÖÃ²ÎÊý */
- 767   1      #if 1   
- 768   1              if ((public_val.version != 0) && (already_read_param == 0))
- 769   1              {
- 770   2                      //if (public_val.ms_timer - cnt_read_param > 100)
- 771   2                      {               
- 772   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á²ÎÊýÖ¡ */
- 773   3                              {
- 774   4      
- 775   4                                      //send_frame_type = DOWN_READ_PARAM;                            
- 776   4      
- 777   4                                      // Ð´Ä¬ÈÏ²ÎÊý
- 778   4                                      Menu_Number[0] = MACHINE_PARAM_NUM;     //»úÆ÷²ÎÊý¸öÊý  22, Menu_Number[]×î´ó´æ´¢30¸ö
- 779   4                                      Menu0_Number = USER_PARAM_NUM;                                  //ÓÃ»§²ÎÊý¸öÊý  2,  Menu0_Number  Ä¬ÈÏ10. Menu1_Number Ä¬ÈÏ20
- 780   4      
- 781   4                                      // ×îºóÒ»¸ö²ÎÊý²»ÊÇ0x55aaÔòÐ´Ò»´ÎÄ¬ÈÏ²ÎÊý
- 782   4                                      if (public_val.menu_parm[MENU_ID_00000_MAX_ITEM - 1] != 0x55aa)
- 783   4                                      {
- 784   5                                              public_val.menu_parm[0] = 310;   //Ö½³¤                                 
- 785   5                                              public_val.menu_parm[1] = 300;   /* Éè¶¨Í²Êý */
- 786   5                                              
- 787   5                                              public_val.menu_parm[2] = 2;     /* 1¡¢±¨¾¯³ÖÐøÊ±¼ä:s */
- 788   5                                              public_val.menu_parm[3] = 15;    /* 2¡¢¶ÂÍ²¼ì²âÊ±¼ä1, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â1¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s */
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 14  
+ 728          Ãû³Æ:   send_data_func(void)
+ 729          ¹¦ÄÜ£º  Í¨Ñ¶´¦Àí¹ý³Ì ÓÉÖ÷³ÌÐòµ÷ÓÃ
+ 730          ²ÎÊý£º  ÎÞ
+ 731          ·µ»ØÖµ£ºÎÞ
+ 732          ËµÃ÷: °æ±¾²»Æ¥Åä: »ñÈ¡²Ëµ¥ÅäÖÃÐÅÏ¢->»ñÈ¡Ä¬ÈÏ²ÎÊý->ÏÂ·¢²Ëµ¥²ÎÊý
+ 733                °æ±¾Æ¥Åä: ÏÂ·¢²Ëµ¥²ÎÊý
+ 734          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+ 735          void send_data_func(void)
+ 736          {
+ 737   1              int i;
+ 738   1      
+ 739   1        char *pcTemp = 0;
+ 740   1              unsigned char sum_byte;
+ 741   1              
+ 742   1      
+ 743   1              /* Ã¿1s¶ÁÈ¡Ò»´ÎÖ÷°å×´Ì¬ */   //¼´io¿ÚµÄ´«¸ÐÆ÷×´Ì¬
+ 744   1      #if 1
+ 745   1              if(public_val.ms_timer - cnt_read_state > READ_STATE_PERIOD)
+ 746   1              {       
+ 747   2                      if (write_param_flag == 0)
+ 748   2                      {
+ 749   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á×´Ì¬Ö¡ */
+ 750   3                              {
+ 751   4                                      send_frame_type = DOWN_READ_STATE;
+ 752   4                              }
+ 753   3                      }
+ 754   2      
+ 755   2                      cnt_read_state = public_val.ms_timer;
+ 756   2              }
+ 757   1      #endif
+ 758   1      
+ 759   1              /* ÒÑ¶Áµ½Ö÷°å×´Ì¬£¬ÇÒÎ´¶ÁÅäÖÃ²ÎÊý£¬Ôò¶ÁÈ¡Ò»´ÎÅäÖÃ²ÎÊý */
+ 760   1      #if 1   
+ 761   1              if ((public_val.version != 0) && (already_read_param == 0))
+ 762   1              {
+ 763   2                      //if (public_val.ms_timer - cnt_read_param > 100)
+ 764   2                      {               
+ 765   3      #if 1
+ 766   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á²ÎÊýÖ¡ */
+ 767   3                              {
+ 768   4                                      //send_frame_type = DOWN_READ_PARAM;                            
+ 769   4      
+ 770   4                                      // Ð´Ä¬ÈÏ²ÎÊý
+ 771   4                                      // ×îºóÒ»¸ö²ÎÊý²»ÊÇ0x55aaÔòÐ´Ò»´ÎÄ¬ÈÏ²ÎÊý
+ 772   4                                      if (public_val.Disp_Dz_10101[MENU_ID_10101_MAX_ITEM] != 0x55aa)
+ 773   4                                      {
+ 774   5                                              public_val.Disp_Dz_00000[0] = 310;   //Ö½³¤                                     
+ 775   5                                              public_val.Disp_Dz_00000[1] = 300;   /* Éè¶¨Í²Êý */
+ 776   5                                              
+ 777   5                                              public_val.Disp_Dz_10101[0] = 2;     /* 1¡¢±¨¾¯³ÖÐøÊ±¼ä:s */
+ 778   5                                              public_val.Disp_Dz_10101[1] = 15;    /* 2¡¢¶ÂÍ²¼ì²âÊ±¼ä1, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â1¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s 
+             -*/
+ 779   5                                              public_val.Disp_Dz_10101[2] = 15;    /* 3¡¢¶ÂÍ²¼ì²âÊ±¼ä2, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â2¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s 
+             -*/
+ 780   5                                              public_val.Disp_Dz_10101[3] = 0;     /* 4¡¢²½½øµç»ú·½Ïò */
+ 781   5                                              public_val.Disp_Dz_10101[4] = 0;     // 5¡¢ËÍÖ½ËÙ¶ÈÔöÒæ
+ 782   5                                              public_val.Disp_Dz_10101[5] = 320;   /* 6¡¢²½½øµç»úÂö³åµ±Á¿:0.1¸ö/mm (4000*2 /(2*3.14*40)) ¼õËÙ±È2 */
+ 783   5                                              public_val.Disp_Dz_10101[6] = 89;    /* 7¡¢·¢Ö½µç»úÁ´ÂÖ¼õËÙ±È */
+ 784   5                                              public_val.Disp_Dz_10101[7] = 400;   /* 8¡¢·¢Ö½Ñ¹ÂÖ°ë¾¶:0.1mm */
+ 785   5                                              public_val.Disp_Dz_10101[8] = 20;   /* 9¡¢·¢Ö½µç»úPIDµ÷ËÙµÄ±ÈÀýÏµÊý*100 */
+ 786   5                                      #ifdef SZ_01    // SZ_01
+                                                      public_val.Disp_Dz_10101[9] = 85;   /* 10¡¢·¢Ö½µç»úÆô¶¯PWMÕ¼¿Õ±È */
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 14  
 
- 789   5                                              public_val.menu_parm[4] = 15;    /* 3¡¢¶ÂÍ²¼ì²âÊ±¼ä2, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â2¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s */
- 790   5                                              public_val.menu_parm[5] = 0;     /* 4¡¢²½½øµç»ú·½Ïò */
- 791   5                                              public_val.menu_parm[6] = 0;     // 5¡¢ËÍÖ½ËÙ¶ÈÔöÒæ
- 792   5                                              public_val.menu_parm[7] = 320;   /* 6¡¢²½½øµç»úÂö³åµ±Á¿:0.1¸ö/mm (4000*2 /(2*3.14*40)) ¼õËÙ±È2 */
- 793   5                                              public_val.menu_parm[8] = 89;    /* 7¡¢·¢Ö½µç»úÁ´ÂÖ¼õËÙ±È */
- 794   5                                              public_val.menu_parm[9] = 400;   /* 8¡¢·¢Ö½Ñ¹ÂÖ°ë¾¶:0.1mm */
- 795   5                                              public_val.menu_parm[10] = 20;   /* 9¡¢·¢Ö½µç»úPIDµ÷ËÙµÄ±ÈÀýÏµÊý*100 */
- 796   5                                      #ifdef SZ_01    // SZ_01
-                                                      public_val.menu_parm[11] = 85;   /* 10¡¢·¢Ö½µç»úÆô¶¯PWMÕ¼¿Õ±È */
-                                                      public_val.menu_parm[12] = 85;   /* 11¡¢ÇÐÖ½µç»úÆô¶¯PWMÕ¼¿Õ±È */
-                                                      public_val.menu_parm[13] = 70;   /* 12¡¢ÇÐÖ½µç»úÄ¿±êPWMÕ¼¿Õ±È */
-                                                      public_val.menu_parm[14] = 10;   /* 13¡¢·¢Ö½×î¸ßËÙ¶È */
-                                                      public_val.menu_parm[15] = 1;    /* 14¡¢·¢Ö½×îµÍËÙ¶È */
-                                                      public_val.menu_parm[16] = 40;   /* 15¡¢ËÍÖ½½Ç¶È */
-                                                      public_val.menu_parm[17] = 3;    /* 16¡¢ÇÐµ¶¿ØÖÆÄ£Ê½ 3:Æß¶Îµ÷ËÙ */
-                                                      public_val.menu_parm[18] = 84;   /* 17¡¢ÇÐÖ½Í£Ö¹ËÙ¶È */
-                                                      public_val.menu_parm[19] = 1;    /* 18¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[20] = 1;    /* 19¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[21] = 60;   /* 20¡¢µ÷ËÙ×î¸ßËÙ¶È */
+                                                      public_val.Disp_Dz_10101[10] = 85;   /* 11¡¢ÇÐÖ½µç»úÆô¶¯PWMÕ¼¿Õ±È */
+                                                      public_val.Disp_Dz_10101[12] = 70;   /* 12¡¢ÇÐÖ½µç»úÄ¿±êPWMÕ¼¿Õ±È */
+                                                      public_val.Disp_Dz_10101[13] = 10;   /* 13¡¢·¢Ö½×î¸ßËÙ¶È */
+                                                      public_val.Disp_Dz_10101[14] = 1;    /* 14¡¢·¢Ö½×îµÍËÙ¶È */
+                                                      public_val.Disp_Dz_10101[15] = 40;   /* 15¡¢ËÍÖ½½Ç¶È */
+                                                      public_val.Disp_Dz_10101[16] = 3;    /* 16¡¢ÇÐµ¶¿ØÖÆÄ£Ê½ 3:Æß¶Îµ÷ËÙ */
+                                                      public_val.Disp_Dz_10101[17] = 84;   /* 17¡¢ÇÐÖ½Í£Ö¹ËÙ¶È */
+                                                      public_val.Disp_Dz_10101[18] = 1;    /* 18¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[19] = 1;    /* 19¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[20] = 60;   /* 20¡¢µ÷ËÙ×î¸ßËÙ¶È */
                                               #endif
- 809   5                                              
- 810   5                                      #ifdef SZ_02            // SZ_02
- 811   5                                              public_val.menu_parm[11] = 84;   /* 10¡¢·¢Ö½µç»úÆô¶¯PWMÕ¼¿Õ±È */                                
- 812   5                                              public_val.menu_parm[12] = 2;    /* 11¡¢ÇÐÖ½µç»úÁ´ÂÖ¼õËÙ±È */
- 813   5                                              public_val.menu_parm[13] = 120;  /* 12¡¢ÇÐÖ½µç»úÄ¿±êËÙ¶È:0.1khz */
- 814   5                                              public_val.menu_parm[14] = 10;   /* 13¡¢·¢Ö½×î¸ßËÙ¶È */
- 815   5                                              public_val.menu_parm[15] = 1;    /* 14¡¢·¢Ö½×îµÍËÙ¶È */
- 816   5                                              public_val.menu_parm[16] = 73;   /* 15¡¢ËÍÖ½½Ç¶È:0.1kÂö³å */
- 817   5                                              public_val.menu_parm[17] = 1;    /* 16¡¢±¸ÓÃ */
- 818   5                                              public_val.menu_parm[18] = 1;    /* 17¡¢±¸ÓÃ */
- 819   5                                              public_val.menu_parm[19] = 1;    /* 18¡¢±¸ÓÃ */
- 820   5                                              public_val.menu_parm[20] = 1;    /* 19¡¢±¸ÓÃ */                                 
- 821   5                                              public_val.menu_parm[21] = 1;    /* 20¡¢±¸ÓÃ */                                 
- 822   5                                      #endif
- 823   5      
- 824   5                                      #ifdef SZ_03
-                                                      public_val.menu_parm[3] = 30;    /* 2¡¢¶ÂÍ²¼ì²âÊ±¼ä1, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â1¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s */
-                                                      public_val.menu_parm[4] = 30;    /* 3¡¢¶ÂÍ²¼ì²âÊ±¼ä2, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â2¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s */
-                                                      public_val.menu_parm[5] = 1;     /* 4¡¢²½½øµç»ú·½Ïò */
-                                                      public_val.menu_parm[6] = 20;    // 5¡¢ËÍÖ½ËÙ¶ÈÔöÒæ                                     
-                                                      public_val.menu_parm[7] = 490;   /* 6¡¢ ËÍÖ½²½½øµç»úÂö³åµ±Á¿:0.1¸ö/mm (4000*(36/12) /(2*3.14*39)) ¼õË
-             -Ù±È36/12 */
-                                                      public_val.menu_parm[8] = 1;     /* 7¡¢ÇÐÖ½µç»úÁ´ÂÖ¼õËÙ±È */
-                                                      public_val.menu_parm[9] = 150;   /* 8¡¢ÇÐÖ½µç»úÄ¿±êËÙ¶È:0.1khz */
-                                                      public_val.menu_parm[10] = 37;   /* 9¡¢ËÍÖ½½Ç¶È:0.1kÂö³å */
-                                                      public_val.menu_parm[11] = 1;    /* 10¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[12] = 1;    /* 11¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[13] = 1;    /* 12¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[14] = 1;    /* 13¡¢±¸ÓÃ */ 
-                                                      public_val.menu_parm[15] = 1;    /* 14¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[16] = 1;    /* 15¡¢±¸ÓÃ */ 
-                                                      public_val.menu_parm[17] = 1;    /* 16¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[18] = 1;    /* 17¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[19] = 1;    /* 18¡¢±¸ÓÃ */
-                                                      public_val.menu_parm[20] = 1;    /* 19¡¢±¸ÓÃ */ 
-                                                      public_val.menu_parm[21] = 1;    /* 20¡¢±¸ÓÃ */                                         //public_val.menu_parm:Ä¬ÈÏ²ÎÊý
+ 799   5                                              
+ 800   5                                      #ifdef SZ_02            // SZ_02
+ 801   5                                              public_val.Disp_Dz_10101[9] = 84;   /* 10¡¢·¢Ö½µç»úÆô¶¯PWMÕ¼¿Õ±È */                             
+ 802   5                                              public_val.Disp_Dz_10101[10] = 2;    /* 11¡¢ÇÐÖ½µç»úÁ´ÂÖ¼õËÙ±È */
+ 803   5                                              public_val.Disp_Dz_10101[11] = 120;  /* 12¡¢ÇÐÖ½µç»úÄ¿±êËÙ¶È:0.1khz */
+ 804   5                                              public_val.Disp_Dz_10101[12] = 10;   /* 13¡¢·¢Ö½×î¸ßËÙ¶È */
+ 805   5                                              public_val.Disp_Dz_10101[13] = 1;    /* 14¡¢·¢Ö½×îµÍËÙ¶È */
+ 806   5                                              public_val.Disp_Dz_10101[14] = 73;   /* 15¡¢ËÍÖ½½Ç¶È:0.1kÂö³å */
+ 807   5                                              public_val.Disp_Dz_10101[15] = 80;    /* 16¡¢±¸ÓÃ */
+ 808   5                                              public_val.Disp_Dz_10101[16] = 1;    /* 16¡¢±¸ÓÃ */
+ 809   5                                              public_val.Disp_Dz_10101[17] = 1;   /* 17¡¢±¸ÓÃ */
+ 810   5                                              public_val.Disp_Dz_10101[18] = 1;    /* 18¡¢±¸ÓÃ */
+ 811   5                                              public_val.Disp_Dz_10101[19] = 1;    /* 19¡¢±¸ÓÃ */
+ 812   5                                              public_val.Disp_Dz_10101[20] = 1;   /* 20¡¢±¸ÓÃ */
+ 813   5                                      #endif
+ 814   5      
+ 815   5                                      #ifdef SZ_03
+                                                      public_val.Disp_Dz_10101[1] = 30;    /* 2¡¢¶ÂÍ²¼ì²âÊ±¼ä1, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â1¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s 
+             -*/
+                                                      public_val.Disp_Dz_10101[2] = 30;    /* 3¡¢¶ÂÍ²¼ì²âÊ±¼ä2, Ê±»ù¸ÐÓ¦µ½¶ÂÍ²¼ì²â2¸ÐÓ¦±¨¾¯µÄÑÓ³ÙÊ±¼ä:0.1s 
+             -*/
+                                                      public_val.Disp_Dz_10101[3] = 1;     /* 4¡¢²½½øµç»ú·½Ïò */
+                                                      public_val.Disp_Dz_10101[4] = 20;    // 5¡¢ËÍÖ½ËÙ¶ÈÔöÒæ                                 
+                                                      public_val.Disp_Dz_10101[5] = 490;   /* 6¡¢ ËÍÖ½²½½øµç»úÂö³åµ±Á¿:0.1¸ö/mm (4000*(36/12) /(2*3.14*39))
+             - ¼õËÙ±È36/12 */
+                                                      public_val.Disp_Dz_10101[6] = 1;     /* 7¡¢ÇÐÖ½µç»úÁ´ÂÖ¼õËÙ±È */
+                                                      public_val.Disp_Dz_10101[7] = 150;   /* 8¡¢ÇÐÖ½µç»úÄ¿±êËÙ¶È:0.1khz */
+                                                      public_val.Disp_Dz_10101[8] = 37;   /* 9¡¢ËÍÖ½½Ç¶È:0.1kÂö³å */
+                                                      public_val.Disp_Dz_10101[11] = 1;    /* 10¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[12] = 1;    /* 11¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[13] = 1;    /* 12¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[14] = 1;    /* 13¡¢±¸ÓÃ */     
+                                                      public_val.Disp_Dz_10101[15] = 1;    /* 14¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[16] = 1;    /* 16¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[17] = 1;   /* 17¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[18] = 1;    /* 18¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[19] = 1;    /* 19¡¢±¸ÓÃ */
+                                                      public_val.Disp_Dz_10101[20] = 1;   /* 20¡¢±¸ÓÃ */
                                               #endif
- 845   5      
- 846   5      
- 847   5                                              public_val.menu_parm[MENU_ID_00000_MAX_ITEM - 1] = 0x55aa;                                      
- 848   5      
- 849   5                                              func_menu_update(0);            ////¸üÐÂÄ¬ÈÏ²ÎÊý
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 15  
+ 835   5      
+ 836   5                                              public_val.Disp_Dz_10101[MENU_ID_10101_MAX_ITEM] = 0x55aa;                                      
+ 837   5      
+ 838   5                                              func_menu_update(MENU_ID_00000);
+ 839   5                                              func_menu_update(MENU_ID_10101);
+ 840   5                                              
+ 841   5                                      }
+ 842   4      
+ 843   4                                      write_param_flag = 1;    // ¸üÐÂÏÂÎ»»ú²ÎÊý
+ 844   4      
+ 845   4                                      already_read_param = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý */
+ 846   4      
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 15  
 
- 850   5                                              
- 851   5                                      }
- 852   4      
- 853   4                                      write_param_flag = 1;    // ¸üÐÂÏÂÎ»»ú²ÎÊý
- 854   4      
- 855   4                                      already_read_param = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý */
- 856   4      
- 857   4                                      send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */                          
- 858   4                                      
- 859   4                              }
- 860   3      
- 861   3                              //cnt_read_param = public_val.ms_timer;
- 862   3                      }
- 863   2              }
- 864   1      #endif  
- 865   1      
- 866   1              /* ÒÑ¶Áµ½ÅäÖÃ²ÎÊý£¬ÇÒÎ´¶ÁÅäÖÃ²ÎÊý·¶Î§£¬Ôò¶ÁÈ¡Ò»´ÎÅäÖÃ²ÎÊý·¶Î§ */
- 867   1              // Ö÷°åÒÑÊÕµ½²Ù×÷Ãæ°åÏÂ·¢µÄÉèÖÃ²ÎÊý,µ«Î´ÊÕµ½¶Á²ÎÊýÅäÖÃ·¶Î§,ÖÃ·¢ËÍÖ¡ÀàÐÍsend_frame_typeÎª¶Á²ÎÊý·¶Î§
- 868   1      #if 1   
- 869   1              if ((already_read_param == 1) && (already_read_param_range == 0))
- 870   1              {
- 871   2                      //if (public_val.ms_timer - cnt_read_param > 100)
- 872   2                      {               
- 873   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á²ÎÊýÖ¡ */
- 874   3                              {
- 875   4                                      send_frame_type = DOWN_READ_PARAM_RANGE;
- 876   4                              }
- 877   3      
- 878   3                              //cnt_read_param = public_val.ms_timer;
- 879   3                      }
- 880   2              }
- 881   1      #endif  
- 882   1      
- 883   1      
- 884   1              /* µ±Ç°ÐèÒª±£´æÅäÖÃ²ÎÊýµ½Ö÷°å */
- 885   1      #if 1
- 886   1              if (write_param_flag != 0)   //½øÐÐ²ÎÊýÐÞ¸ÄÊ±,Ã¿ÐÞ¸ÄÒ»¸ö²ÎÊýÈ·¶¨,¸üÐÂÏÂÎ»»ú²ÎÊý  ¶¼ÓëÖ÷¿Ø°å½øÐÐÍ¨ÐÅ¸üÐÂ²Î
+ 847   4                                      send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */                          
+ 848   4                                      
+ 849   4                              }
+ 850   3      #endif
+ 851   3                              //cnt_read_param = public_val.ms_timer;
+ 852   3                      }
+ 853   2              }
+ 854   1      #endif  
+ 855   1      
+ 856   1              /* ÒÑ¶Áµ½ÅäÖÃ²ÎÊý£¬ÇÒÎ´¶ÁÅäÖÃ²ÎÊý·¶Î§£¬Ôò¶ÁÈ¡Ò»´ÎÅäÖÃ²ÎÊý·¶Î§ */
+ 857   1              // Ö÷°åÒÑÊÕµ½²Ù×÷Ãæ°åÏÂ·¢µÄÉèÖÃ²ÎÊý,µ«Î´ÊÕµ½¶Á²ÎÊýÅäÖÃ·¶Î§,ÖÃ·¢ËÍÖ¡ÀàÐÍsend_frame_typeÎª¶Á²ÎÊý·¶Î§
+ 858   1      #if 1   
+ 859   1              if ((already_read_param == 1) && (already_read_param_range == 0))
+ 860   1              {
+ 861   2                      //if (public_val.ms_timer - cnt_read_param > 100)
+ 862   2                      {               
+ 863   3                              if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍ¶Á²ÎÊýÖ¡ */
+ 864   3                              {
+ 865   4                                      send_frame_type = DOWN_READ_PARAM_RANGE;
+ 866   4                              }
+ 867   3      
+ 868   3                              //cnt_read_param = public_val.ms_timer;
+ 869   3                      }
+ 870   2              }
+ 871   1      #endif  
+ 872   1      
+ 873   1      
+ 874   1              /* µ±Ç°ÐèÒª±£´æÅäÖÃ²ÎÊýµ½Ö÷°å */
+ 875   1      #if 1
+ 876   1              if (write_param_flag != 0)   //½øÐÐ²ÎÊýÐÞ¸ÄÊ±,Ã¿ÐÞ¸ÄÒ»¸ö²ÎÊýÈ·¶¨,¸üÐÂÏÂÎ»»ú²ÎÊý  ¶¼ÓëÖ÷¿Ø°å½øÐÐÍ¨ÐÅ¸üÐÂ²Î
              -Êý
- 887   1              {
- 888   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²ÎÊýÖ¡ */
- 889   2                      {
- 890   3                              send_frame_type = DOWN_WRITE_PARAM;
- 891   3                      }
- 892   2              }
- 893   1      #endif
- 894   1      
- 895   1      
- 896   1              /* µ±Ç°ÐèÒªÐ´Ñ§Ï°Ä£Ê½µ½Ö÷°å */
+ 877   1              {
+ 878   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²ÎÊýÖ¡ */
+ 879   2                      {
+ 880   3                              send_frame_type = DOWN_WRITE_PARAM;
+ 881   3                      }
+ 882   2              }
+ 883   1      #endif
+ 884   1      
+ 885   1      
+ 886   1              /* µ±Ç°ÐèÒªÐ´Ñ§Ï°Ä£Ê½µ½Ö÷°å */
+ 887   1      #if 1
+ 888   1              if (write_learn_mode_flag != 0)
+ 889   1              {
+ 890   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
+ 891   2                      {
+ 892   3                              send_frame_type = DOWN_WRITE_LEARN_MODE;
+ 893   3                      }
+ 894   2              }
+ 895   1      #endif
+ 896   1      
  897   1      #if 1
- 898   1              if (write_learn_mode_flag != 0)
+ 898   1              if (write_warning_flag != 0)
  899   1              {
  900   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
  901   2                      {
- 902   3                              send_frame_type = DOWN_WRITE_LEARN_MODE;
+ 902   3                              send_frame_type = DOWN_WRITE_WARNING_MSG;
  903   3                      }
  904   2              }
  905   1      #endif
  906   1      
- 907   1      #if 1
- 908   1              if (write_warning_flag != 0)
- 909   1              {
- 910   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 16  
+ 907   1      
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 16  
 
- 911   2                      {
- 912   3                              send_frame_type = DOWN_WRITE_WARNING_MSG;
- 913   3                      }
- 914   2              }
- 915   1      #endif
- 916   1      
- 917   1      
- 918   1      
- 919   1              /* µ±Ç°ÐèÒªÐ´²âÊÔÄ£Ê½µ½Ö÷°å */
- 920   1      #if 1
- 921   1              if (write_test_mode_flag != 0)
- 922   1              {
- 923   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
- 924   2                      {
- 925   3                              send_frame_type = DOWN_WRITE_TEST_MODE;
- 926   3                      }
- 927   2              }
- 928   1      #endif
- 929   1      
- 930   1              /* µ±Ç°ÐèÒªÐ´ËÙ¶ÈÄ£Ê½µ½Ö÷°å */
- 931   1      #if 1
- 932   1              if (write_speed_mode_flag != 0)
- 933   1              {
- 934   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
- 935   2                      {
- 936   3                              send_frame_type = DOWN_WRITE_SPEED_MODE;
- 937   3                      }
- 938   2              }
- 939   1      #endif
- 940   1      
- 941   1      
- 942   1              /* µ±Ç°ÐèÒªÐ´Çå³ýÒÑ³öÍ²ÊýÖ÷°å */
- 943   1      #if 1
- 944   1              if (write_clear_cnt_flag != 0)
- 945   1              {
- 946   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
- 947   2                      {
- 948   3                              send_frame_type = DOWN_WRITE_CLEAR_CNT;
- 949   3                      }
- 950   2              }
- 951   1      #endif
- 952   1      
- 953   1              /* µ±Ç°ÐèÒªÐ´°´¼üµ½Ö÷°å */
- 954   1      #if 1
- 955   1              if (write_key_flag != 0)
+ 908   1      
+ 909   1              /* µ±Ç°ÐèÒªÐ´²âÊÔÄ£Ê½µ½Ö÷°å */
+ 910   1      #if 1
+ 911   1              if (write_test_mode_flag != 0)
+ 912   1              {
+ 913   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
+ 914   2                      {
+ 915   3                              send_frame_type = DOWN_WRITE_TEST_MODE;
+ 916   3                      }
+ 917   2              }
+ 918   1      #endif
+ 919   1      
+ 920   1              /* µ±Ç°ÐèÒªÐ´ËÙ¶ÈÄ£Ê½µ½Ö÷°å */
+ 921   1      #if 1
+ 922   1              if (write_speed_mode_flag != 0)
+ 923   1              {
+ 924   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
+ 925   2                      {
+ 926   3                              send_frame_type = DOWN_WRITE_SPEED_MODE;
+ 927   3                      }
+ 928   2              }
+ 929   1      #endif
+ 930   1      
+ 931   1      
+ 932   1              /* µ±Ç°ÐèÒªÐ´Çå³ýÒÑ³öÍ²ÊýÖ÷°å */
+ 933   1      #if 1
+ 934   1              if (write_clear_cnt_flag != 0)
+ 935   1              {
+ 936   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´²âÊÔÄ£Ê½Ö¡ */
+ 937   2                      {
+ 938   3                              send_frame_type = DOWN_WRITE_CLEAR_CNT;
+ 939   3                      }
+ 940   2              }
+ 941   1      #endif
+ 942   1      
+ 943   1              /* µ±Ç°ÐèÒªÐ´°´¼üµ½Ö÷°å */
+ 944   1      #if 1
+ 945   1              if (write_key_flag != 0)
+ 946   1              {
+ 947   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´°´¼üÖ¡ */
+ 948   2                      {
+ 949   3                              send_frame_type = DOWN_WRITE_KEY;
+ 950   3                      }
+ 951   2              }       
+ 952   1      #endif
+ 953   1      
+ 954   1              /* ·¢ËÍ×éÖ¡ */
+ 955   1              switch (send_frame_type)
  956   1              {
- 957   2                      if (send_frame_type == UP_REPLY_DONE)  /* ÉÏÒ»Ö¡ÒÑÊÕµ½»Ø¸´£¬Ôò·¢ËÍÐ´°´¼üÖ¡ */
- 958   2                      {
- 959   3                              send_frame_type = DOWN_WRITE_KEY;
- 960   3                      }
- 961   2              }       
- 962   1      #endif
- 963   1      
- 964   1              /* ·¢ËÍ×éÖ¡ */
- 965   1              switch (send_frame_type)
- 966   1              {
- 967   2                      case DOWN_READ_PARAM:  /* ÏÂÐÐ¶Á²ÎÊýÖ¡ */
- 968   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
- 969   2                              
- 970   2                              uart_send_buf[0] = DOWN_READ_PARAM;
- 971   2                              uart_send_buf[1] = 1;                   
- 972   2                              uart_send_buf[2] = 0;
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 17  
+ 957   2                      case DOWN_READ_PARAM:  /* ÏÂÐÐ¶Á²ÎÊýÖ¡ */
+ 958   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
+ 959   2                              
+ 960   2                              uart_send_buf[0] = DOWN_READ_PARAM;
+ 961   2                              uart_send_buf[1] = 1;                   
+ 962   2                              uart_send_buf[2] = 0;
+ 963   2                              uart_send_buf[3] = 1;
+ 964   2      
+ 965   2                              Send_UartBuf(uart_send_buf);
+ 966   2      
+ 967   2                              send_frame_type = DOWN_READ_PARAM_SENT;   /* ÖÃÎª¶Á²ÎÊýÖ¡ÒÑ·¢ËÍ */
+ 968   2                              
+ 969   2                              break;
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 17  
 
- 973   2                              uart_send_buf[3] = 1;
- 974   2      
- 975   2                              Send_UartBuf(uart_send_buf);
- 976   2      
- 977   2                              send_frame_type = DOWN_READ_PARAM_SENT;   /* ÖÃÎª¶Á²ÎÊýÖ¡ÒÑ·¢ËÍ */
- 978   2                              
- 979   2                              break;
- 980   2      
- 981   2                      //ÏÂ·¢¶Á×´Ì¬,Ö÷¿Ø°å·µ»ØÏàÓ¦×´Ì¬
- 982   2                      case DOWN_READ_STATE:  /* ÏÂÐÐ¶Á×´Ì¬ */   //Ã¿¼ä¸ô1s¶ÁÈ¡Ö÷°å×´Ì¬
- 983   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
- 984   2                              
- 985   2                              uart_send_buf[0] = DOWN_READ_STATE;
- 986   2                              uart_send_buf[1] = 1;                   
- 987   2                              uart_send_buf[2] = 0;
- 988   2                              uart_send_buf[3] = 2;
- 989   2      
- 990   2                              Send_UartBuf(uart_send_buf);
- 991   2      
- 992   2                              send_frame_type = DOWN_READ_STATE_SENT;   /* ÖÃÎª¶Á×´Ì¬Ö¡ÒÑ·¢ËÍ */
- 993   2                              
- 994   2                              break;
+ 970   2      
+ 971   2                      //ÏÂ·¢¶Á×´Ì¬,Ö÷¿Ø°å·µ»ØÏàÓ¦×´Ì¬
+ 972   2                      case DOWN_READ_STATE:  /* ÏÂÐÐ¶Á×´Ì¬ */   //Ã¿¼ä¸ô1s¶ÁÈ¡Ö÷°å×´Ì¬
+ 973   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
+ 974   2                              
+ 975   2                              uart_send_buf[0] = DOWN_READ_STATE;
+ 976   2                              uart_send_buf[1] = 1;                   
+ 977   2                              uart_send_buf[2] = 0;
+ 978   2                              uart_send_buf[3] = 2;
+ 979   2      
+ 980   2                              Send_UartBuf(uart_send_buf);
+ 981   2      
+ 982   2                              send_frame_type = DOWN_READ_STATE_SENT;   /* ÖÃÎª¶Á×´Ì¬Ö¡ÒÑ·¢ËÍ */
+ 983   2                              
+ 984   2                              break;
+ 985   2      
+ 986   2                      case DOWN_READ_PARAM_RANGE:  /* ÏÂÐÐ¶Á²ÎÊý·¶Î§ */
+ 987   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
+ 988   2      
+ 989   2                              uart_send_buf[0] = DOWN_READ_PARAM_RANGE;
+ 990   2                              uart_send_buf[1] = 1;                   
+ 991   2                              uart_send_buf[2] = 0;
+ 992   2                              uart_send_buf[3] = 4;           
+ 993   2      
+ 994   2                              Send_UartBuf(uart_send_buf);
  995   2      
- 996   2                      case DOWN_READ_PARAM_RANGE:  /* ÏÂÐÐ¶Á²ÎÊý·¶Î§ */
- 997   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));
- 998   2      
- 999   2                              uart_send_buf[0] = DOWN_READ_PARAM_RANGE;
-1000   2                              uart_send_buf[1] = 1;                   
-1001   2                              uart_send_buf[2] = 0;
-1002   2                              uart_send_buf[3] = 4;           
-1003   2      
-1004   2                              Send_UartBuf(uart_send_buf);
+ 996   2                              send_frame_type = DOWN_READ_PARAM_RANGE_SENT;   /* ÖÃÎª¶Á²ÎÊý·¶Î§Ö¡ÒÑ·¢ËÍ */
+ 997   2      
+ 998   2                              
+ 999   2                              break;
+1000   2      
+1001   2      
+1002   2                      //ÏòÖ÷¿Ø°å·¢ËÍÒÑÅäÖÃµÄ²ÎÊý
+1003   2                      case DOWN_WRITE_PARAM:  /* ÏÂÐÐÐ´ÅäÖÃ²ÎÊý */
+1004   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
 1005   2      
-1006   2                              send_frame_type = DOWN_READ_PARAM_RANGE_SENT;   /* ÖÃÎª¶Á²ÎÊý·¶Î§Ö¡ÒÑ·¢ËÍ */
-1007   2      
-1008   2                              
-1009   2                              break;
+1006   2                              uart_send_buf[0] = DOWN_WRITE_PARAM;
+1007   2                              uart_send_buf[1] = COM_MENU_MAX_ITEM << 1;      
+1008   2      
+1009   2                              pcTemp = (char *)&public_val.menu_parm[0];   //½«ËùÓÐ²ÎÊý½øÐÐÒ»´Î¸üÐÂ
 1010   2      
-1011   2      
-1012   2                      //ÏòÖ÷¿Ø°å·¢ËÍÒÑÅäÖÃµÄ²ÎÊý
-1013   2                      case DOWN_WRITE_PARAM:  /* ÏÂÐÐÐ´ÅäÖÃ²ÎÊý */
-1014   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-1015   2      
-1016   2                              uart_send_buf[0] = DOWN_WRITE_PARAM;
-1017   2                              uart_send_buf[1] = Menu_Number[0] << 1; 
-1018   2      
-1019   2                              pcTemp = (char *)&public_val.menu_parm[0];   //½«ËùÓÐ²ÎÊý½øÐÐÒ»´Î¸üÐÂ
-1020   2      
-1021   2                              sum_byte = uart_send_buf[0] + uart_send_buf[1];                 
+1011   2                              sum_byte = uart_send_buf[0] + uart_send_buf[1];                 
+1012   2                              
+1013   2                              for (i = 0; i < (COM_MENU_MAX_ITEM << 1); i++)
+1014   2                              {
+1015   3                                      uart_send_buf[2 + i] = pcTemp[i];
+1016   3      
+1017   3                                      /* ¼ÆËãÐ£ÑéºÍ */
+1018   3                                      sum_byte += pcTemp[i];                          
+1019   3                              }
+1020   2                              
+1021   2                              //sum_byte &= 0xff;
 1022   2                              
-1023   2                              for (i = 0; i < (Menu_Number[0] << 1); i++)
-1024   2                              {
-1025   3                                      uart_send_buf[2 + i] = pcTemp[i];
-1026   3      
-1027   3                                      /* ¼ÆËãÐ£ÑéºÍ */
-1028   3                                      sum_byte += pcTemp[i];                          
-1029   3                              }
-1030   2                              
-1031   2                              //sum_byte &= 0xff;
-1032   2                              
-1033   2                              uart_send_buf[2 + (Menu_Number[0] << 1)] = sum_byte;
-1034   2              
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 18  
+1023   2                              uart_send_buf[2 + (COM_MENU_MAX_ITEM << 1)] = sum_byte;
+1024   2              
+1025   2                              Send_UartBuf(uart_send_buf);
+1026   2      
+1027   2                              send_frame_type = DOWN_WRITE_PARAM_SENT;   /* ÖÃÎªÐ´²ÎÊýÖ¡ÒÑ·¢ËÍ */
+1028   2      
+1029   2      
+1030   2                              write_param_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´ÅäÖÃ²ÎÊý£¬ÖÃÎª²»Ð´×´Ì¬ */ 
+1031   2                              
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 18  
 
-1035   2                              Send_UartBuf(uart_send_buf);
+1032   2                              break;
+1033   2      
+1034   2                      case DOWN_WRITE_TEST_MODE:  /* ÏÂÐÐÐ´½øÈë²âÊÔÄ£Ê½ */
+1035   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
 1036   2      
-1037   2                              send_frame_type = DOWN_WRITE_PARAM_SENT;   /* ÖÃÎªÐ´²ÎÊýÖ¡ÒÑ·¢ËÍ */
-1038   2      
-1039   2      
-1040   2                              write_param_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´ÅäÖÃ²ÎÊý£¬ÖÃÎª²»Ð´×´Ì¬ */ 
-1041   2                              
-1042   2                              break;
+1037   2                              uart_send_buf[0] = DOWN_WRITE_TEST_MODE;
+1038   2                              uart_send_buf[1] = 1;                   
+1039   2                              uart_send_buf[2] = test_mode;
+1040   2                              uart_send_buf[3] = 5 + test_mode;               
+1041   2      
+1042   2                              Send_UartBuf(uart_send_buf);
 1043   2      
-1044   2                      case DOWN_WRITE_TEST_MODE:  /* ÏÂÐÐÐ´½øÈë²âÊÔÄ£Ê½ */
-1045   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-1046   2      
-1047   2                              uart_send_buf[0] = DOWN_WRITE_TEST_MODE;
-1048   2                              uart_send_buf[1] = 1;                   
-1049   2                              uart_send_buf[2] = test_mode;
-1050   2                              uart_send_buf[3] = 5 + test_mode;               
-1051   2      
-1052   2                              Send_UartBuf(uart_send_buf);
-1053   2      
-1054   2                              send_frame_type = DOWN_WRITE_TEST_MODE_SENT;   /* ÖÃÎªÐ´²âÊÔÄ£Ê½Ö¡ÒÑ·¢ËÍ */                     
-1055   2      
-1056   2                              write_test_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´²âÊÔÄ£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */     
+1044   2                              send_frame_type = DOWN_WRITE_TEST_MODE_SENT;   /* ÖÃÎªÐ´²âÊÔÄ£Ê½Ö¡ÒÑ·¢ËÍ */                     
+1045   2      
+1046   2                              write_test_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´²âÊÔÄ£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */     
+1047   2      
+1048   2                              break;
+1049   2      
+1050   2                      case DOWN_WRITE_LEARN_MODE:  /* ÏÂÐÐÐ´½øÈëÑ§Ï°Ä£Ê½ */
+1051   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
+1052   2      
+1053   2                              uart_send_buf[0] = DOWN_WRITE_LEARN_MODE;
+1054   2                              uart_send_buf[1] = 1;                   
+1055   2                              uart_send_buf[2] = 0;  // no use
+1056   2                              uart_send_buf[3] = 8;           
 1057   2      
-1058   2                              break;
+1058   2                              Send_UartBuf(uart_send_buf);
 1059   2      
-1060   2                      case DOWN_WRITE_LEARN_MODE:  /* ÏÂÐÐÐ´½øÈëÑ§Ï°Ä£Ê½ */
-1061   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-1062   2      
-1063   2                              uart_send_buf[0] = DOWN_WRITE_LEARN_MODE;
-1064   2                              uart_send_buf[1] = 1;                   
-1065   2                              uart_send_buf[2] = 0;  // no use
-1066   2                              uart_send_buf[3] = 8;           
+1060   2                              send_frame_type = DOWN_WRITE_LEARN_MODE_SENT;   /* ÖÃÎªÐ´Ñ§Ï°Ä£Ê½Ö¡ÒÑ·¢ËÍ */                    
+1061   2      
+1062   2                              write_learn_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´Ñ§Ï°Ä£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */    
+1063   2      
+1064   2                              break;
+1065   2      
+1066   2                      case DOWN_WRITE_SPEED_MODE:  /* ÏÂÐÐÐ´ÇÐ»»ËÙ¶ÈÄ£Ê½ */
 1067   2      
-1068   2                              Send_UartBuf(uart_send_buf);
+1068   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
 1069   2      
-1070   2                              send_frame_type = DOWN_WRITE_LEARN_MODE_SENT;   /* ÖÃÎªÐ´Ñ§Ï°Ä£Ê½Ö¡ÒÑ·¢ËÍ */                    
-1071   2      
-1072   2                              write_learn_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´Ñ§Ï°Ä£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */    
-1073   2      
-1074   2                              break;
-1075   2      
-1076   2                      case DOWN_WRITE_SPEED_MODE:  /* ÏÂÐÐÐ´ÇÐ»»ËÙ¶ÈÄ£Ê½ */
-1077   2      
-1078   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-1079   2      
-1080   2                              uart_send_buf[0] = DOWN_WRITE_SPEED_MODE;
-1081   2                              uart_send_buf[1] = 1;                   
-1082   2                              uart_send_buf[2] = speed_mode;  
-1083   2                              uart_send_buf[3] = 9 + speed_mode;              
-1084   2      
-1085   2                              Send_UartBuf(uart_send_buf);
-1086   2      
-1087   2                              send_frame_type = DOWN_WRITE_SPEED_MODE_SENT;   /* ÖÃÎªÐ´ËÙ¶ÈÄ£Ê½Ö¡ÒÑ·¢ËÍ */                    
-1088   2      
-1089   2                              write_speed_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´ËÙ¶ÈÄ£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */    
-1090   2      
-1091   2      
-1092   2                              break;
-1093   2      
-1094   2                      case DOWN_WRITE_WARNING_MSG:
-1095   2      
-1096   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 19  
+1070   2                              uart_send_buf[0] = DOWN_WRITE_SPEED_MODE;
+1071   2                              uart_send_buf[1] = 1;                   
+1072   2                              uart_send_buf[2] = speed_mode;  
+1073   2                              uart_send_buf[3] = 9 + speed_mode;              
+1074   2      
+1075   2                              Send_UartBuf(uart_send_buf);
+1076   2      
+1077   2                              send_frame_type = DOWN_WRITE_SPEED_MODE_SENT;   /* ÖÃÎªÐ´ËÙ¶ÈÄ£Ê½Ö¡ÒÑ·¢ËÍ */                    
+1078   2      
+1079   2                              write_speed_mode_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´ËÙ¶ÈÄ£Ê½£¬ÖÃÎª²»Ð´×´Ì¬ */    
+1080   2      
+1081   2      
+1082   2                              break;
+1083   2      
+1084   2                      case DOWN_WRITE_WARNING_MSG:
+1085   2      
+1086   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
+1087   2      
+1088   2                              uart_send_buf[0] = DOWN_WRITE_WARNING_MSG;
+1089   2                              uart_send_buf[1] = 1;                   
+1090   2                              uart_send_buf[2] = 0;   // no use
+1091   2                              uart_send_buf[3] = 10;          
+1092   2      
+1093   2                              Send_UartBuf(uart_send_buf);
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 19  
 
-1097   2      
-1098   2                              uart_send_buf[0] = DOWN_WRITE_WARNING_MSG;
-1099   2                              uart_send_buf[1] = 1;                   
-1100   2                              uart_send_buf[2] = 0;   // no use
-1101   2                              uart_send_buf[3] = 10;          
-1102   2      
-1103   2                              Send_UartBuf(uart_send_buf);
-1104   2      
-1105   2                              send_frame_type = DOWN_WRITE_WARNING_MSG_SENT;   
-1106   2      
-1107   2                              write_warning_flag = 0;  
+1094   2      
+1095   2                              send_frame_type = DOWN_WRITE_WARNING_MSG_SENT;   
+1096   2      
+1097   2                              write_warning_flag = 0;  
+1098   2      
+1099   2                              break;
+1100   2      
+1101   2                      case DOWN_WRITE_CLEAR_CNT:  /* ÏÂÐÐÐ´Çå³ýÒÑ³öÍ²Êý */
+1102   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
+1103   2      
+1104   2                              uart_send_buf[0] = DOWN_WRITE_CLEAR_CNT;
+1105   2                              uart_send_buf[1] = 1;                   
+1106   2                              uart_send_buf[2] = 0;
+1107   2                              uart_send_buf[3] = 6;           
 1108   2      
-1109   2                              break;
+1109   2                              Send_UartBuf(uart_send_buf);
 1110   2      
-1111   2                      case DOWN_WRITE_CLEAR_CNT:  /* ÏÂÐÐÐ´Çå³ýÒÑ³öÍ²Êý */
-1112   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
-1113   2      
-1114   2                              uart_send_buf[0] = DOWN_WRITE_CLEAR_CNT;
-1115   2                              uart_send_buf[1] = 1;                   
-1116   2                              uart_send_buf[2] = 0;
-1117   2                              uart_send_buf[3] = 6;           
-1118   2      
-1119   2                              Send_UartBuf(uart_send_buf);
-1120   2      
-1121   2                              send_frame_type = DOWN_WRITE_CLEAR_CNT_SENT;                    
-1122   2      
-1123   2                              write_clear_cnt_flag = 0;  
-1124   2      
-1125   2                              break;
-1126   2      
-1127   2                      case DOWN_WRITE_KEY:  /* ÏÂÐÐÐ´°´¼ü²Ù×÷ */
-1128   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
+1111   2                              send_frame_type = DOWN_WRITE_CLEAR_CNT_SENT;                    
+1112   2      
+1113   2                              write_clear_cnt_flag = 0;  
+1114   2      
+1115   2                              break;
+1116   2      
+1117   2                      case DOWN_WRITE_KEY:  /* ÏÂÐÐÐ´°´¼ü²Ù×÷ */
+1118   2                              memset(uart_send_buf, 0, sizeof(uart_send_buf));                        
+1119   2      
+1120   2                              uart_send_buf[0] = DOWN_WRITE_KEY;
+1121   2                              uart_send_buf[1] = 3;                   
+1122   2                              uart_send_buf[2] = (char)gsKeyVal;
+1123   2                              uart_send_buf[3] = (char)(gsKeyVal >> 8);
+1124   2                              uart_send_buf[4] = gcKeyType;                   
+1125   2                              uart_send_buf[5] = 9 + uart_send_buf[2] + uart_send_buf[3] 
+1126   2                                      + uart_send_buf[4];
+1127   2      
+1128   2                              Send_UartBuf(uart_send_buf);
 1129   2      
-1130   2                              uart_send_buf[0] = DOWN_WRITE_KEY;
-1131   2                              uart_send_buf[1] = 3;                   
-1132   2                              uart_send_buf[2] = (char)gsKeyVal;
-1133   2                              uart_send_buf[3] = (char)(gsKeyVal >> 8);
-1134   2                              uart_send_buf[4] = gcKeyType;                   
-1135   2                              uart_send_buf[5] = 9 + uart_send_buf[2] + uart_send_buf[3] 
-1136   2                                      + uart_send_buf[4];
-1137   2      
-1138   2                              Send_UartBuf(uart_send_buf);
-1139   2      
-1140   2                              send_frame_type = DOWN_WRITE_KEY_SENT;                          
-1141   2      
-1142   2                              write_key_flag = 0;  
-1143   2      
-1144   2                              break;
-1145   2      
-1146   2                      default:
-1147   2                              break;
-1148   2              }
-1149   1      
-1150   1      
-1151   1              //if (send_frame_type != 0x7f)     /* ÓÐÖ¡Òª·¢ËÍ */
-1152   1              //{             
-1153   1              //      Send_UartBuf(uart_send_buf);  //deleted for test
-1154   1      
-1155   1                      //send_frame_type = 0x7f;      /* ·¢ËÍÍê³É£¬ÖÃÎªÎÞÐ§Ö¡£¬ÎÞÖ¡·¢ËÍ */
-1156   1              //}
-1157   1              
-1158   1      }
-C51 COMPILER V9.00   UART                                                                  05/05/2016 16:13:40 PAGE 20  
+1130   2                              send_frame_type = DOWN_WRITE_KEY_SENT;                          
+1131   2      
+1132   2                              write_key_flag = 0;  
+1133   2      
+1134   2                              break;
+1135   2      
+1136   2                      default:
+1137   2                              break;
+1138   2              }
+1139   1      
+1140   1      
+1141   1              //if (send_frame_type != 0x7f)     /* ÓÐÖ¡Òª·¢ËÍ */
+1142   1              //{             
+1143   1              //      Send_UartBuf(uart_send_buf);  //deleted for test
+1144   1      
+1145   1                      //send_frame_type = 0x7f;      /* ·¢ËÍÍê³É£¬ÖÃÎªÎÞÐ§Ö¡£¬ÎÞÖ¡·¢ËÍ */
+1146   1              //}
+1147   1              
+1148   1      }
+1149          
+1150          
+1151          
+1152          //´®¿ÚÆÁ²Ù×÷
+1153          //µÚÒ»´ÎÊ¹ÓÃ´®¿ÚÖúÊÖ(Commix 1.4)(Ê¹ÓÃ×Ö·û´®·½Ê½)(by enter ÊÇ·ñ´ò¹³Ã»Ê²Ã´Çø±ð)·¢ËÍÈçÏÂÃüÁî³É¹¦:
+1154          //CLS(0);\x0d\x0a
+1155          //µÚ¶þ´Î·¢ËÍ³É¹¦
+C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 20  
 
-1159          
-1160          
-1161          
-1162          //´®¿ÚÆÁ²Ù×÷
-1163          //µÚÒ»´ÎÊ¹ÓÃ´®¿ÚÖúÊÖ(Commix 1.4)(Ê¹ÓÃ×Ö·û´®·½Ê½)(by enter ÊÇ·ñ´ò¹³Ã»Ê²Ã´Çø±ð)·¢ËÍÈçÏÂÃüÁî³É¹¦:
-1164          //CLS(0);\x0d\x0a
-1165          //µÚ¶þ´Î·¢ËÍ³É¹¦
-1166          //DS48(0,0,'ÏÔÊ¾×Ö·û´®',1);\x0d\x0a
-1167          
-1168          //²âÊÔ³ÌÐò
-1169          //¸ÄÐ´³ÌÐò,³õÊ¼»¯usart2ºó,·¢ËÍÈçÉÏÃüÁî:
-1170          //CLS(0);\x0d\x0a
-1171          //DS48(0,0,'ÏÔÊ¾×Ö·û´®',1);\x0d\x0a
-1172          //¿´Ð§¹ûÈçºÎ
-1173          
-1174          //GpuSend("PL(0,80,320,80,11);\r\n");
-1175          
-1176          //sprintf(buf,"ICON(%d,165,1,11,1,10);DS16(%d,224,' --- ',4);BOXF(%d,31,%d,79,0);BOXF(%d,81,%d,129,0);",54
+1156          //DS48(0,0,'ÏÔÊ¾×Ö·û´®',1);\x0d\x0a
+1157          
+1158          //²âÊÔ³ÌÐò
+1159          //¸ÄÐ´³ÌÐò,³õÊ¼»¯usart2ºó,·¢ËÍÈçÉÏÃüÁî:
+1160          //CLS(0);\x0d\x0a
+1161          //DS48(0,0,'ÏÔÊ¾×Ö·û´®',1);\x0d\x0a
+1162          //¿´Ð§¹ûÈçºÎ
+1163          
+1164          //GpuSend("PL(0,80,320,80,11);\r\n");
+1165          
+1166          //sprintf(buf,"ICON(%d,165,1,11,1,10);DS16(%d,224,' --- ',4);BOXF(%d,31,%d,79,0);BOXF(%d,81,%d,129,0);",54
              -*i,54*i+4,x1,x2,x1,x2);
-1177          //                              GpuSend(buf);
-1178          
-1179          //GpuSend("CLS(13);BOX(0,0,219,175,15);BOX(1,1,218,174,0);BOXF(2,2,217,17,3);PL(2,18,218,18,0);\r\n");
-1180                  
-1181          
+1167          //                              GpuSend(buf);
+1168          
+1169          //GpuSend("CLS(13);BOX(0,0,219,175,15);BOX(1,1,218,174,0);BOXF(2,2,217,17,3);PL(2,18,218,18,0);\r\n");
+1170                  
+1171          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   2108    ----
+   CODE SIZE        =   2349    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     36    ----
+   XDATA SIZE       =    120      19
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     10      19
+   DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      2    ----
 END OF MODULE INFORMATION.
 
 
-C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
+C51 COMPILATION COMPLETE.  2 WARNING(S),  0 ERROR(S)

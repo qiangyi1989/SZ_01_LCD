@@ -1,10 +1,10 @@
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 1   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
 OBJECT MODULE PLACED IN .\out\main.obj
-COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\main.lst) OBJECT(.\out\main.ob
-                    -j)
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE main.c LARGE BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\main.lst) OBJECT(.\out\m
+                    -ain.obj)
 
 line level    source
 
@@ -62,7 +62,7 @@ line level    source
   52          char start_com_flag = 0;             /* 操作板开始串口通信的标志: 1开始，0未开始 */
   53          
   54          unsigned int usLongDownFlag = 0;     /* 长按下标志: 0未按下，1已按下 */
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 2   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 2   
 
   55          
   56          
@@ -126,7 +126,7 @@ line level    source
               //  AUXR &= 0x7f;                       //定时器0为12T模式
               
                   TMOD = 0x00;                    //设置定时器为模式0(16位自动重装载)
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 3   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 3   
 
               
                       //TL0 = 0xfd;                     //初始化计时值
@@ -190,7 +190,7 @@ line level    source
  176          {
  177   1          AUXR |= 0x80;                       //定时器0为1T模式
  178   1      //  AUXR &= 0x7f;                       //定时器0为12T模式
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 4   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 4   
 
  179   1      
  180   1          TMOD = 0x00;                    //设置定时器为模式0(16位自动重装载)
@@ -254,7 +254,7 @@ line level    source
  238   2                      if( !(unKey.all & p->us_inMask) )                                                                               
  239   2                      {
  240   3                              p->us_DownCnt++;
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 5   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 5   
 
  241   3                              if(p->us_DownCnt > KEY_JIT_DELAY)                       ///<按下                                                
  242   3                              {
@@ -318,7 +318,7 @@ line level    source
  300   3                              p->us_UpCnt = 0;
  301   3                              p->us_logStep = 20;
  302   3                      }
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 6   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 6   
 
  303   2                      
  304   2                      break;
@@ -382,7 +382,7 @@ line level    source
                                       p->us_UpCnt++;
                                       if(p->us_UpCnt > KEY_JIT_DELAY)   /* 弹起 */                                                                    
                                       {
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 7   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 7   
 
                                               p->us_finishFlag = KEY_LONG_UP_FLAG;   /* 判为长按抬起 */   
               
@@ -446,7 +446,7 @@ line level    source
  424   4                              }
  425   3                      }
  426   2                      else if (t_FzFwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 8   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 8   
 
  427   2                      {
  428   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
@@ -510,7 +510,7 @@ line level    source
  486   3                              write_key_flag = 1;   /* 有按键，需要写按键到主板 */                    
  487   3                      }       
  488   2              }
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 9   
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 9   
 
  489   1      
  490   1      
@@ -574,7 +574,7 @@ line level    source
  548   2                      else if (t_PaperBwKey.us_finishFlag == KEY_SHORT_UP_FLAG) /* 短按 */
  549   2                      {
  550   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 10  
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 10  
 
  551   3      
  552   3                              t_PaperBwKey.us_finishFlag = 0;
@@ -638,7 +638,7 @@ line level    source
                               }       
                       }
               #endif
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 11  
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 11  
 
  613   1      
  614   1              /* 下料 */      
@@ -702,7 +702,7 @@ line level    source
  672   3                              gcKeyType = KEY_SHORT_UP_FLAG;   
  673   3      
  674   3                              t_RollKey.us_finishFlag = 0;
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 12  
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 12  
 
  675   3                              t_RollKey.us_logStep = 0;                       
  676   3      
@@ -738,24 +738,24 @@ line level    source
  706   1              check_uart_rec();
  707   1      
  708   1              key_detect();
- 709   1      }
- 710          
+ 709   1              
+ 710   1      }
  711          
  712          
- 713          void main()
- 714          {
- 715   1              eeprom_en = 0;
- 716   1      
- 717   1              /* 硬件初始化 */
- 718   1              sys_init();
- 719   1      
- 720   1              /* 全局变量初始化 */
- 721   1              GlobalInit();
- 722   1                      
- 723   1              InitLEDDisplay();
- 724   1      
- 725   1              cnt_read_state = public_val.ms_timer;   
- 726   1      
+ 713          
+ 714          void main()
+ 715          {
+ 716   1              eeprom_en = 0;
+ 717   1      
+ 718   1              /* 硬件初始化 */
+ 719   1              sys_init();
+ 720   1      
+ 721   1              /* 全局变量初始化 */
+ 722   1              GlobalInit();
+ 723   1                      
+ 724   1              InitLEDDisplay();
+ 725   1      
+ 726   1              cnt_read_state = public_val.ms_timer;   
  727   1              
  728   1              while(1)
  729   1              {       
@@ -766,7 +766,7 @@ line level    source
  734   3                              {
  735   4                                      cnt_read_state = public_val.ms_timer;
  736   4                                      cnt_read_param = public_val.ms_timer;
-C51 COMPILER V9.00   MAIN                                                                  05/05/2016 16:13:40 PAGE 13  
+C51 COMPILER V9.00   MAIN                                                                  05/10/2016 17:31:06 PAGE 13  
 
  737   4      
  738   4                                      /* 开始手动模式按键检测 */
@@ -779,7 +779,7 @@ line level    source
  745   2                      if (start_com_flag == 1)
  746   2                      {               
  747   3                              LEDDisplay();
- 748   3      
+ 748   3                              
  749   3                              if(public_val.uart_rec_statu == 2)   /* 接收完毕，开始处理 */
  750   3                              {                       
  751   4                                      rec_data_func();
@@ -787,25 +787,26 @@ line level    source
  753   4                                      public_val.uart_rec_statu = 3;   /* 置接收处理完毕状态 */
  754   4                                      public_val.uart_rec_count = 0;   /* 清接收字节计数 */
  755   4                              }
- 756   3      
- 757   3                              send_data_func();
- 758   3      
- 759   3                              judge_key();
- 760   3      
- 761   3                      }
- 762   2                      
- 763   2              }
- 764   1      }
- 765          
+ 756   3                              
+ 757   3      
+ 758   3                              send_data_func();
+ 759   3      
+ 760   3                              judge_key();
+ 761   3      
+ 762   3                      }
+ 763   2                      
+ 764   2              }
+ 765   1      }
  766          
+ 767          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   1294    ----
+   CODE SIZE        =   1519    ----
    CONSTANT SIZE    =   ----    ----
-   XDATA SIZE       =     98    ----
+   XDATA SIZE       =    121       3
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     23       3
+   DATA SIZE        =   ----    ----
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

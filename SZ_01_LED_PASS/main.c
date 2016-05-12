@@ -706,6 +706,7 @@ void tm0_isr() interrupt 1 using 1
 	check_uart_rec();
 
 	key_detect();
+	
 }
 
 
@@ -723,7 +724,6 @@ void main()
 	InitLEDDisplay();
 
 	cnt_read_state = public_val.ms_timer;	
-
 	
 	while(1)
 	{	
@@ -745,14 +745,15 @@ void main()
 		if (start_com_flag == 1)
 		{		
 			LEDDisplay();
-
-		  	if(public_val.uart_rec_statu == 2)   /* 接收完毕，开始处理 */
-	  		{			
-	  			rec_data_func();
+			
+			if(public_val.uart_rec_statu == 2)   /* 接收完毕，开始处理 */
+			{			
+				rec_data_func();
 				
-	  			public_val.uart_rec_statu = 3;   /* 置接收处理完毕状态 */
-	  			public_val.uart_rec_count = 0;   /* 清接收字节计数 */
-	  		}
+				public_val.uart_rec_statu = 3;   /* 置接收处理完毕状态 */
+				public_val.uart_rec_count = 0;   /* 清接收字节计数 */
+			}
+		  	
 
 			send_data_func();
 

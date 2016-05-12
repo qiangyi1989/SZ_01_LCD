@@ -1,1 +1,0 @@
-"I2c.c" BROWSE DEBUG OBJECTEXTEND PRINT(.\lst\I2c.lst) OBJECT(.\out\I2c.obj)
