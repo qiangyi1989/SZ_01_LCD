@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 1   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE LED_DISPLAY
@@ -62,7 +62,7 @@ line level    source
   52          //void InitLEDDrivers(void);
   53          void LEDShowFlashString(const char  * buff,char x);
   54          //void LEDShowString(char  * buff,char x);
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 2   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 2   
 
   55          void LEDShowCharS(const char * buff,char num,char x);
   56          void LEDClearChar(char x,char n);
@@ -126,7 +126,7 @@ line level    source
  113          static xdata const MENU_SHOW * pMenu;                                                           //菜单指针
  114          static xdata const MENU_ITEM * pItem;                                                           //菜单项目指针
  115          
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 3   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 3   
 
  116          //static xdata const MENU_SHOW * pCode;
  117          static xdata const MENU_SHOW * pDataValue;
@@ -190,7 +190,7 @@ line level    source
  175          };
  176          
  177          /*-------------------------主画面数据配置,全局变量----------------------------*/
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 4   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 4   
 
  178          xdata const MAIN_PIC main_menu_cfg[]={
  179              {4,2,MainItem,MenuItem},
@@ -254,7 +254,7 @@ line level    source
  237   2              }while(x<6 && *buff!=0);
  238   1      }
  239          
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 5   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 5   
 
  240          void  LEDShowCaption(char num) 
  241          {
@@ -318,7 +318,7 @@ line level    source
  299   2                      case 18:
  300   2                              buff = "19";
  301   2                      break;  
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 6   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 6   
 
  302   2                      case 19:
  303   2                              buff = "20";
@@ -382,7 +382,7 @@ line level    source
  361   2                      break;
  362   2                      case 89:
  363   2                              buff = "  A10";
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 7   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 7   
 
  364   2                      break;
  365   2              }
@@ -446,7 +446,7 @@ line level    source
  423          返回值：无。
  424          说明：
  425          ++++++++++++++++++++++++++++++++++++++++++++++++*/
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 8   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 8   
 
  426          void  LED_ShowNumber(char * buff,char x) 
  427          {
@@ -510,7 +510,7 @@ line level    source
  485          参数：  无
  486          返回值：无
  487          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 9   
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 9   
 
  488          
  489          
@@ -574,7 +574,7 @@ line level    source
  547   1              char TempB;
  548   1              for(TempB = 0; TempB < MENU_ID_00000_MAX_ITEM; TempB++)
  549   1                      {
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 10  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 10  
 
  550   2                              public_val.menu_parm[TempB] = public_val.Disp_Dz_00000[TempB];
  551   2                      }
@@ -638,7 +638,7 @@ line level    source
  609   1              DisplayMainTotal = TempB;
  610   1      
  611   1              ///【统计下级子菜单数量】
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 11  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 11  
 
  612   1              pItem = main_menu_cfg[0].m_menu;
  613   1              pMenu = pItem[0].m_pcfg;
@@ -702,7 +702,7 @@ line level    source
  671   1              unsigned char *progbyte,i,readbyte;
  672   1              unsigned int progadd;
  673   1              
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 12  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 12  
 
  674   1              eeprom_en = 0xaa;
  675   1              IapEraseSector(MenuItem[menu_id].eeprom_add);
@@ -766,7 +766,7 @@ line level    source
                       eeprom_en = 0xaa;
                       IapProgramByte(EEPROM_DRIVE_TYPE,progbyte);
                       progbyte = (unsigned char)(public_val.drive_type & 0xff);
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 13  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 13  
 
                       IapProgramByte(EEPROM_DRIVE_TYPE + 1,progbyte);
                       progbyte = public_val.drive_indx;
@@ -830,7 +830,7 @@ line level    source
  795   2                              LEDShowFlashString(" F--3",0);
  796   2                              break;  
  797   2                      case 4:
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 14  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 14  
 
  798   2                              LEDShowFlashString(" F--4",0);
  799   2                              break;                          
@@ -894,7 +894,7 @@ line level    source
  857   1              unKey.u_bit.IO6 = P27;
  858   1              unKey.u_bit.IO7 = P12;
  859   1              unKey.u_bit.IO8 = P13;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 15  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 15  
 
  860   1              unKey.u_bit.IO9 = P16;
  861   1      
@@ -958,7 +958,7 @@ line level    source
  919   3                              Read_key_dely_2 = public_val.ms_timer;
  920   3                              
  921   3                              //if( ( (Key_Val&0xff) != 0xff) && (!long_input_flag) )
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 16  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 16  
 
  922   3                              if( ( (Key_Val&0xffff) != 0xffff) && (!long_input_flag) )
  923   3                              {
@@ -1022,7 +1022,7 @@ line level    source
  981   2                      else
  982   2                              {
  983   3                                      write_key_flag = 1;   /* 有按键，需要写按键到主板 */
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 17  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 17  
 
  984   3                                      
  985   3                                      gsKeyVal = Key_Val;
@@ -1086,7 +1086,7 @@ line level    source
 1042   2                              {                       
 1043   3                                      LCDChildDisplayState =0;
 1044   3                                      LCDDisplayState = 0x00;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 18  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 18  
 
 1045   3                              }
 1046   2                              else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
@@ -1105,8 +1105,8 @@ line level    source
 1059   2                              
 1060   2                              if(g_iErrStatus == 1)
 1061   2                                      g_iErrUIChange =1;
-1062   2                              else
-1063   2                                      LCDChildDisplayState =8;
+1062   2                              
+1063   2                              LCDChildDisplayState =8;
 1064   2                              break;
 1065   2                      case KEY_IO4:              /* 下料 */
 1066   2                              g_pcStatus = "下料";
@@ -1150,7 +1150,7 @@ line level    source
 1104   2                  {
 1105   3                      switch(Key_Val)
 1106   3                          {
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 19  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 19  
 
 1107   4                              case KEY_SEL:
 1108   4      
@@ -1214,7 +1214,7 @@ line level    source
 1166   4      
 1167   4                                              test_key_cnt = 0;
 1168   4                                              
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 20  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 20  
 
 1169   4                                              Main_adj_key_delay = public_val.ms_timer;                                       
 1170   4                                              Main_disp_other = 5;
@@ -1278,7 +1278,7 @@ line level    source
 1228   5                                                      now_menu.par_id = 1;
 1229   5                                                      now_menu.event_flag = 1;
 1230   5                                      DisplayItemNum  = 1;                    
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 21  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 21  
 
 1231   5                                                      zc_key_flag = 1;
 1232   5                                                      //DisplayMenuTotal = Menu_Number[0];
@@ -1342,7 +1342,7 @@ line level    source
 1290   5                                                      
 1291   5                                                      //进入切纸等待
 1292   5                                                      Main_disp_other = 4;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 22  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 22  
 
 1293   5                                                      qz_wait = 1;                                            
 1294   5                                              }
@@ -1406,7 +1406,7 @@ line level    source
 1352   5                              
 1353   5                                              if ((public_val.Err_Flag == P_FINISH_LEARN1)
 1354   5                                                      || (public_val.Err_Flag == P_FINISH_LEARN2)) 
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 23  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 23  
 
 1355   5                                              {
 1356   6                                                      //学习完成也显示送纸计数
@@ -1470,7 +1470,7 @@ line level    source
 1414   4                                      if( (public_val.ms_timer - Main_adj_key_delay) > MAIN_ADJ_DELAY)
 1415   4                                      {
 1416   5                                              Main_disp_other = 3;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 24  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 24  
 
 1417   5                                      }
 1418   4                              }
@@ -1534,7 +1534,7 @@ line level    source
                               }       
                       #endif
 1478   2                      
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 25  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 25  
 
 1479   2                  break;
 1480   2      
@@ -1598,7 +1598,7 @@ line level    source
 1538   4                                  }
 1539   3                                              return;
 1540   3                                  break;      
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 26  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 26  
 
 1541   3                          }
 1542   2                      if( flash_flag  && !long_input_flag  )                                                                                          //闪烁功能
@@ -1662,7 +1662,7 @@ line level    source
 1600   2                              {
 1601   3                                      LEDShowFlashString("P-- 0",0);
 1602   3                                      war_bell_step = 0;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 27  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 27  
 
 1603   3                                      cPauseBell = 0; 
 1604   3                              }
@@ -1726,7 +1726,7 @@ line level    source
 1662   3                                      case KEY_IO2:  // 退纸
 1663   3                                              LEDShowFlashString("   15",0);
 1664   3                                              break;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 28  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 28  
 
 1665   3      
 1666   3                                      case KEY_IO1:  // 进纸
@@ -1790,7 +1790,7 @@ line level    source
 1724   4                                                      cMenuSn = 29;
 1725   4                                  break;      
 1726   4                              case KEY_INCREASE:
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 29  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 29  
 
 1727   4      
 1728   4                                  if (++DisplayItemNum >= DisplayMenuTotal) 
@@ -1854,7 +1854,7 @@ line level    source
 1786   5      
 1787   5                                                      DisplayState=ST_DATA_INPUT;                                                                             //进入参数输入界面
 1788   5      
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 30  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 30  
 
 1789   5                                                      pDataValue=&pMenu[TempDataB];
 1790   5                                                      DataType=TY_D;
@@ -1918,7 +1918,7 @@ line level    source
 1848   3      
 1849   3                              LEDShowCaption(DisplayItemNum);
 1850   3      
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 31  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 31  
 
 1851   3                              TempValue=DataToStr(&TempInputData,   //pDataValue->m_data_vale
 1852   3                                                  INT32_SIZE,      //pDataValue->m_size,
@@ -1982,7 +1982,7 @@ line level    source
 1910   6                                                          {
 1911   7                                                          case INT32_SIZE:
 1912   7                                                              *(long *)pDataValue->m_data_vale = TempInputData;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 32  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 32  
 
 1913   7                                                              break;
 1914   7                                                          case INT16_SIZE:
@@ -2046,7 +2046,7 @@ line level    source
 1972   5                                                              CycShowCount  = 0;
 1973   5                                                              now_menu.menu_id = 888;
 1974   5                                                              now_menu.event_flag = 1;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 33  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 33  
 
 1975   5                                                  DisplayItemNum = 0; 
 1976   5                                                  DisplayState   = ST_MAIN;                                                                                   //返回主界面
@@ -2110,7 +2110,7 @@ line level    source
 2034   2                      if(g_iErrStatus == 1)
 2035   2                                      g_iErrUIChange =1;
 2036   2                      
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 34  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 34  
 
 2037   2                      LCDDisplayState = DisplayState;
 2038   2                      switch(LCDDisplayState)
@@ -2174,7 +2174,7 @@ line level    source
 2096   4                                              
 2097   4                                              sprintf(lcd_disp_buf,"DS64(1,1,'%s',15);\r\n","1-");
 2098   4                                              GpuSend(lcd_disp_buf);
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 35  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 35  
 
 2099   4                                              DELAY_US(UART2_DELAY);
 2100   4                                              
@@ -2238,7 +2238,7 @@ line level    source
 2157   3                                      GpuSend("CLS(0);\r\n");
 2158   3                                      DELAY_US(UART2_DELAY);
 2159   3                                      sprintf(lcd_disp_buf,"DS64(200,100,'%s',15);\r\n","延时显示修改出错");
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 36  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 36  
 
 2160   3                                      GpuSend(lcd_disp_buf);
 2161   3                                      break;
@@ -2302,7 +2302,7 @@ line level    source
 2219   4                              }
 2220   3                              if(errFlashFlag)
 2221   3                              {       
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 37  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 37  
 
 2222   4                                      sprintf(lcd_disp_buf,"DS48(5,80,'E--%d',1);\r\n",public_val.Err_Flag);
 2223   4                                      GpuSend(lcd_disp_buf);
@@ -2366,7 +2366,7 @@ line level    source
 2281   4                                                      {
 2282   5                                                              static xdata staFlashFlag=0;
 2283   5                                                              g_iFlashOldTime = public_val.ms_timer;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 38  
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 38  
 
 2284   5                                                              GpuSend("W8UE(2);\r\n");
 2285   5                                                              if(staFlashFlag)
@@ -2387,543 +2387,547 @@ line level    source
 2300   4                                              }
 2301   3                                              break;
 2302   3                                      case 1:
-2303   3                                              ClearLCDScreen(0);
-2304   3                                              GpuSend("SPG(57);\r\n");
-2305   3                                              DELAY_US(10000);
-2306   3                                              GpuSend("W8UE(1);\r\n");
-2307   3                                              sprintf(cLcd_count_data_buf,"%s","16-5-12");
-2308   3                                              sprintf(lcd_disp_buf,"DS64(130,2,'%s',15);\r\n",cLcd_count_data_buf);
-2309   3                                              GpuSend(lcd_disp_buf);
-2310   3                                              GpuSend("W8UE(2);\r\n");
-2311   3                                              sprintf(cLcd_count_data_buf,"%d",public_val.version);
-2312   3                                              sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
-2313   3                                              GpuSend(lcd_disp_buf);
-2314   3                                              GpuSend("W8UE(3);\r\n");
-2315   3                                              sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
-2316   3                                              GpuSend(lcd_disp_buf);
-2317   3                                              GpuSend("SXY(0,0)\r\n");
-2318   3                                              g_iInterfaceChangOldTime = public_val.ms_timer;
-2319   3                                              LCDChildDisplayState++;
-2320   3                                              break;
-2321   3                                      case 2:
-2322   3                                              if(public_val.ms_timer - g_iInterfaceChangOldTime  > 2000)
-2323   3                                              {
-2324   4                                                      ClearLCDScreen(0);
-2325   4                                                      GpuSend("SPG(60);\r\n");
-2326   4                                                      g_iInterfaceChangOldTime  = public_val.ms_timer;
-2327   4                                                      LCDChildDisplayState++;                                         
-2328   4                                              }
-2329   3                                              break;
-2330   3                                      case 3:
-2331   3                                              if(public_val.ms_timer - g_iInterfaceChangOldTime  > 5000)
-2332   3                                              {
-2333   4                                                      g_iInterfaceChangOldTime  = 0;
-2334   4                                                      LCDChildDisplayState = 0;
-2335   4                                                      LCDDisplayState = 0x00;//无画面显示，形成与DispplayState不同的状态，刷新界面。                                  
-2336   4                                              }
-2337   3                                              break;
-2338   3                                      
-2339   3                                      case 8://切纸询问界面
-2340   3                                              if(public_val.ms_timer -  g_iFlashOldTime> 500)
-2341   3                                              {
-2342   4                                                      static xdata int icutFlashFlag =0;
-2343   4                                                      g_iFlashOldTime = public_val.ms_timer;
-2344   4                                                      ClearLCDScreen(0);
-2345   4                                                      if(icutFlashFlag)
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 39  
+2303   3                                              if(g_iErrStatus   == 1)
+2304   3                                                      break;
+2305   3                                              ClearLCDScreen(0);
+2306   3                                              GpuSend("SPG(57);\r\n");
+2307   3                                              DELAY_US(10000);
+2308   3                                              GpuSend("W8UE(1);\r\n");
+2309   3                                              sprintf(cLcd_count_data_buf,"%s","16-5-12");
+2310   3                                              sprintf(lcd_disp_buf,"DS64(130,2,'%s',15);\r\n",cLcd_count_data_buf);
+2311   3                                              GpuSend(lcd_disp_buf);
+2312   3                                              GpuSend("W8UE(2);\r\n");
+2313   3                                              sprintf(cLcd_count_data_buf,"%d",public_val.version);
+2314   3                                              sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
+2315   3                                              GpuSend(lcd_disp_buf);
+2316   3                                              GpuSend("W8UE(3);\r\n");
+2317   3                                              sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
+2318   3                                              GpuSend(lcd_disp_buf);
+2319   3                                              GpuSend("SXY(0,0)\r\n");
+2320   3                                              g_iInterfaceChangOldTime = public_val.ms_timer;
+2321   3                                              LCDChildDisplayState++;
+2322   3                                              break;
+2323   3                                      case 2:
+2324   3                                              if(public_val.ms_timer - g_iInterfaceChangOldTime  > 2000)
+2325   3                                              {
+2326   4                                                      ClearLCDScreen(0);
+2327   4                                                      GpuSend("SPG(60);\r\n");
+2328   4                                                      g_iInterfaceChangOldTime  = public_val.ms_timer;
+2329   4                                                      LCDChildDisplayState++;                                         
+2330   4                                              }
+2331   3                                              break;
+2332   3                                      case 3:
+2333   3                                              if(public_val.ms_timer - g_iInterfaceChangOldTime  > 5000)
+2334   3                                              {
+2335   4                                                      g_iInterfaceChangOldTime  = 0;
+2336   4                                                      LCDChildDisplayState = 0;
+2337   4                                                      LCDDisplayState = 0x00;//无画面显示，形成与DispplayState不同的状态，刷新界面。                                  
+2338   4                                              }
+2339   3                                              break;
+2340   3                                      
+2341   3                                      case 8://切纸询问界面
+2342   3                                              if(g_iErrStatus   == 1)
+2343   3                                                      break;
+2344   3                                              if(public_val.ms_timer -  g_iFlashOldTime> 500)
+2345   3                                              {
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 39  
 
-2346   4                                                      {
-2347   5                                                              GpuSend("SPG(62);\r\n");
-2348   5                                                      }
-2349   4                                                      else
+2346   4                                                      static xdata int icutFlashFlag =0;
+2347   4                                                      g_iFlashOldTime = public_val.ms_timer;
+2348   4                                                      ClearLCDScreen(0);
+2349   4                                                      if(icutFlashFlag)
 2350   4                                                      {
-2351   5                                                              GpuSend("SPG(63);\r\n");
+2351   5                                                              GpuSend("SPG(62);\r\n");
 2352   5                                                      }
-2353   4                                                      icutFlashFlag = !icutFlashFlag;
-2354   4                                              }
-2355   3                                              
-2356   3                                              switch(Key_Val)
-2357   3                                              {
-2358   4                                                      case 0xFFFF:
-2359   4                                                      case 0x0000:
-2360   4                                                              break;
-2361   4                                                      case KEY_IO3://切纸                                                     
-2362   4                                                              break;
-2363   4                                                      case KEY_K4://确认
-2364   4                                                      //清除显示
-2365   4                                                              g_pcStatus = 0;
-2366   4                                                              LCDChildDisplayState =0;
-2367   4                                                              LCDDisplayState = 0x00;
-2368   4                                                              break;
-2369   4                                                      case KEY_K1://选择
-2370   4                                                              //sprintf(lcd_disp_buf,"DS64(130,1,'%X',15);\r\n",Key_Val);
-2371   4                                                              //GpuSend(lcd_disp_buf);
-2372   4                                                              LCDChildDisplayState =0;
-2373   4                                                              LCDDisplayState = 0x00;
-2374   4                                                              break;
-2375   4                                                      default:
-2376   4                                                      break;
-2377   4                                              }
-2378   3                                              
-2379   3                                              break;
-2380   3                                      default:
-2381   3                                              break;
-2382   3                              }
-2383   2                              
-2384   2                              
-2385   2                              break;
-2386   2                      case ST_PASSWORD:
-2387   2                              for(i=0 ;i < 5; i++)
-2388   2                                      cLcd_data_buf[i] = PasswordBuff[i];
+2353   4                                                      else
+2354   4                                                      {
+2355   5                                                              GpuSend("SPG(63);\r\n");
+2356   5                                                      }
+2357   4                                                      icutFlashFlag = !icutFlashFlag;
+2358   4                                              }
+2359   3                                              
+2360   3                                              switch(Key_Val)
+2361   3                                              {
+2362   4                                                      case 0xFFFF:
+2363   4                                                      case 0x0000:
+2364   4                                                              break;
+2365   4                                                      case KEY_IO3://切纸                                                     
+2366   4                                                              break;
+2367   4                                                      case KEY_K4://确认
+2368   4                                                      //清除显示
+2369   4                                                              g_pcStatus = 0;
+2370   4                                                              LCDChildDisplayState =0;
+2371   4                                                              LCDDisplayState = 0x00;
+2372   4                                                              break;
+2373   4                                                      case KEY_K1://选择
+2374   4                                                              //sprintf(lcd_disp_buf,"DS64(130,1,'%X',15);\r\n",Key_Val);
+2375   4                                                              //GpuSend(lcd_disp_buf);
+2376   4                                                              LCDChildDisplayState =0;
+2377   4                                                              LCDDisplayState = 0x00;
+2378   4                                                              break;
+2379   4                                                      default:
+2380   4                                                      break;
+2381   4                                              }
+2382   3                                              
+2383   3                                              break;
+2384   3                                      default:
+2385   3                                              break;
+2386   3                              }
+2387   2                              
+2388   2                              
 2389   2                              break;
-2390   2                      case ST_MENU:
-2391   2                              if(Key_Val == KEY_REDUCE || Key_Val == KEY_INCREASE)
-2392   2                              {
-2393   3                                      LCDDisplayState = 0x00;
-2394   3                              }
-2395   2                              break;
-2396   2                              //now_menu.par_id
-2397   2                      case ST_DATA_INPUT:
-2398   2                              if(now_menu.menu_id == 0 && now_menu.par_id ==0)//纸长
-2399   2                              {
-2400   3                                      pLCDDataValue=&pMenu[0];
-2401   3                                      iLen = *(int *)pLCDDataValue->m_data_vale;
-2402   3                              //      sprintf(cLcd_data_buf,"%d",iLen);
-2403   3                              }
-2404   2                              else if(now_menu.menu_id == 0 && now_menu.par_id ==1)//捆数
-2405   2                              {                                       
-2406   3                                      pLCDDataValue=&pMenu[1];
-2407   3                                      iCount= *(int *)pLCDDataValue->m_data_vale;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 40  
+2390   2                      case ST_PASSWORD:
+2391   2                              for(i=0 ;i < 5; i++)
+2392   2                                      cLcd_data_buf[i] = PasswordBuff[i];
+2393   2                              break;
+2394   2                      case ST_MENU:
+2395   2                              if(Key_Val == KEY_REDUCE || Key_Val == KEY_INCREASE)
+2396   2                              {
+2397   3                                      LCDDisplayState = 0x00;
+2398   3                              }
+2399   2                              break;
+2400   2                              //now_menu.par_id
+2401   2                      case ST_DATA_INPUT:
+2402   2                              if(now_menu.menu_id == 0 && now_menu.par_id ==0)//纸长
+2403   2                              {
+2404   3                                      pLCDDataValue=&pMenu[0];
+2405   3                                      iLen = *(int *)pLCDDataValue->m_data_vale;
+2406   3                              //      sprintf(cLcd_data_buf,"%d",iLen);
+2407   3                              }
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 40  
 
-2408   3                              //      sprintf(cLcd_data_buf,"%d",iCount);
-2409   3                              }
-2410   2                              iCount = TempInputData;
-2411   2                              sprintf(cLcd_data_buf,"%d",iCount);
-2412   2                              break;
-2413   2              }
-2414   1              
-2415   1              
-2416   1              if((DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT) && g_iErrStatus != 1)
-2417   1              {
-2418   2                      xdata char lcd_disp_buf[50*2] = {0};
-2419   2                      xdata char old_disp;
-2420   2                      if(public_val.ms_timer -  g_iFlashOldTime> 300)//闪烁频率
-2421   2                      {
-2422   3                              static xdata int flash = 0;
-2423   3                              static xdata int oldDataLen =0;
-2424   3      
-2425   3                              g_iFlashOldTime = public_val.ms_timer;
-2426   3                              
-2427   3                              if(flash)
-2428   3                              {
-2429   4                                      if(strlen(cLcd_data_buf) >= oldDataLen )//当cLcd_data_buf中变成另一个参数时，会导致判断不准确。
-2430   4                                      {
-2431   5                                              sprintf(lcd_disp_buf,"DS48(30,190,'%s',1);\r\n",cLcd_data_buf);
-2432   5                                              GpuSend(lcd_disp_buf);
-2433   5                                      }
-2434   4                                      else
-2435   4                                      {
-2436   5                                              sprintf(lcd_disp_buf,"DS48(30,190,'%s  ',1);\r\n",cLcd_data_buf);
-2437   5                                              GpuSend(lcd_disp_buf);
-2438   5                                      }
-2439   4                              }
-2440   3                              else
-2441   3                              {
-2442   4                                      if(  DisplayState ==ST_PASSWORD )
-2443   4                                      {
-2444   5                                              old_disp = cLcd_data_buf[DisplayBitNum];
-2445   5                                              cLcd_data_buf[DisplayBitNum] = '_';
-2446   5                                      }
-2447   4                                      else
-2448   4                                      {
-2449   5                                              i=0;
-2450   5                                              while(cLcd_data_buf[i] != '\0')
-2451   5                                                      i++;
-2452   5                                              i--;
-2453   5                                              old_disp = cLcd_data_buf[i];
-2454   5                                              cLcd_data_buf[i]='_';
-2455   5                                      }
-2456   4                                      sprintf(lcd_disp_buf,"DS48(30,190,'%s  ',1);\r\n",cLcd_data_buf);//不分情况直接多输出两个空格，
-2457   4                                      GpuSend(lcd_disp_buf);
-2458   4                                      if(  DisplayState ==ST_PASSWORD )
-2459   4                                      {
-2460   5                                              cLcd_data_buf[DisplayBitNum] = old_disp;
-2461   5                                      }
-2462   4                                      else
+2408   2                              else if(now_menu.menu_id == 0 && now_menu.par_id ==1)//捆数
+2409   2                              {                                       
+2410   3                                      pLCDDataValue=&pMenu[1];
+2411   3                                      iCount= *(int *)pLCDDataValue->m_data_vale;
+2412   3                              //      sprintf(cLcd_data_buf,"%d",iCount);
+2413   3                              }
+2414   2                              iCount = TempInputData;
+2415   2                              sprintf(cLcd_data_buf,"%d",iCount);
+2416   2                              break;
+2417   2              }
+2418   1              
+2419   1              
+2420   1              if((DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT) && g_iErrStatus != 1)
+2421   1              {
+2422   2                      xdata char lcd_disp_buf[50*2] = {0};
+2423   2                      xdata char old_disp;
+2424   2                      if(public_val.ms_timer -  g_iFlashOldTime> 300)//闪烁频率
+2425   2                      {
+2426   3                              static xdata int flash = 0;
+2427   3                              static xdata int oldDataLen =0;
+2428   3      
+2429   3                              g_iFlashOldTime = public_val.ms_timer;
+2430   3                              
+2431   3                              if(flash)
+2432   3                              {
+2433   4                                      if(strlen(cLcd_data_buf) >= oldDataLen )//当cLcd_data_buf中变成另一个参数时，会导致判断不准确。
+2434   4                                      {
+2435   5                                              sprintf(lcd_disp_buf,"DS48(30,190,'%s',1);\r\n",cLcd_data_buf);
+2436   5                                              GpuSend(lcd_disp_buf);
+2437   5                                      }
+2438   4                                      else
+2439   4                                      {
+2440   5                                              sprintf(lcd_disp_buf,"DS48(30,190,'%s  ',1);\r\n",cLcd_data_buf);
+2441   5                                              GpuSend(lcd_disp_buf);
+2442   5                                      }
+2443   4                              }
+2444   3                              else
+2445   3                              {
+2446   4                                      if(  DisplayState ==ST_PASSWORD )
+2447   4                                      {
+2448   5                                              old_disp = cLcd_data_buf[DisplayBitNum];
+2449   5                                              cLcd_data_buf[DisplayBitNum] = '_';
+2450   5                                      }
+2451   4                                      else
+2452   4                                      {
+2453   5                                              i=0;
+2454   5                                              while(cLcd_data_buf[i] != '\0')
+2455   5                                                      i++;
+2456   5                                              i--;
+2457   5                                              old_disp = cLcd_data_buf[i];
+2458   5                                              cLcd_data_buf[i]='_';
+2459   5                                      }
+2460   4                                      sprintf(lcd_disp_buf,"DS48(30,190,'%s  ',1);\r\n",cLcd_data_buf);//不分情况直接多输出两个空格，
+2461   4                                      GpuSend(lcd_disp_buf);
+2462   4                                      if(  DisplayState ==ST_PASSWORD )
 2463   4                                      {
-2464   5                                              cLcd_data_buf[i]=old_disp;
+2464   5                                              cLcd_data_buf[DisplayBitNum] = old_disp;
 2465   5                                      }
-2466   4                              }
-2467   3                              flash = !flash;
-2468   3                      }
-2469   2              }
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 41  
+2466   4                                      else
+2467   4                                      {
+2468   5                                              cLcd_data_buf[i]=old_disp;
+2469   5                                      }
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 41  
 
-2470   1      
-2471   1      
-2472   1                      
-2473   1      
-2474   1              if(!UpdateState)
-2475   1              {
-2476   2                      UpdateState = 1;
-2477   2                      UpdateCountB = public_val.ms_timer;
-2478   2              }
-2479   1              else
-2480   1              {
-2481   2                      if(public_val.ms_timer - UpdateCountB > 100)
-2482   2                      {
-2483   3                              flash_flag = !flash_flag;
-2484   3                              UpdateState = 0;
-2485   3                      }               
-2486   2              }
-2487   1      
-2488   1      
-2489   1              switch(war_bell_step)  /* 蜂鸣器报警处理 */
-2490   1              {
-2491   2                      case 1:
-2492   2                              war_bell_delay = public_val.ms_timer;
-2493   2                              Bell_flag |= 0x02;
-2494   2                              war_bell_step = 10;
-2495   2                      break;
-2496   2                      case 10:
-2497   2                              iBellOnTime = (cPauseBell == 0) ? 500 : 50;
-2498   2                              //iBellOnTime = (cPauseBell == 0) ? 2000 : 50;
-2499   2                              if(public_val.ms_timer - war_bell_delay > iBellOnTime) //响的时间
-2500   2                                      {
-2501   3                                              war_bell_delay = public_val.ms_timer;
-2502   3                                              Bell_flag &= 0xfd;
-2503   3                                              war_bell_step = 20;
-2504   3                                      }
-2505   2                      break;
-2506   2                      case 20:
-2507   2                              iBellOffTime = (cPauseBell == 0) ? 2000 : 2000;                 
-2508   2                              //iBellOffTime = (cPauseBell == 0) ? 200 : 2000;                        
-2509   2                              if(public_val.ms_timer - war_bell_delay > iBellOffTime) //不响的时间
-2510   2                                      {
-2511   3                                              war_bell_delay = public_val.ms_timer;
-2512   3                                              war_bell_step = 30;
-2513   3                                      }                       
-2514   2                      break;
-2515   2                      case 30:
-2516   2                              if((!public_val.Err_Flag) 
-2517   2                                 && (!(public_val.Work_Pause_Flag & 0x80))
-2518   2                                 && (!public_val.Bell_Flag))  /* added for v19416 */
-2519   2                                      {
-2520   3                                              war_bell_step = 0;   /* 无报错 */
-2521   3                                      }
-2522   2                              else
+2470   4                              }
+2471   3                              flash = !flash;
+2472   3                      }
+2473   2              }
+2474   1      
+2475   1      
+2476   1                      
+2477   1      
+2478   1              if(!UpdateState)
+2479   1              {
+2480   2                      UpdateState = 1;
+2481   2                      UpdateCountB = public_val.ms_timer;
+2482   2              }
+2483   1              else
+2484   1              {
+2485   2                      if(public_val.ms_timer - UpdateCountB > 100)
+2486   2                      {
+2487   3                              flash_flag = !flash_flag;
+2488   3                              UpdateState = 0;
+2489   3                      }               
+2490   2              }
+2491   1      
+2492   1      
+2493   1              switch(war_bell_step)  /* 蜂鸣器报警处理 */
+2494   1              {
+2495   2                      case 1:
+2496   2                              war_bell_delay = public_val.ms_timer;
+2497   2                              Bell_flag |= 0x02;
+2498   2                              war_bell_step = 10;
+2499   2                      break;
+2500   2                      case 10:
+2501   2                              iBellOnTime = (cPauseBell == 0) ? 500 : 50;
+2502   2                              //iBellOnTime = (cPauseBell == 0) ? 2000 : 50;
+2503   2                              if(public_val.ms_timer - war_bell_delay > iBellOnTime) //响的时间
+2504   2                                      {
+2505   3                                              war_bell_delay = public_val.ms_timer;
+2506   3                                              Bell_flag &= 0xfd;
+2507   3                                              war_bell_step = 20;
+2508   3                                      }
+2509   2                      break;
+2510   2                      case 20:
+2511   2                              iBellOffTime = (cPauseBell == 0) ? 2000 : 2000;                 
+2512   2                              //iBellOffTime = (cPauseBell == 0) ? 200 : 2000;                        
+2513   2                              if(public_val.ms_timer - war_bell_delay > iBellOffTime) //不响的时间
+2514   2                                      {
+2515   3                                              war_bell_delay = public_val.ms_timer;
+2516   3                                              war_bell_step = 30;
+2517   3                                      }                       
+2518   2                      break;
+2519   2                      case 30:
+2520   2                              if((!public_val.Err_Flag) 
+2521   2                                 && (!(public_val.Work_Pause_Flag & 0x80))
+2522   2                                 && (!public_val.Bell_Flag))  /* added for v19416 */
 2523   2                                      {
-2524   3                                              war_bell_step = 1;
+2524   3                                              war_bell_step = 0;   /* 无报错 */
 2525   3                                      }
-2526   2                      break;
-2527   2              }
-2528   1              
-2529   1              if(Bell_flag)
-2530   1              {
-2531   2                      BELL = 1;
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 42  
+2526   2                              else
+2527   2                                      {
+2528   3                                              war_bell_step = 1;
+2529   3                                      }
+2530   2                      break;
+2531   2              }
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 42  
 
-2532   2              }
-2533   1              else
+2532   1              
+2533   1              if(Bell_flag)
 2534   1              {
-2535   2                      BELL = 0;
+2535   2                      BELL = 1;
 2536   2              }
-2537   1              
-2538   1      
-2539   1      //      TM1637_Write();
-2540   1      
+2537   1              else
+2538   1              {
+2539   2                      BELL = 0;
+2540   2              }
 2541   1              
-2542   1      }
+2542   1      
+2543   1      //      TM1637_Write();
+2544   1      
+2545   1              
+2546   1      }
 *** WARNING C280 IN LINE 842 OF LED_DISPLAY.C: 'iTatol': unreferenced local variable
-2543                          
-2544          
-2545          /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-2546          功能：整形变字符型
-2547          
-2548          参数：nBit:整数位个数，nPoint:小数位个数  ,nFlag==1整数位前的0以空格补充
-2549          
-2550          返回值：高位空格数
-2551          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-2552          static char DataToStr(void * const pData,char size,char nBit,char nPoint,char *string,char nFlag,char nTyp
+2547                          
+2548          
+2549          /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2550          功能：整形变字符型
+2551          
+2552          参数：nBit:整数位个数，nPoint:小数位个数  ,nFlag==1整数位前的0以空格补充
+2553          
+2554          返回值：高位空格数
+2555          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+2556          static char DataToStr(void * const pData,char size,char nBit,char nPoint,char *string,char nFlag,char nTyp
              -e)
-2553          {       
-2554   1              long DataS32Bit;
-2555   1              char spaces;
-2556   1              char Temp,module;
-2557   1              char SignZero;//负数标志位,  >0: 0,  <0: 1
-2558   1              
-2559   1              if(size==0 || size>4)//判断size的合理性
-2560   1                  return 0;
-2561   1              size--;
-2562   1      //      if( ( *((char *)(pData)+size) ) & 0x80 )//判断最高位是否为1
-2563   1      //          SignZero=1;
-2564   1      //      else
-2565   1                  SignZero=0; 
-2566   1                  
-2567   1          DataS32Bit=0;
-2568   1              if(size==3)//LONG型数据
-2569   1              {                           
-2570   2                      if(SignZero)
-2571   2                          *((long *)&DataS32Bit) = 0 - *((long *)pData);
-2572   2                      else
-2573   2                          *((long *)&DataS32Bit) = *((long *)pData);
-2574   2              }       
-2575   1              else if(size==1)//INT型数据
-2576   1              {
-2577   2                  if(SignZero)
-2578   2                          *((int *)&DataS32Bit) = 0 - *((int *)pData);                                                
-2579   2                      else
-2580   2                          *((int *)&DataS32Bit) = *((int *)pData);    
-2581   2              }       
-2582   1              else if(size==0)//char型数据
-2583   1              {
-2584   2                  if(SignZero)
-2585   2                          *((char *)&DataS32Bit) = 0 - *((char *)pData);
-2586   2                      else
-2587   2                          *((char *)&DataS32Bit) = *((char *)pData);
-2588   2              }
-2589   1              else
-2590   1                      return 0;       
-2591   1              
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 43  
+2557          {       
+2558   1              long DataS32Bit;
+2559   1              char spaces;
+2560   1              char Temp,module;
+2561   1              char SignZero;//负数标志位,  >0: 0,  <0: 1
+2562   1              
+2563   1              if(size==0 || size>4)//判断size的合理性
+2564   1                  return 0;
+2565   1              size--;
+2566   1      //      if( ( *((char *)(pData)+size) ) & 0x80 )//判断最高位是否为1
+2567   1      //          SignZero=1;
+2568   1      //      else
+2569   1                  SignZero=0; 
+2570   1                  
+2571   1          DataS32Bit=0;
+2572   1              if(size==3)//LONG型数据
+2573   1              {                           
+2574   2                      if(SignZero)
+2575   2                          *((long *)&DataS32Bit) = 0 - *((long *)pData);
+2576   2                      else
+2577   2                          *((long *)&DataS32Bit) = *((long *)pData);
+2578   2              }       
+2579   1              else if(size==1)//INT型数据
+2580   1              {
+2581   2                  if(SignZero)
+2582   2                          *((int *)&DataS32Bit) = 0 - *((int *)pData);                                                
+2583   2                      else
+2584   2                          *((int *)&DataS32Bit) = *((int *)pData);    
+2585   2              }       
+2586   1              else if(size==0)//char型数据
+2587   1              {
+2588   2                  if(SignZero)
+2589   2                          *((char *)&DataS32Bit) = 0 - *((char *)pData);
+2590   2                      else
+2591   2                          *((char *)&DataS32Bit) = *((char *)pData);
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 43  
 
-2592   1              switch(nType){
-2593   2              case TY_B:
-2594   2                      module=2;
-2595   2                      break;
-2596   2              case TY_D:
-2597   2              case TY_RD:
-2598   2              case TY_D_A:
-2599   2              case TY_D_L:
-2600   2              module=10;
-2601   2                      break;
-2602   2              case TY_H:
-2603   2              module=16;
-2604   2                      break;
-2605   2              }
-2606   1              
-2607   1          spaces = 3-(nPoint+nBit);
-2608   1              Temp = nPoint+nBit;
-2609   1              if(Temp<3)
-2610   1              {
-2611   2                  nBit += (3-Temp);
-2612   2                      Temp=3;
-2613   2              }
-2614   1                      
-2615   1              do
-2616   1          {
-2617   2              if(Temp!=nBit || nFlag)
-2618   2              {
-2619   3                  string[Temp]='0'+(char)(DataS32Bit%(module));
-2620   3                  DataS32Bit/=module;
-2621   3              }
-2622   2              else 
-2623   2                      {
-2624   3                              if(nPoint!=0)
-2625   3                                  string[Temp]='.';
-2626   3                              else
-2627   3                                  string[Temp]=' ';
-2628   3                      }
-2629   2              
-2630   2          }while( Temp-- >0 );
-2631   1              
-2632   1              if(nFlag)//nFlag==1整数位前的0以空格补充
-2633   1              {
-2634   2                  if(SignZero && spaces<3)
-2635   2                          string[spaces]='-';
-2636   2                      return 0;
-2637   2          }
-2638   1              
-2639   1              Temp=0;
-2640   1              spaces=0;
-2641   1          do
-2642   1          {
-2643   2             if(string[Temp]=='0' && (Temp+1<nBit)) 
-2644   2             {
-2645   3                         string[Temp]=' ';
-2646   3                         spaces++;
-2647   3                 }
-2648   2             else
-2649   2                 {
-2650   3                 break;
+2592   2              }
+2593   1              else
+2594   1                      return 0;       
+2595   1              
+2596   1              switch(nType){
+2597   2              case TY_B:
+2598   2                      module=2;
+2599   2                      break;
+2600   2              case TY_D:
+2601   2              case TY_RD:
+2602   2              case TY_D_A:
+2603   2              case TY_D_L:
+2604   2              module=10;
+2605   2                      break;
+2606   2              case TY_H:
+2607   2              module=16;
+2608   2                      break;
+2609   2              }
+2610   1              
+2611   1          spaces = 3-(nPoint+nBit);
+2612   1              Temp = nPoint+nBit;
+2613   1              if(Temp<3)
+2614   1              {
+2615   2                  nBit += (3-Temp);
+2616   2                      Temp=3;
+2617   2              }
+2618   1                      
+2619   1              do
+2620   1          {
+2621   2              if(Temp!=nBit || nFlag)
+2622   2              {
+2623   3                  string[Temp]='0'+(char)(DataS32Bit%(module));
+2624   3                  DataS32Bit/=module;
+2625   3              }
+2626   2              else 
+2627   2                      {
+2628   3                              if(nPoint!=0)
+2629   3                                  string[Temp]='.';
+2630   3                              else
+2631   3                                  string[Temp]=' ';
+2632   3                      }
+2633   2              
+2634   2          }while( Temp-- >0 );
+2635   1              
+2636   1              if(nFlag)//nFlag==1整数位前的0以空格补充
+2637   1              {
+2638   2                  if(SignZero && spaces<3)
+2639   2                          string[spaces]='-';
+2640   2                      return 0;
+2641   2          }
+2642   1              
+2643   1              Temp=0;
+2644   1              spaces=0;
+2645   1          do
+2646   1          {
+2647   2             if(string[Temp]=='0' && (Temp+1<nBit)) 
+2648   2             {
+2649   3                         string[Temp]=' ';
+2650   3                         spaces++;
 2651   3                 }
-2652   2             Temp++;
-2653   2          }while(1);
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 44  
+2652   2             else
+2653   2                 {
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 44  
 
-2654   1              if(SignZero)
-2655   1              {
-2656   2                  string[--spaces]='-';
-2657   2              }
-2658   1              Temp=nPoint+nBit-spaces;
-2659   1              if(Temp<3)
-2660   1                  spaces -= (3-Temp);
-2661   1              return spaces;
-2662   1      }
-2663          
-2664          /*++++++++++++++++++++++++++++++++++++++++++++++++++++
-2665          功能：需要一个函数将字符化整形
-2666          
-2667          参数：len 为字符长度
-2668          
-2669          返回值：无
-2670          ++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-2671          static long StrToData(char *string,char len,char nType)
-2672          {       
-2673   1          unsigned long x,bi;     
-2674   1          char i,module;
-2675   1      
-2676   1          switch(nType){
-2677   2              case TY_B:
-2678   2                      module=2;
-2679   2                      break;
-2680   2              case TY_D:
-2681   2              module=10;
-2682   2                      break;
-2683   2              case TY_H:
-2684   2              module=16;
-2685   2                      break;
-2686   2              }
-2687   1              x=0;
-2688   1              bi=1;
-2689   1              for(i=len;i>0;)
-2690   1          {
-2691   2              i--;
-2692   2                      if(string[i] >= '0' && string[i]<=0x3F)
-2693   2                      {
-2694   3                         x+=(string[i] - '0')*bi;
-2695   3                         bi*=module;
-2696   3              }
-2697   2              }
-2698   1              if(string[0]=='-' || string[1]=='-' || string[2]=='-' )//负数
-2699   1                  return (0-x);
-2700   1              else
-2701   1                  return x;
-2702   1      
-2703   1      }
-2704          void MenuEditLook(unsigned char cDisplayItemNum)
-2705          {
-2706   1              
-2707   1              //unsigned char DisplayItemNum;
-2708   1              switch(cDisplayItemNum)
-2709   1              {
-2710   2                      case 10:
-2711   2                              GpuSend("SPG(31);\r\n");                
-2712   2                      break;
-2713   2              
-2714   2                      case 11:
-2715   2                              GpuSend("SPG(32);\r\n");                
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 45  
+2654   3                 break;
+2655   3                 }
+2656   2             Temp++;
+2657   2          }while(1);
+2658   1              if(SignZero)
+2659   1              {
+2660   2                  string[--spaces]='-';
+2661   2              }
+2662   1              Temp=nPoint+nBit-spaces;
+2663   1              if(Temp<3)
+2664   1                  spaces -= (3-Temp);
+2665   1              return spaces;
+2666   1      }
+2667          
+2668          /*++++++++++++++++++++++++++++++++++++++++++++++++++++
+2669          功能：需要一个函数将字符化整形
+2670          
+2671          参数：len 为字符长度
+2672          
+2673          返回值：无
+2674          ++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+2675          static long StrToData(char *string,char len,char nType)
+2676          {       
+2677   1          unsigned long x,bi;     
+2678   1          char i,module;
+2679   1      
+2680   1          switch(nType){
+2681   2              case TY_B:
+2682   2                      module=2;
+2683   2                      break;
+2684   2              case TY_D:
+2685   2              module=10;
+2686   2                      break;
+2687   2              case TY_H:
+2688   2              module=16;
+2689   2                      break;
+2690   2              }
+2691   1              x=0;
+2692   1              bi=1;
+2693   1              for(i=len;i>0;)
+2694   1          {
+2695   2              i--;
+2696   2                      if(string[i] >= '0' && string[i]<=0x3F)
+2697   2                      {
+2698   3                         x+=(string[i] - '0')*bi;
+2699   3                         bi*=module;
+2700   3              }
+2701   2              }
+2702   1              if(string[0]=='-' || string[1]=='-' || string[2]=='-' )//负数
+2703   1                  return (0-x);
+2704   1              else
+2705   1                  return x;
+2706   1      
+2707   1      }
+2708          void MenuEditLook(unsigned char cDisplayItemNum)
+2709          {
+2710   1              
+2711   1              //unsigned char DisplayItemNum;
+2712   1              switch(cDisplayItemNum)
+2713   1              {
+2714   2                      case 10:
+2715   2                              GpuSend("SPG(31);\r\n");                
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 45  
 
 2716   2                      break;
-2717   2                      
-2718   2                      case 12:
-2719   2                              GpuSend("SPG(33);\r\n");                
+2717   2              
+2718   2                      case 11:
+2719   2                              GpuSend("SPG(32);\r\n");                
 2720   2                      break;
 2721   2                      
-2722   2                      case 13:
-2723   2                              GpuSend("SPG(34);\r\n");                
+2722   2                      case 12:
+2723   2                              GpuSend("SPG(33);\r\n");                
 2724   2                      break;
 2725   2                      
-2726   2                      case 14:
-2727   2                              GpuSend("SPG(35);\r\n");                
+2726   2                      case 13:
+2727   2                              GpuSend("SPG(34);\r\n");                
 2728   2                      break;
 2729   2                      
-2730   2                      case 15:
-2731   2                              GpuSend("SPG(36);\r\n");                
+2730   2                      case 14:
+2731   2                              GpuSend("SPG(35);\r\n");                
 2732   2                      break;
 2733   2                      
-2734   2                      case 16:
-2735   2                              GpuSend("SPG(37);\r\n");                
+2734   2                      case 15:
+2735   2                              GpuSend("SPG(36);\r\n");                
 2736   2                      break;
 2737   2                      
-2738   2                      case 17:
-2739   2                              GpuSend("SPG(38);\r\n");                
+2738   2                      case 16:
+2739   2                              GpuSend("SPG(37);\r\n");                
 2740   2                      break;
 2741   2                      
-2742   2                      case 18:
-2743   2                              GpuSend("SPG(39);\r\n");                
+2742   2                      case 17:
+2743   2                              GpuSend("SPG(38);\r\n");                
 2744   2                      break;
 2745   2                      
-2746   2                      case 19:
-2747   2                              GpuSend("SPG(40);\r\n");                
+2746   2                      case 18:
+2747   2                              GpuSend("SPG(39);\r\n");                
 2748   2                      break;
 2749   2                      
-2750   2                      
-2751   2                      case 20:
-2752   2                              GpuSend("SPG(41);\r\n");                
-2753   2                      break;
+2750   2                      case 19:
+2751   2                              GpuSend("SPG(40);\r\n");                
+2752   2                      break;
+2753   2                      
 2754   2                      
-2755   2                      
-2756   2                      case 21:
-2757   2                              GpuSend("SPG(42);\r\n");                
-2758   2                      break;
+2755   2                      case 20:
+2756   2                              GpuSend("SPG(41);\r\n");                
+2757   2                      break;
+2758   2                      
 2759   2                      
-2760   2                      case 22:
-2761   2                              GpuSend("SPG(43);\r\n");                
+2760   2                      case 21:
+2761   2                              GpuSend("SPG(42);\r\n");                
 2762   2                      break;
 2763   2                      
-2764   2                      case 23:
-2765   2                              GpuSend("SPG(44);\r\n");                
+2764   2                      case 22:
+2765   2                              GpuSend("SPG(43);\r\n");                
 2766   2                      break;
 2767   2                      
-2768   2                      case 24:
-2769   2                              GpuSend("SPG(45);\r\n");                
+2768   2                      case 23:
+2769   2                              GpuSend("SPG(44);\r\n");                
 2770   2                      break;
 2771   2                      
-2772   2                      case 25:
-2773   2                              GpuSend("SPG(46);\r\n");                
+2772   2                      case 24:
+2773   2                              GpuSend("SPG(45);\r\n");                
 2774   2                      break;
 2775   2                      
-2776   2                      case 26:
-2777   2                              GpuSend("SPG(47);\r\n");                
-C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 16:44:05 PAGE 46  
+2776   2                      case 25:
+2777   2                              GpuSend("SPG(46);\r\n");                
+C51 COMPILER V9.00   LED_DISPLAY                                                           05/12/2016 17:23:54 PAGE 46  
 
 2778   2                      break;
 2779   2                      
-2780   2                      case 27:
-2781   2                              GpuSend("SPG(48);\r\n");                
+2780   2                      case 26:
+2781   2                              GpuSend("SPG(47);\r\n");                
 2782   2                      break;
 2783   2                      
-2784   2                      case 28:
-2785   2                              GpuSend("SPG(49);\r\n");                
+2784   2                      case 27:
+2785   2                              GpuSend("SPG(48);\r\n");                
 2786   2                      break;
 2787   2                      
-2788   2                      case 29:
-2789   2                              GpuSend("SPG(50);\r\n");                
+2788   2                      case 28:
+2789   2                              GpuSend("SPG(49);\r\n");                
 2790   2                      break;
-2791   2                      default:
-2792   2                              GpuSend("SPG(31);\r\n");
-2793   2                              break;
-2794   2              
-2795   2              }
-2796   1              
-2797   1              DELAY_US(UART1s_DELAY);
-2798   1      }
-2799          
-2800          void ClearLCDScreen(int c)
-2801          {
-2802   1              xdata char buf[20];
-2803   1              DELAY_US(1000);
-2804   1              sprintf(buf,"CLS(%d);\r\n",c);
-2805   1              GpuSend(buf);
-2806   1              DELAY_US(1000);
-2807   1              
-2808   1      }
-2809          
-2810          void TextOut(char *text)
-2811          {
-2812   1      //      xdata char lcd_disp_buf[50*2] = {0};
-2813   1      //      sprintf(lcd_disp_buf,"DS%d(%d,%d,'%s',%d);\r\n",fontsize,x,y,text,colour);
-2814   1      //      GpuSend(lcd_disp_buf);
-2815   1      }
-*** WARNING C280 IN LINE 2810 OF LED_DISPLAY.C: 'text': unreferenced local variable
-2816          #endif
+2791   2                      
+2792   2                      case 29:
+2793   2                              GpuSend("SPG(50);\r\n");                
+2794   2                      break;
+2795   2                      default:
+2796   2                              GpuSend("SPG(31);\r\n");
+2797   2                              break;
+2798   2              
+2799   2              }
+2800   1              
+2801   1              DELAY_US(UART1s_DELAY);
+2802   1      }
+2803          
+2804          void ClearLCDScreen(int c)
+2805          {
+2806   1              xdata char buf[20];
+2807   1              DELAY_US(1000);
+2808   1              sprintf(buf,"CLS(%d);\r\n",c);
+2809   1              GpuSend(buf);
+2810   1              DELAY_US(1000);
+2811   1              
+2812   1      }
+2813          
+2814          void TextOut(char *text)
+2815          {
+2816   1      //      xdata char lcd_disp_buf[50*2] = {0};
+2817   1      //      sprintf(lcd_disp_buf,"DS%d(%d,%d,'%s',%d);\r\n",fontsize,x,y,text,colour);
+2818   1      //      GpuSend(lcd_disp_buf);
+2819   1      }
+*** WARNING C280 IN LINE 2814 OF LED_DISPLAY.C: 'text': unreferenced local variable
+2820          #endif
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =  15377    ----
+   CODE SIZE        =  15412    ----
    CONSTANT SIZE    =   1820    ----
    XDATA SIZE       =   1071     334
    PDATA SIZE       =   ----    ----

@@ -1059,8 +1059,8 @@ void LEDDisplay(void)
 			
 			if(g_iErrStatus == 1)
 				g_iErrUIChange =1;
-			else
-				LCDChildDisplayState =8;
+			
+			LCDChildDisplayState =8;
 			break;
 		case KEY_IO4: 		   /* 下料 */
 			g_pcStatus = "下料";
@@ -2300,6 +2300,8 @@ void LEDDisplay(void)
 					}
 					break;
 				case 1:
+					if(g_iErrStatus   == 1)
+						break;
 					ClearLCDScreen(0);
 					GpuSend("SPG(57);\r\n");
 					DELAY_US(10000);
@@ -2337,6 +2339,8 @@ void LEDDisplay(void)
 					break;
 				
 				case 8://切纸询问界面
+					if(g_iErrStatus   == 1)
+						break;
 					if(public_val.ms_timer -  g_iFlashOldTime> 500)
 					{
 						static xdata int icutFlashFlag =0;
