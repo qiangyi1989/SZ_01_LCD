@@ -213,13 +213,23 @@ xdata char speed_mode = 1;   //速度模式: 1高速， 0低速
 xdata char qz_wait = 0;      //等待切纸确认: 0未等待，1等待
 
 //add by yq
+#define E1  				1	//完成设定筒数	本错误码只告警提示，不停机，为非故障报警。
+#define E2					2   //搓条机下料处无杆钎报错。
+#define E3					3   //搓条机弹片处无杆钎报错。
+#define E4					4   //切刀堵纸光电传感器报错。
+#define E5					5   //下料堵纸光电传感器报错。
+#define E6					6   //切刀零位接近传感器报错。
+#define E7					7   //储纸光电传感器感应到无纸。
+#define E8					8   //搓条周期接近传感器报错。
+#define E9					9	//打胶到位感应器报错。
 xdata char Menu0_Number;
 xdata unsigned int g_iFlashOldTime = 0;
 xdata unsigned int g_iInterfaceChangOldTime=0;
 xdata char* g_pcStatus = 0;
 xdata int g_iErrStatus =0;
 xdata int g_iErrUIChange =0;
-void ClearLCDScreen(int c);						   
+void ClearLCDScreen(int c);	
+void IOCheck();
 /*++++++++++++++++++++++++++++++++++++++++++++++++
 功能：显示字符串。
 
@@ -839,7 +849,7 @@ void LEDDisplay(void)
 	//ADD by yq
 	xdata char lcd_disp_buf[50*2] = {0};
 	xdata unsigned char  cMenuSn;
-	xdata int iLen=0,iCount=0,iTatol;
+	xdata int iLen=0,iCount=0;
 	MENU_SHOW *pLCDDataValue;
 	xdata unsigned char  cLcd_data_buf[6]={0},cLcd_len_data_buf[6]={0},cLcd_count_data_buf[6]={0};
 	
@@ -1029,7 +1039,7 @@ void LEDDisplay(void)
 		case 0xFFFF://无按键
 			break;
 		case KEY_K1: //选择
-			if(LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3)
+			if((LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3 )&& DisplayState == ST_MAIN)
 			{
 				LCDDisplayState	= 0x00;
 				LCDChildDisplayState = 0;
@@ -1038,10 +1048,10 @@ void LEDDisplay(void)
 				g_iErrUIChange =1;
 			break;
 		case KEY_K4:           /* 确认 */
-			if(LCDChildDisplayState == 2 || LCDChildDisplayState == 3 && DisplayState == ST_MAIN)//如果处于主界面的子界面有按键就返回
+			if((LCDChildDisplayState == 2 || LCDChildDisplayState == 3 ) && DisplayState == ST_MAIN)//如果处于主界面的子界面有按键就返回
 			{			
-				LCDChildDisplayState =0;
-				LCDDisplayState	= 0x00;
+			//	LCDChildDisplayState =0;
+			//	LCDDisplayState	= 0x00;
 			}
 			else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
 				LCDChildDisplayState = 1;
@@ -2038,6 +2048,7 @@ void LEDDisplay(void)
 		switch(LCDDisplayState)
 		{
 			case ST_MAIN:
+			if(public_val.Err_Flag == 0)
 			{
 				ClearLCDScreen(0);
 				//GpuSend("SPG(52);\r\n");	
@@ -2178,71 +2189,6 @@ void LEDDisplay(void)
 	}
 	
 
-	//错误标志 低4位:主控板错误号 高4位:操作板错误
-	if(public_val.Err_Flag)
-	{
-		if(g_iErrStatus == 0 || g_iErrUIChange == 1)//出现错误 或者 错误界面被更改
-		{
-			g_iErrStatus = 1;
-			g_iErrUIChange =0;
-			ClearLCDScreen(0);
-			switch(public_val.Err_Flag)
-			{
-				default:
-					GpuSend("PIC(0,0,18);\r\n");
-					break;
-			}
-		}
-		
-		if(public_val.ms_timer -  g_iFlashOldTime> 500)
-		{
-			static xdata errFlashFlag=0;
-			if(g_pcStatus)
-			{
-				LCDChildDisplayState =0;
-				LCDDisplayState	= 0x00;
-				g_pcStatus = 0;
-			}
-			sprintf(lcd_disp_buf,"DS48(5,130,'0x%X',15);\r\n",(int)DisplayState);
-			GpuSend(lcd_disp_buf);
-			
-			//GpuSend("W8UE(2);\r\n");
-			if(public_val.Err_Flag > 0xf)
-			{	
-				sprintf(lcd_disp_buf,"DS24(3,20,'%s',15);\r\n","主控板错误：");
-				GpuSend(lcd_disp_buf);
-			}
-			else
-			{
-				sprintf(lcd_disp_buf,"DS24(3,20,'%s',15);\r\n","操作板错误：");
-				GpuSend(lcd_disp_buf);
-			}
-			if(errFlashFlag)
-			{	
-				sprintf(lcd_disp_buf,"DS48(5,80,'E--%d',1);\r\n",public_val.Err_Flag);
-				GpuSend(lcd_disp_buf);
-			}
-			else
-			{
-				sprintf(lcd_disp_buf,"DS48(5,80,'E--%d',15);\r\n",public_val.Err_Flag);
-				GpuSend(lcd_disp_buf);
-			}
-			//GpuSend("SXY(0);\r\n");
-			errFlashFlag = !errFlashFlag;
-		}
-		
-		
-	}
-	else
-	{
-		if(g_iErrStatus == 1)//从错误中恢复
-		{
-			LCDDisplayState = 0x00;
-			g_iErrStatus = 0;
-		}
-	}
-		
-	
 	
 	switch(DisplayState)//数据更新以及显示
 	{
@@ -2270,11 +2216,11 @@ void LEDDisplay(void)
 						sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
 						GpuSend(lcd_disp_buf);
 						GpuSend("W8UE(4);\r\n");
-						sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
+						sprintf(lcd_disp_buf,"DS64(130,1,'%ld',15);\r\n",public_val.main_disp_val);
 						GpuSend(lcd_disp_buf);
 						GpuSend("SXY(0,0)\r\n");
 					}
-					if(g_pcStatus )
+					if(g_pcStatus && g_iErrStatus == 0)
 					{
 						
 						if(public_val.ms_timer -  g_iFlashOldTime> 500)
@@ -2300,8 +2246,7 @@ void LEDDisplay(void)
 					}
 					break;
 				case 1:
-					if(g_iErrStatus   == 1)
-						break;
+
 					ClearLCDScreen(0);
 					GpuSend("SPG(57);\r\n");
 					DELAY_US(10000);
@@ -2314,7 +2259,7 @@ void LEDDisplay(void)
 					sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
 					GpuSend(lcd_disp_buf);
 					GpuSend("W8UE(3);\r\n");
-					sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
+					sprintf(lcd_disp_buf,"DS64(130,1,'%ld',15);\r\n",public_val.main_disp_val);
 					GpuSend(lcd_disp_buf);
 					GpuSend("SXY(0,0)\r\n");
 					g_iInterfaceChangOldTime = public_val.ms_timer;
@@ -2325,22 +2270,22 @@ void LEDDisplay(void)
 					{
 						ClearLCDScreen(0);
 						GpuSend("SPG(60);\r\n");
+						DELAY_US(10000);
 						g_iInterfaceChangOldTime  = public_val.ms_timer;
 						LCDChildDisplayState++;						
 					}
 					break;
 				case 3:
-					if(public_val.ms_timer - g_iInterfaceChangOldTime  > 5000)
 					{
-						g_iInterfaceChangOldTime  = 0;
-						LCDChildDisplayState = 0;
-						LCDDisplayState	= 0x00;//无画面显示，形成与DispplayState不同的状态，刷新界面。					
+						if(public_val.ms_timer - g_iFlashOldTime > 200 )
+						{
+							g_iFlashOldTime = public_val.ms_timer;
+							IOCheck();
+						}
 					}
 					break;
 				
 				case 8://切纸询问界面
-					if(g_iErrStatus   == 1)
-						break;
 					if(public_val.ms_timer -  g_iFlashOldTime> 500)
 					{
 						static xdata int icutFlashFlag =0;
@@ -2377,7 +2322,7 @@ void LEDDisplay(void)
 							LCDDisplayState	= 0x00;
 							break;
 						default:
-						break;
+							break;
 					}
 					
 					break;
@@ -2415,9 +2360,97 @@ void LEDDisplay(void)
 			sprintf(cLcd_data_buf,"%d",iCount);
 			break;
 	}
+	//错误标志 低4位:主控板错误号 高4位:操作板错误
+	if(public_val.Err_Flag && DisplayState == ST_MAIN && LCDChildDisplayState == 0)
+	{
+		if(g_iErrStatus == 0 || g_iErrUIChange == 1)//出现错误 或者 错误界面被更改
+		{
+			g_iErrStatus = 1;
+			g_iErrUIChange =0;
+			ClearLCDScreen(0);
+			switch(public_val.Err_Flag)
+			{
+				case E1   ://完成设定筒数错误	本错误码只告警提示，不停机，为非故障报警。
+					GpuSend("PIC(0,0,18);\r\n");
+					GpuSend("DS32(1,32,'完成设定筒数错误',15);\r\n");					
+					break;
+				case E2   ://搓条机下料处无杆钎报错。
+					GpuSend("DS32(1,32,'搓条机下料处无杆钎报错',15);\r\n");
+					break;
+				case E3   ://搓条机弹片处无杆钎报错。
+					GpuSend("DS32(1,32,'搓条机弹片处无杆钎报错',15);\r\n");
+					break;
+				case E4   ://切刀堵纸光电传感器报错。
+					GpuSend("DS32(1,32,'切刀堵纸光电传感器报错',15);\r\n");
+					break;
+				case E5   ://下料堵纸光电传感器报错。
+					GpuSend("DS32(1,32,'下料堵纸光电传感器报错。',15);\r\n");
+					break;
+				case E6   ://切刀零位接近传感器报错。
+					GpuSend("DS32(1,32,'切刀零位接近传感器报错。',15);\r\n");
+					break;
+				case E7   ://储纸光电传感器感应到无纸。
+					GpuSend("DS32(1,32,'储纸光电传感器感应到无纸。',15);\r\n");
+					break;
+				case E8  : //搓条周期接近传感器报错。
+					GpuSend("DS32(1,32,'搓条周期接近传感器报错。',15);\r\n");
+					break;
+				case E9	:  //打胶到位感应器报错。
+					GpuSend("DS32(1,32,'打胶到位感应器报错。',15);\r\n");
+					break;
+				default:
+					GpuSend("PIC(0,0,18);\r\n");
+					break;
+			}
+		}
+		
+		if(public_val.ms_timer -  g_iFlashOldTime> 500)
+		{
+			static xdata errFlashFlag=0;
+			if(g_pcStatus)
+			{
+				g_pcStatus = 0;
+			}
+			sprintf(lcd_disp_buf,"DS48(5,130,'0x%X,%d',15);\r\n",(int)DisplayState,Main_disp_other);
+			GpuSend(lcd_disp_buf);
+			
+			//GpuSend("W8UE(2);\r\n");
+			if(public_val.Err_Flag > 0xf)
+			{	
+				sprintf(lcd_disp_buf,"DS32(3,1,'%s',15);\r\n","主控板错误：");
+				GpuSend(lcd_disp_buf);
+			}
+			else
+			{
+				sprintf(lcd_disp_buf,"DS32(3,1,'%s',15);\r\n","操作板错误：");
+				GpuSend(lcd_disp_buf);
+			}
+			if(errFlashFlag)
+			{	
+				sprintf(lcd_disp_buf,"DS32(180,1,'E--%d',1);\r\n",public_val.Err_Flag);
+				GpuSend(lcd_disp_buf);
+			}
+			else
+			{
+				sprintf(lcd_disp_buf,"DS32(180,1,'E--%d',15);\r\n",public_val.Err_Flag);
+				GpuSend(lcd_disp_buf);
+			}
+			//GpuSend("SXY(0);\r\n");
+			errFlashFlag = !errFlashFlag;
+		}
+		
+		
+	}
+	else if(public_val.Err_Flag == 0)
+	{
+		if(g_iErrStatus == 1)//从错误中恢复
+		{
+			LCDDisplayState = 0x00;
+			g_iErrStatus = 0;
+		}
+	}
 	
-	
-	if((DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT) && g_iErrStatus != 1)
+	if((DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT) )
 	{
 		xdata char lcd_disp_buf[50*2] = {0};
 		xdata char old_disp;
@@ -2817,4 +2850,207 @@ void TextOut(char *text)
 //	sprintf(lcd_disp_buf,"DS%d(%d,%d,'%s',%d);\r\n",fontsize,x,y,text,colour);
 //	GpuSend(lcd_disp_buf);
 }
+void IOCheck()
+{
+	xdata int i =0;
+	xdata char usart2_buf[30]={0}; 
+	
+	for(i=1;i < 7 ;i ++)
+	{
+		sprintf(usart2_buf,"W8UE(%d);\r\n",i);
+		GpuSend(usart2_buf);
+		
+		if ((public_val.io_read & (0x01 << ((i -1 ) *2  ))) == 0)//(sziostatus[8] - '0' == 0)
+		{
+			GpuSend("CIRF(65,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(65,55,15,2);\r\n");
+		}
+		DELAY_US(UART2_DELAY);
+		if ((public_val.io_read & (0x01 << ( (i-1)  * 2 + 1)) )== 0)//sziostatus[9] - '0' == 0)
+		{
+			GpuSend("CIRF(165,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(165,55,15,2);\r\n");
+		}				
+		GpuSend("SXY(0,0);\r\n");
+		DELAY_US(UART2_DELAY);
+	}
+/*	for(i =0 ;i < 2 ; i++)
+	{
+		sprintf(usart2_buf,"W8UE(%d);\r\n",5 + i);
+		GpuSend(usart2_buf);
+		if ((public_val.io_read>>(2+ i*2) & 0x01) == 0)//(sziostatus[8] - '0' == 0)
+		{
+			GpuSend("CIRF(65,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(65,55,15,2);\r\n");
+		}
+		DELAY_US(UART2_DELAY);
+		if ((public_val.io_read>>(2 + i + 1 ) & 0x01) == 0)//sziostatus[9] - '0' == 0)
+		{
+			GpuSend("CIRF(165,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(165,55,15,2);\r\n");
+		}				
+		GpuSend("SXY(0,0);\r\n");
+		DELAY_US(UART2_DELAY);
+	}
+*/	
+}
+/*
+void IOView()
+{
+	GpuSend("W8UE(1);\r\n");		//\r\n
+	DELAY_US(UART2_DELAY);
+	if (!io_status.bit_16.b08)//(sziostatus[8] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	if (!io_status.bit_16.b09)//sziostatus[9] - '0' == 0)
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}				
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+	
+	GpuSend("W8UE(2);\r\n");
+	DELAY_US(UART2_DELAY);			
+	if (!io_status.bit_16.b10)//sziostatus[10] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);								
+	if (!io_status.bit_16.b11)//sziostatus[11] - '0' == 0)
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+	GpuSend("W8UE(3);\r\n");
+	DELAY_US(UART2_DELAY);
+	//GpuSend("DS32(1,5,'S5',15);");								
+	if (!io_status.bit_16.b12)//sziostatus[12] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	//GpuSend("DS32(100,5,'S6',15);\r\n");
+	DELAY_US(UART2_DELAY);								
+	if (!io_status.bit_16.b13)//sziostatus[13] - '0' == 0)
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+	GpuSend("W8UE(4);\r\n");
+	DELAY_US(UART2_DELAY);
+	//GpuSend("DS32(1,5,'S7',15);");								
+	if (!io_status.bit_16.b14)//sziostatus[14] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	//GpuSend("DS32(100,5,'S8',15);");								
+	if (!io_status.bit_16.b15)//sziostatus[15] - '0' == 0)
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+	GpuSend("W8UE(5);\r\n");
+	DELAY_US(UART2_DELAY);
+	//GpuSend("DS32(1,7,'S9',15);");		//sziostatus[0],sziostatus[1]无信号						
+	if (!io_status.bit_16.b02)//sziostatus[2] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("DS16(100,10,'S10',15);");
+	DELAY_US(UART2_DELAY);
+	if (!io_status.bit_16.b03)//sziostatus[3] - '0' == 0)
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+	GpuSend("W8UE(6);\r\n");
+	DELAY_US(UART2_DELAY);
+	GpuSend("DS16(1,10,'S11',15);");
+	DELAY_US(UART2_DELAY);
+	if (!io_status.bit_16.b04)//sziostatus[4] - '0' == 0)
+	{
+		GpuSend("CIRF(65,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(65,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("DS24(100,7,'S12',15);");
+	DELAY_US(UART2_DELAY);								
+	if (!io_status.bit_16.b05)//sziostatus[5] - '0' == 0)				//sziostatus[6]、sziostatus[7]无显示
+	{
+		GpuSend("CIRF(165,55,15,1);\r\n");
+	}
+	else
+	{
+		GpuSend("CIRF(165,55,15,2);\r\n");
+	}
+	DELAY_US(UART2_DELAY);
+	GpuSend("SXY(0,0);\r\n");
+	DELAY_US(UART2_DELAY);
+}
+*/
 #endif

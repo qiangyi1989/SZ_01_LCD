@@ -726,7 +726,7 @@ void main()
 	cnt_read_state = public_val.ms_timer;	
 	
 	//add by yq
-	GpuSend("DR2\r\n");
+//	GpuSend("DR2\r\n");
 	
 	while(1)
 	{	
