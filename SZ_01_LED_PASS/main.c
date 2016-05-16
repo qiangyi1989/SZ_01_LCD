@@ -727,6 +727,13 @@ void main()
 	
 	//add by yq
 //	GpuSend("DR2\r\n");
+	{
+		long i;
+		for(i = 0; i < 1000; i++)
+			{
+				_nop_();
+			}
+	}
 	
 	while(1)
 	{	
