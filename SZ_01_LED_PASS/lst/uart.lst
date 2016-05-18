@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 1   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE UART
@@ -62,7 +62,7 @@ line level    source
   52          
   53          extern xdata unsigned int  unUpVerNum;
   54          extern xdata unsigned int  unDownVerNum;
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 2   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 2   
 
   55          extern xdata unsigned int  unIoStatus;
   56          
@@ -126,7 +126,7 @@ line level    source
  112   1              //ÉèÖÃ´®¿Ú1Îª¸ßÓÅÏÈ¼¶ÖÐ¶Ï    //¸ù¾ÝÏàÍ¬ÓÅÏÈ¼¶µÄÄÚ²¿²éÑ¯Ë³´Î: usart1¸ßÓÚusart2, t1¸ßÓÚt2.
  113   1              //µ±Ê¹ÓÃcÓïÑÔ±à³ÌÊ±,ÖÐ¶Ï²éÑ¯Ë³´ÎºÅ,¾ÍÊÇÖÐ¶ÏºÅ.
  114   1              PS = 1;         //add 0331
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 3   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 3   
 
  115   1      }
  116          
@@ -190,7 +190,7 @@ line level    source
                               //test 0407             
                               
                               //ÔÚ´®¿Ú1½ÓÊÕ£¬×ª·¢¸ø´®¿Ú2£¬¶¨ÒåLCD_UART_DOWNÊ±£¬²âÊÔOK.
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 4   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 4   
 
                       //Uasrt2SendData(SBUF);         
                   }
@@ -254,7 +254,7 @@ line level    source
  233   2          }
  234   1      }
  235          
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 5   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 5   
 
  236          
  237          
@@ -318,7 +318,7 @@ line level    source
  294          ·µ»ØÖµ£ºÎÞ
  295          ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
  296          void Send_UartBuf(char * buf)
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 6   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 6   
 
  297          {
  298   1              int i;
@@ -382,7 +382,7 @@ line level    source
  356          {
  357   1              //del 0407
  358   1      #ifndef LCD_UART_DOWN
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 7   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 7   
 
  359   1              while (busy2);               //    //ÏÂÔØÒ³ÃæÐÅÏ¢Ê±£¬while (busy2) Óï¾äÐèÆÁ±Î; //ÔÚ±¾»úÔËÐÐÍ¨ÐÅ(·ÇÓëPC»úÍ
              -¨ÐÅ)Ê±,while (busy2) Óï¾ä²»ÄÜÆÁ±Î  //µÈ´ýÇ°ÃæµÄÊý¾Ý·¢ËÍÍê³É
@@ -446,7 +446,7 @@ line level    source
                       switch(((get_ver_stru *)com_data)->cmd_type)
                               {
                                       case GET_VER_CMD:
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 8   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 8   
 
                                               public_val.drive_type_com = ((get_ver_stru *)com_data)->ver;
                                               public_val.drive_index_com = ((get_ver_stru *)com_data)->drive_indx;
@@ -510,7 +510,7 @@ line level    source
                                                       }
                                               //±£´æ²Ëµ¥Êý¾ÝÖµµ½EEPROM
                                               func_menu_update(menu_id);
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 9   
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 9   
 
                                       break;
                                       case GET_STATU_INFO:
@@ -574,7 +574,7 @@ line level    source
  541   2                      case UP_WRITE_PARAM:
  542   2      
  543   2                              /* »ñÈ¡²ÎÊý¸öÊý */
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 10  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 10  
 
  544   2                              //Menu_Number[0] = Uart_RecBuf[1] >> 1;    /* ÔØºÉ³¤¶È³ýÒÔ2Îª²ÎÊý¸öÊý */
  545   2      //                      Menu_Number[0] = (Uart_RecBuf[1] + Uart_RecBuf[2]) >> 1;  //ËùÓÐ²ÎÊý¸öÊý
@@ -638,7 +638,7 @@ line level    source
  603   4                                                      public_val.work_count_user = public_val.work_count;
  604   4                                                      save_user_count();
  605   4                                              }
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 11  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 11  
 
  606   3                                                                      
  607   3                                      save_sys_lock();
@@ -702,7 +702,7 @@ line level    source
  665   2                      case UP_WRITE_TEST_MODE_DONE:
  666   2      
  667   2                              send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 12  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 12  
 
  668   2      
  669   2                      break;
@@ -766,7 +766,7 @@ line level    source
 *** WARNING C280 IN LINE 516 OF UART.C: 'ucSaveLearn2': unreferenced local variable
  726          
  727          /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 13  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 13  
 
  728          Ãû³Æ:   send_data_func(void)
  729          ¹¦ÄÜ£º  Í¨Ñ¶´¦Àí¹ý³Ì ÓÉÖ÷³ÌÐòµ÷ÓÃ
@@ -830,7 +830,7 @@ line level    source
  785   5                                              public_val.Disp_Dz_10101[8] = 20;   /* 9¡¢·¢Ö½µç»úPIDµ÷ËÙµÄ±ÈÀýÏµÊý*100 */
  786   5                                      #ifdef SZ_01    // SZ_01
                                                       public_val.Disp_Dz_10101[9] = 85;   /* 10¡¢·¢Ö½µç»úÆô¶¯PWMÕ¼¿Õ±È */
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 14  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 14  
 
                                                       public_val.Disp_Dz_10101[10] = 85;   /* 11¡¢ÇÐÖ½µç»úÆô¶¯PWMÕ¼¿Õ±È */
                                                       public_val.Disp_Dz_10101[12] = 70;   /* 12¡¢ÇÐÖ½µç»úÄ¿±êPWMÕ¼¿Õ±È */
@@ -894,7 +894,7 @@ line level    source
  844   4      
  845   4                                      already_read_param = 1;  /* ÖÃÎªÒÑ¶Áµ½ÅäÖÃ²ÎÊý */
  846   4      
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 15  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 15  
 
  847   4                                      send_frame_type = UP_REPLY_DONE;  /* ¿ÉÒÔ·¢ËÍÏÂÒ»Ö¡ */                          
  848   4                                      
@@ -958,7 +958,7 @@ line level    source
  905   1      #endif
  906   1      
  907   1      
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 16  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 16  
 
  908   1      
  909   1              /* µ±Ç°ÐèÒªÐ´²âÊÔÄ£Ê½µ½Ö÷°å */
@@ -1022,7 +1022,7 @@ line level    source
  967   2                              send_frame_type = DOWN_READ_PARAM_SENT;   /* ÖÃÎª¶Á²ÎÊýÖ¡ÒÑ·¢ËÍ */
  968   2                              
  969   2                              break;
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 17  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 17  
 
  970   2      
  971   2                      //ÏÂ·¢¶Á×´Ì¬,Ö÷¿Ø°å·µ»ØÏàÓ¦×´Ì¬
@@ -1086,7 +1086,7 @@ line level    source
 1029   2      
 1030   2                              write_param_flag = 0;  /* ÒÑÍê³ÉÒ»´ÎÐ´ÅäÖÃ²ÎÊý£¬ÖÃÎª²»Ð´×´Ì¬ */ 
 1031   2                              
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 18  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 18  
 
 1032   2                              break;
 1033   2      
@@ -1150,7 +1150,7 @@ line level    source
 1091   2                              uart_send_buf[3] = 10;          
 1092   2      
 1093   2                              Send_UartBuf(uart_send_buf);
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 19  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 19  
 
 1094   2      
 1095   2                              send_frame_type = DOWN_WRITE_WARNING_MSG_SENT;   
@@ -1214,7 +1214,7 @@ line level    source
 1153          //µÚÒ»´ÎÊ¹ÓÃ´®¿ÚÖúÊÖ(Commix 1.4)(Ê¹ÓÃ×Ö·û´®·½Ê½)(by enter ÊÇ·ñ´ò¹³Ã»Ê²Ã´Çø±ð)·¢ËÍÈçÏÂÃüÁî³É¹¦:
 1154          //CLS(0);\x0d\x0a
 1155          //µÚ¶þ´Î·¢ËÍ³É¹¦
-C51 COMPILER V9.00   UART                                                                  05/10/2016 17:31:06 PAGE 20  
+C51 COMPILER V9.00   UART                                                                  05/18/2016 11:47:56 PAGE 20  
 
 1156          //DS48(0,0,'ÏÔÊ¾×Ö·û´®',1);\x0d\x0a
 1157          

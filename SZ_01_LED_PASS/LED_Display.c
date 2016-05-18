@@ -213,11 +213,25 @@ xdata char speed_mode = 1;   //速度模式: 1高速， 0低速
 xdata char qz_wait = 0;      //等待切纸确认: 0未等待，1等待
 
 //add by yq
+#define E1  				1	//完成设定筒数	本错误码只告警提示，不停机，为非故障报警。
+#define E2					2   //搓条机下料处无杆钎报错。
+#define E3					3   //搓条机弹片处无杆钎报错。
+#define E4					4   //切刀堵纸光电传感器报错。
+#define E5					5   //下料堵纸光电传感器报错。
+#define E6					6   //切刀零位接近传感器报错。
+#define E7					7   //储纸光电传感器感应到无纸。
+#define E8					8   //搓条周期接近传感器报错。
+#define E9					9	//打胶到位感应器报错。
+xdata int g_key_val_2;
+xdata int g_rubbing_st=0;
 xdata char Menu0_Number;
 xdata unsigned int g_iFlashOldTime = 0;
 xdata unsigned int g_iInterfaceChangOldTime=0;
-xdata char* g_pcStatus = 0;						   
-void ClearLCDScreen(int c);						   
+xdata char* g_pcStatus = 0;
+xdata int g_iErrStatus =0;
+xdata int g_iErrUIChange =0;
+void ClearLCDScreen(int c);	
+void IOCheck();
 /*++++++++++++++++++++++++++++++++++++++++++++++++
 功能：显示字符串。
 
@@ -837,7 +851,7 @@ void LEDDisplay(void)
 	//ADD by yq
 	xdata char lcd_disp_buf[50*2] = {0};
 	xdata unsigned char  cMenuSn;
-	xdata int iLen=0,iCount=0,iTatol;
+	xdata int iLen=0,iCount=0;
 	MENU_SHOW *pLCDDataValue;
 	xdata unsigned char  cLcd_data_buf[6]={0},cLcd_len_data_buf[6]={0},cLcd_count_data_buf[6]={0};
 	
@@ -1016,9 +1030,116 @@ void LEDDisplay(void)
 						gsKeyVal = KEY_DJ;
 						gcKeyType = KEY_SHORT_UP_FLAG;
 						dj_key_step = 0;
+						//add by yq
+						g_key_val_2= KEY_DJ;
 					}
 			break;
 		}
+		
+	//按键状态显示  add by yq
+	if(LCDChildDisplayState != 8)
+	switch(Key_Val)
+	{
+		case 0xFFFF://无按键
+		case 0x0000:
+			if(g_key_val_2 == KEY_DJ)
+			{
+				g_key_val_2= 0; //清除打胶键值
+				g_pcStatus= "打胶";
+			}
+			else if(g_rubbing_st == 1)
+			{
+				g_pcStatus = "搓条";
+			}
+			else
+				g_pcStatus = 0;
+			break;
+		case KEY_K2:
+		//	public_val.Err_Flag++;
+			break;
+		case KEY_K3:
+		//	public_val.Err_Flag--;
+			break;
+		case KEY_K1: //选择
+			if((LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3 )&& DisplayState == ST_MAIN)
+			{
+				LCDDisplayState	= 0x00;
+				LCDChildDisplayState = 0;
+			}
+			if(g_iErrStatus == 1)
+				g_iErrUIChange =1;
+			break;
+		case KEY_K4:           /* 确认 */
+			if((LCDChildDisplayState == 2 || LCDChildDisplayState == 3 ) && DisplayState == ST_MAIN)//如果处于主界面的子界面有按键就返回
+			{			
+			//	LCDChildDisplayState =0;
+			//	LCDDisplayState	= 0x00;
+			}
+			else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
+				LCDChildDisplayState = 1;
+			if(g_iErrStatus == 1)
+				g_iErrUIChange =1;	
+			break;
+		case KEY_IO1:          /* 进纸 */
+			g_pcStatus = "进纸";
+			break;
+		case KEY_IO2: 		   /* 退纸 */
+			g_pcStatus = "退纸";
+			break;
+		case KEY_IO3:          /* 切纸 */
+			//g_pcStatus = "切纸";
+			
+			if(g_iErrStatus == 1)
+				g_iErrUIChange =1;
+			
+			LCDChildDisplayState =8;
+			break;
+		case KEY_IO4: 		   /* 下料 */
+			g_pcStatus = "下料";
+			break;
+		case KEY_IO5:          /* 搓条 */
+			if(g_rubbing_st == 0)
+			{
+				g_rubbing_st = 1;
+				g_pcStatus = "搓条";
+				
+			}
+			else
+			{
+				g_rubbing_st = 0 ;
+			}
+			break;
+		case KEY_IO6:          /* 停止送纸 */
+			g_pcStatus = "停纸";	
+			break;
+		case KEY_IO7:          /* 启动 */
+			g_pcStatus = "启动";
+			break;
+		case KEY_IO8: 	       /* 停止 */
+			g_pcStatus = "停止";
+			break;
+		case KEY_IO9:          /* 发纸 */
+			g_pcStatus = "发纸";
+			break;
+		case KEY_RED:          /* 收纸 */
+			g_pcStatus = "收纸";
+			break;
+		case KEY_GREEN: 	   /* 纸长 */
+			if(g_iErrStatus == 1)
+				g_iErrUIChange =1;
+			break;
+		case KEY_BLUE:         /* 捆数 */
+			if(g_iErrStatus == 1)
+				g_iErrUIChange =1;
+			break;
+		case KEY_DJ:        /* 打胶 */
+			g_pcStatus= "打胶";
+			break;
+		default:
+			
+			break;
+	}
+	
     switch(DisplayState)
 	{
 	    case ST_MAIN:   /* 主界面 */
@@ -1952,11 +2073,14 @@ void LEDDisplay(void)
 		xdata char* paperNum = "捆数";
 		xdata char* paperTatol = "总数";
 		
+		if(g_iErrStatus == 1)
+				g_iErrUIChange =1;
 		
 		LCDDisplayState = DisplayState;
 		switch(LCDDisplayState)
 		{
 			case ST_MAIN:
+			if(public_val.Err_Flag == 0)
 			{
 				ClearLCDScreen(0);
 				//GpuSend("SPG(52);\r\n");	
@@ -1967,18 +2091,18 @@ void LEDDisplay(void)
 				GpuSend("W8UE(1);\r\n");//查看串口发送的数据是正确的，必须两条才能起作用。液晶屏BUG
 				GpuSend("W8UE(1);\r\n");
 				DELAY_US(UART2_DELAY);
-				sprintf(lcd_disp_buf,"DS64(1,2,'%s',15);\r\n",paperLen);
+				sprintf(lcd_disp_buf,"DS64(1,8,'%s',15);\r\n",paperLen);
 				GpuSend(lcd_disp_buf);
 				DELAY_US(UART2_DELAY);
 				GpuSend("SXY(0,0)\r\n");
 				GpuSend("W8UE(3);\r\n");
 				DELAY_US(UART2_DELAY);
-				sprintf(lcd_disp_buf,"DS64(1,2,'%s',15);\r\n",paperNum);
+				sprintf(lcd_disp_buf,"DS64(1,8,'%s',15);\r\n",paperNum);
 				GpuSend(lcd_disp_buf);
 				GpuSend("SXY(0,0)\r\n");
 				DELAY_US(UART2_DELAY);
 				GpuSend("W8UE(4);\r\n");
-				sprintf(lcd_disp_buf,"DS64(1,1,'%s',15);\r\n",paperTatol);
+				sprintf(lcd_disp_buf,"DS64(1,8,'%s',15);\r\n",paperTatol);
 				GpuSend(lcd_disp_buf);
 				GpuSend("SXY(0,0)\r\n");
 				DELAY_US(UART2_DELAY);
@@ -2097,141 +2221,18 @@ void LEDDisplay(void)
 	}
 	
 
-	//错误标志 低4位:主控板错误号 高4位:操作板错误
-	if(public_val.Err_Flag)
-	{
-		
-		if(public_val.ms_timer -  g_iFlashOldTime> 500)
-		{
-			static xdata errFlashFlag=0;
-			if(g_pcStatus)
-			{
-				LCDChildDisplayState =0;
-				LCDDisplayState	= 0x00;
-				g_pcStatus = 0;
-			}
-			GpuSend("W8UE(2);\r\n");
-			if(public_val.Err_Flag > 0xf)
-			{	
-				sprintf(lcd_disp_buf,"DS24(3,20,'%s',15);\r\n","主控板错误：");
-				GpuSend(lcd_disp_buf);
-			}
-			else
-			{
-				sprintf(lcd_disp_buf,"DS24(3,20,'%s',15);\r\n","操作板错误：");
-				GpuSend(lcd_disp_buf);
-			}
-			if(errFlashFlag)
-			{	
-				sprintf(lcd_disp_buf,"DS48(5,80,'E--%d',1);\r\n",public_val.Err_Flag);
-				GpuSend(lcd_disp_buf);
-			}
-			else
-			{
-				sprintf(lcd_disp_buf,"DS48(5,80,'E--%d',15);\r\n",public_val.Err_Flag);
-				GpuSend(lcd_disp_buf);
-			}
-			GpuSend("SXY(0);\r\n");
-			errFlashFlag = !errFlashFlag;
-		}
-		
-		
-	}
-	else if(g_pcStatus && LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
-	{
-		
-		if(public_val.ms_timer -  g_iFlashOldTime> 500)
-		{
-			static xdata staFlashFlag=0;
-			g_iFlashOldTime = public_val.ms_timer;
-			GpuSend("W8UE(2);\r\n");
-			if(staFlashFlag)
-			{	
-				sprintf(lcd_disp_buf,"DS48(20,60,'%s',15);\r\n",g_pcStatus);
-				GpuSend(lcd_disp_buf);			
-			}
-			else
-			{
-				sprintf(lcd_disp_buf,"DS48(20,60,'%s',1);\r\n",g_pcStatus);
-				GpuSend(lcd_disp_buf);
-			}
-			GpuSend("SXY(0);\r\n");
-			staFlashFlag = !staFlashFlag;
-		}
-		
-		
-	}
-	//按键状态显示
-	if(LCDChildDisplayState != 8)
-	switch(Key_Val)
-	{
-		case 0xFFFF://无按键
-			break;
-		case KEY_K1: //选择
-			if(LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3)
-				LCDChildDisplayState = 0;
-			break;
-		case KEY_K4:           /* 确认 */
-			if(LCDChildDisplayState == 2 || LCDChildDisplayState == 3)//如果处于主界面的子界面有按键就返回
-			{			
-				LCDChildDisplayState =0;
-				LCDDisplayState	= 0x00;
-			}
-			else if(LCDChildDisplayState == 0 && DisplayState == ST_MAIN)
-				LCDChildDisplayState = 1;
-				
-			break;
-		case KEY_IO1:          /* 进纸 */
-			g_pcStatus = "进纸";
-			break;
-		case KEY_IO2: 		   /* 退纸 */
-			g_pcStatus = "退纸";
-			break;
-		case KEY_IO3:          /* 切纸 */
-			//g_pcStatus = "切纸";
-			LCDChildDisplayState =8;
-			break;
-		case KEY_IO4: 		   /* 下料 */
-			g_pcStatus = "下料";
-			break;
-		case KEY_IO5:          /* 搓条 */
-			g_pcStatus = "搓条";
-			break;
-		case KEY_IO6:          /* 停止送纸 */
-			g_pcStatus = "停纸";	
-			break;
-		case KEY_IO7:          /* 启动 */
-			g_pcStatus = "启动";
-			break;
-		case KEY_IO8: 	       /* 停止 */
-			g_pcStatus = "停止";
-			break;
-		case KEY_IO9:          /* 发纸 */
-			g_pcStatus = "发纸";
-			break;
-		case KEY_RED:          /* 收纸 */
-			g_pcStatus = "收纸";
-			break;
-		case KEY_GREEN: 	   /* 纸长 */
-			break;
-		case KEY_BLUE:         /* 捆数 */
-			break;
-		case KEY_DJ:        /* 打胶 */
-			g_pcStatus= "打胶";
-			break;
-		default:
-			
-			break;
-	}
+	
 	switch(DisplayState)//数据更新以及显示
 	{
 		case ST_MAIN:
 			switch(LCDChildDisplayState)
 			{
 				case 0:
-					if(public_val.ms_timer - g_iInterfaceChangOldTime  > 500)
+					if(public_val.ms_timer - g_iInterfaceChangOldTime  > 500 && g_iErrStatus == 0)
 					//if(now_menu.menu_id == 0 && now_menu.par_id ==1)//纸长
 					{
+						xdata char total[9] = {'0'};
+						xdata int numLen=0;
 						g_iInterfaceChangOldTime = public_val.ms_timer;
  						pLCDDataValue=pItem[0].m_pcfg;
 						iLen = *(int *)pLCDDataValue->m_data_vale;
@@ -2243,18 +2244,65 @@ void LEDDisplay(void)
 						iCount= *(int *)pLCDDataValue->m_data_vale;
 						sprintf(cLcd_count_data_buf,"%d",iCount);
 						GpuSend("W8UE(1);\r\n");
-						sprintf(lcd_disp_buf,"DS64(130,2,'%s',15);\r\n",cLcd_len_data_buf);
+						sprintf(lcd_disp_buf,"DS64(142,8,'%s',15);\r\n",cLcd_len_data_buf);
 						GpuSend(lcd_disp_buf);
 						GpuSend("W8UE(3);\r\n");
-						sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
+						sprintf(lcd_disp_buf,"DS64(142,8,'%s',15);\r\n",cLcd_count_data_buf);
 						GpuSend(lcd_disp_buf);
 						GpuSend("W8UE(4);\r\n");
-						sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
+						sprintf(lcd_disp_buf,"%ld",public_val.main_disp_val);
+						numLen =strlen(lcd_disp_buf);
+						for(i =0;i< 9  ;i++)
+							total[i]='0';
+						for(i=0; ((i< numLen) && i< 8);i++)
+						{
+							
+							total[8 - numLen + i] = lcd_disp_buf[i];
+						}
+
+						total[8]='\0';
+						//sprintf(lcd_disp_buf,"DS64(138,8,'%7ld',15);\r\n",public_val.main_disp_val);
+						sprintf(lcd_disp_buf,"DS64(142,8,'%s',15);\r\n",total);
 						GpuSend(lcd_disp_buf);
 						GpuSend("SXY(0,0)\r\n");
 					}
+					if(g_pcStatus && g_iErrStatus == 0)
+					{
+						
+						if(public_val.ms_timer -  g_iFlashOldTime> 500)
+						{
+							static xdata staFlashFlag=0;
+							g_iFlashOldTime = public_val.ms_timer;
+							GpuSend("W8UE(2);\r\n");
+							if(staFlashFlag)
+							{	
+								sprintf(lcd_disp_buf,"DS48(20,60,'%s',15);\r\n",g_pcStatus);
+								GpuSend(lcd_disp_buf);			
+							}
+							else
+							{
+								sprintf(lcd_disp_buf,"DS48(20,60,'%s',1);\r\n",g_pcStatus);
+								GpuSend(lcd_disp_buf);
+							}
+							GpuSend("SXY(0);\r\n");
+							staFlashFlag = !staFlashFlag;
+						}
+						
+						
+					}else if(g_pcStatus == 0 && g_iErrStatus == 0)
+					{
+						if(public_val.ms_timer -  g_iFlashOldTime> 500)
+						{
+							GpuSend("W8UE(2);\r\n");
+							sprintf(lcd_disp_buf,"DS48(20,60,'    ',1);\r\n");
+							GpuSend(lcd_disp_buf);
+							GpuSend("SXY(0);\r\n");
+						}
+					}
+					
 					break;
 				case 1:
+
 					ClearLCDScreen(0);
 					GpuSend("SPG(57);\r\n");
 					DELAY_US(10000);
@@ -2267,7 +2315,7 @@ void LEDDisplay(void)
 					sprintf(lcd_disp_buf,"DS64(130,1,'%s',15);\r\n",cLcd_count_data_buf);
 					GpuSend(lcd_disp_buf);
 					GpuSend("W8UE(3);\r\n");
-					sprintf(lcd_disp_buf,"DS64(130,1,'%d',15);\r\n",public_val.main_disp_val);
+					sprintf(lcd_disp_buf,"DS64(130,1,'%ld',15);\r\n",public_val.main_disp_val);
 					GpuSend(lcd_disp_buf);
 					GpuSend("SXY(0,0)\r\n");
 					g_iInterfaceChangOldTime = public_val.ms_timer;
@@ -2278,16 +2326,18 @@ void LEDDisplay(void)
 					{
 						ClearLCDScreen(0);
 						GpuSend("SPG(60);\r\n");
+						DELAY_US(10000);
 						g_iInterfaceChangOldTime  = public_val.ms_timer;
 						LCDChildDisplayState++;						
 					}
 					break;
 				case 3:
-					if(public_val.ms_timer - g_iInterfaceChangOldTime  > 5000)
 					{
-						g_iInterfaceChangOldTime  = 0;
-						LCDChildDisplayState = 0;
-						LCDDisplayState	= 0x00;//无画面显示，形成与DispplayState不同的状态，刷新界面。					
+						if(public_val.ms_timer - g_iFlashOldTime > 200 )
+						{
+							g_iFlashOldTime = public_val.ms_timer;
+							IOCheck();
+						}
 					}
 					break;
 				
@@ -2328,9 +2378,11 @@ void LEDDisplay(void)
 							LCDDisplayState	= 0x00;
 							break;
 						default:
-						break;
+							break;
 					}
 					
+					break;
+				default:
 					break;
 			}
 			
@@ -2364,9 +2416,157 @@ void LEDDisplay(void)
 			sprintf(cLcd_data_buf,"%d",iCount);
 			break;
 	}
+	//错误标志 低4位:主控板错误号 高4位:操作板错误
+	if(public_val.Err_Flag && DisplayState == ST_MAIN && LCDChildDisplayState == 0)
+	{
+		xdata int iErrPosX,iErrPosY,iPicNum;
+		if(g_iErrStatus == 0 || g_iErrUIChange == 1)//出现错误 或者 错误界面被更改
+		{
+			g_iErrStatus = 1;
+			g_iErrUIChange =0;
+			ClearLCDScreen(0);
+			switch(public_val.Err_Flag)
+			{
+				case E1   ://完成设定筒数错误	本错误码只告警提示，不停机，为非故障报警。
+					iErrPosX=320;
+					iErrPosY=200;
+					GpuSend("BPIC(1,0,0,1);\r\n");
+					DELAY_US(5000);
+					iPicNum =1;
+					GpuSend("PS32(1,1,1,'完成一捆,请捆条',15);\r\n");					
+					break;
+				case E2   ://搓条机下料处无杆钎报错。
+					iErrPosX=200;
+					iErrPosY=80;
+					iPicNum =2;
+					GpuSend("BPIC(2,0,0,2);\r\n");
+					DELAY_US(5000);
+					GpuSend("BOX(120,180,150,198);\r\n");
+					GpuSend("PS32(2,1,1,'搓条机下料处无杆钎报错',15);\r\n");
+					break;
+				case E3   ://搓条机弹片处无杆钎报错。
+					iErrPosX=200;
+					iErrPosY=80;
+					iPicNum =3;
+					GpuSend("BPIC(3,0,0,3);\r\n");
+					DELAY_US(3500);
+					GpuSend("BOX(100,80,200,160);\r\n");
+					GpuSend("PS32(3,1,1,'搓条机弹片处无杆钎报错',15);\r\n");
+					
+					break;
+				case E4   ://切刀堵纸光电传感器报错。
+					iErrPosX=100;
+					iErrPosY=170;
+					iPicNum =4;
+					GpuSend("BPIC(4,0,0,4);\r\n");
+					DELAY_US(3500);
+					
+					GpuSend("PS32(4,1,1,'切刀堵纸光电传感器报错',15);\r\n");
+					break;
+				case E5   ://下料堵纸光电传感器报错。
+					iErrPosX=180;
+					iErrPosY=34;
+					GpuSend("BPIC(5,0,0,5);\r\n");
+					DELAY_US(3500);
+					iPicNum =5;          
+					GpuSend("PS32(5,1,1,'下料堵纸光电传感器报错。',15);\r\n");
+					break;
+				case 16:
+				case 26:
+				case 36:
+				case E6   ://切刀零位接近传感器报错 
+					iErrPosX=300;
+					iErrPosY=100;
+					iPicNum =6;
+					GpuSend("BPIC(6,0,0,6);\r\n");
+					DELAY_US(3500);
+					GpuSend("BOX(280,80,298,100);\r\n");
+					GpuSend("PS32(6,1,1,'切刀零位接近传感器报错。',15);\r\n");
+					break;
+				case E7   ://储纸光电传感器感应到无纸。
+					iErrPosX=160;
+					iErrPosY=60;
+					iPicNum =7;
+					GpuSend("BPIC(7,0,0,7);\r\n");
+					DELAY_US(3500);
+					GpuSend("BOX(140,40,180,58);\r\n");
+					GpuSend("PS32(7,1,1,'储纸感应到无纸或纸多。',15);\r\n");
+					break;
+				case E8  : //搓条周期接近传感器报错。
+					iErrPosX=140;
+					iErrPosY=200;
+					iPicNum =8;
+					GpuSend("BPIC(8,0,0,8);\r\n");
+					DELAY_US(3500);
+					GpuSend("BOX(100,170,139,210);\r\n");
+					GpuSend("PS32(8,1,1,'搓条周期接近传感器报错。',15);\r\n");
+					break;
+				case E9	:  //打胶到位感应器报错。
+					iErrPosX=180;
+					iErrPosY=34;
+					GpuSend("BPIC(9,0,0,1);\r\n");
+					DELAY_US(3500);
+					iPicNum =9;
+					GpuSend("PS32(9,1,1,'打胶到位感应器报错。',15);\r\n");
+					break;
+				default:
+					iErrPosX=180;
+					iErrPosY=1;
+					iPicNum=0;
+					GpuSend("BPIC(0,0,0,1);\r\n");
+					break;
+			}
+		}
+		
+		if(public_val.ms_timer -  g_iFlashOldTime> 500)
+		{
+			static xdata errFlashFlag=0;
+			if(g_pcStatus)
+			{
+				g_pcStatus = 0;
+			}
+			g_iFlashOldTime = public_val.ms_timer;
+			//GpuSend("W8UE(2);\r\n");
+/*			if(public_val.Err_Flag > 0xf)
+			{	
+				sprintf(lcd_disp_buf,"PS32(%d,3,1,'%s',15);\r\n",iPicNum,"主控板错误：");
+				//sprintf(lcd_disp_buf,"DS32(3,1,'%s',15);\r\n","主控板错误：");
+				GpuSend(lcd_disp_buf);
+			}
+			else
+			{
+				sprintf(lcd_disp_buf,"PS32(%d,3,1,'%s',15);\r\n",iPicNum,"操作板错误：");
+				//sprintf(lcd_disp_buf,"DS32(3,1,'%s',15);\r\n","操作板错误：");
+				GpuSend(lcd_disp_buf);
+			}
+*/			
+			if(errFlashFlag)
+			{	
+				sprintf(lcd_disp_buf,"PS32(%d,%d,%d,'E%d',1);\r\n",iPicNum,iErrPosX,iErrPosY,public_val.Err_Flag);
+				GpuSend(lcd_disp_buf);
+			}
+			else
+			{
+				sprintf(lcd_disp_buf,"PS32(%d,%d,%d,'E%d',15);\r\n",iPicNum,iErrPosX,iErrPosY,public_val.Err_Flag);
+				GpuSend(lcd_disp_buf);
+			}
+			//GpuSend("SXY(0);\r\n");
+			errFlashFlag = !errFlashFlag;
+		}
+		
+		
+	}
+	else if(public_val.Err_Flag == 0)
+	{
+		if(g_iErrStatus == 1)//从错误中恢复
+		{
+			LCDDisplayState = 0x00;
+			LCDChildDisplayState= 0;
+			g_iErrStatus = 0;
+		}
+	}
 	
-	
-	if(DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT)
+	if((DisplayState ==ST_PASSWORD  || DisplayState == ST_DATA_INPUT) )
 	{
 		xdata char lcd_disp_buf[50*2] = {0};
 		xdata char old_disp;
@@ -2766,4 +2966,65 @@ void TextOut(char *text)
 //	sprintf(lcd_disp_buf,"DS%d(%d,%d,'%s',%d);\r\n",fontsize,x,y,text,colour);
 //	GpuSend(lcd_disp_buf);
 }
+void IOCheck()
+{
+	xdata int i =0;
+	xdata int tool = 0x01;
+	xdata char usart2_buf[30]={0}; 
+//				sprintf(usart2_buf,"DS32(3,1,'%s,%d',15);\r\n","IO：",public_val.io_read);
+				//sprintf(lcd_disp_buf,"DS32(3,1,'%s',15);\r\n","操作板错误：");
+//				GpuSend(usart2_buf);
+	for(i=1;i < 5 ;i ++)
+	{
+		sprintf(usart2_buf,"W8UE(%d);\r\n",i);
+		GpuSend(usart2_buf);
+		
+		if ((public_val.io_read & (tool << ((i -1 ) *2  ))) == 0)//(sziostatus[8] - '0' == 0)
+		{
+			GpuSend("CIRF(65,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(65,55,15,2);\r\n");
+		}
+		DELAY_US(UART2_DELAY);
+		if ((public_val.io_read & (tool << ( (i-1)  * 2 + 1)) )== 0)//sziostatus[9] - '0' == 0)
+		{
+			GpuSend("CIRF(165,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(165,55,15,2);\r\n");
+		}				
+		GpuSend("SXY(0,0);\r\n");
+		DELAY_US(UART2_DELAY);
+	}
+	for(i =5;i< 7 ;i++)
+	{
+		sprintf(usart2_buf,"W8UE(%d);\r\n",i);
+		GpuSend(usart2_buf);
+		
+		if ((public_val.io_read & (tool << ((i) *2  ))) == 0)//(sziostatus[8] - '0' == 0)
+		{
+			GpuSend("CIRF(65,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(65,55,15,2);\r\n");
+		}
+		DELAY_US(UART2_DELAY);
+		if ((public_val.io_read & (tool << ( (i)  * 2 + 1)) )== 0)//sziostatus[9] - '0' == 0)
+		{
+			GpuSend("CIRF(165,55,15,1);\r\n");
+		}
+		else
+		{
+			GpuSend("CIRF(165,55,15,2);\r\n");
+		}				
+		GpuSend("SXY(0,0);\r\n");
+		DELAY_US(UART2_DELAY);
+	}
+
+}
+
 #endif
