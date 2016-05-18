@@ -223,6 +223,7 @@ xdata char qz_wait = 0;      //等待切纸确认: 0未等待，1等待
 #define E8					8   //搓条周期接近传感器报错。
 #define E9					9	//打胶到位感应器报错。
 xdata int g_key_val_2;
+xdata int g_rubbing_st=0;
 xdata char Menu0_Number;
 xdata unsigned int g_iFlashOldTime = 0;
 xdata unsigned int g_iInterfaceChangOldTime=0;
@@ -1046,14 +1047,18 @@ void LEDDisplay(void)
 				g_key_val_2= 0; //清除打胶键值
 				g_pcStatus= "打胶";
 			}
+			else if(g_rubbing_st == 1)
+			{
+				g_pcStatus = "搓条";
+			}
 			else
 				g_pcStatus = 0;
 			break;
 		case KEY_K2:
-			//public_val.Err_Flag++;
+		//	public_val.Err_Flag++;
 			break;
 		case KEY_K3:
-			//public_val.Err_Flag--;
+		//	public_val.Err_Flag--;
 			break;
 		case KEY_K1: //选择
 			if((LCDChildDisplayState == 2  ||  LCDChildDisplayState == 3 )&& DisplayState == ST_MAIN)
@@ -1093,7 +1098,16 @@ void LEDDisplay(void)
 			g_pcStatus = "下料";
 			break;
 		case KEY_IO5:          /* 搓条 */
-			g_pcStatus = "搓条";
+			if(g_rubbing_st == 0)
+			{
+				g_rubbing_st = 1;
+				g_pcStatus = "搓条";
+				
+			}
+			else
+			{
+				g_rubbing_st = 0 ;
+			}
 			break;
 		case KEY_IO6:          /* 停止送纸 */
 			g_pcStatus = "停纸";	
@@ -2424,27 +2438,29 @@ void LEDDisplay(void)
 				case E2   ://搓条机下料处无杆钎报错。
 					iErrPosX=200;
 					iErrPosY=80;
-
+					iPicNum =2;
 					GpuSend("BPIC(2,0,0,2);\r\n");
 					DELAY_US(5000);
-					iPicNum =2;
+					GpuSend("BOX(120,180,150,198);\r\n");
 					GpuSend("PS32(2,1,1,'搓条机下料处无杆钎报错',15);\r\n");
 					break;
 				case E3   ://搓条机弹片处无杆钎报错。
 					iErrPosX=200;
 					iErrPosY=80;
+					iPicNum =3;
 					GpuSend("BPIC(3,0,0,3);\r\n");
 					DELAY_US(3500);
-					iPicNum =3;
+					GpuSend("BOX(100,80,200,160);\r\n");
 					GpuSend("PS32(3,1,1,'搓条机弹片处无杆钎报错',15);\r\n");
 					
 					break;
 				case E4   ://切刀堵纸光电传感器报错。
 					iErrPosX=100;
 					iErrPosY=170;
+					iPicNum =4;
 					GpuSend("BPIC(4,0,0,4);\r\n");
 					DELAY_US(3500);
-					iPicNum =4;
+					
 					GpuSend("PS32(4,1,1,'切刀堵纸光电传感器报错',15);\r\n");
 					break;
 				case E5   ://下料堵纸光电传感器报错。
@@ -2455,28 +2471,34 @@ void LEDDisplay(void)
 					iPicNum =5;          
 					GpuSend("PS32(5,1,1,'下料堵纸光电传感器报错。',15);\r\n");
 					break;
+				case 16:
+				case 26:
+				case 36:
 				case E6   ://切刀零位接近传感器报错 
 					iErrPosX=300;
 					iErrPosY=100;
-					GpuSend("BPIC(6,0,0,6);\r\n");
 					iPicNum =6;
+					GpuSend("BPIC(6,0,0,6);\r\n");
 					DELAY_US(3500);
+					GpuSend("BOX(280,80,298,100);\r\n");
 					GpuSend("PS32(6,1,1,'切刀零位接近传感器报错。',15);\r\n");
 					break;
 				case E7   ://储纸光电传感器感应到无纸。
 					iErrPosX=160;
 					iErrPosY=60;
-					GpuSend("BPIC(7,0,0,7);\r\n");
 					iPicNum =7;
+					GpuSend("BPIC(7,0,0,7);\r\n");
 					DELAY_US(3500);
-					GpuSend("PS32(7,1,1,'储纸光电传感器感应到无纸。',15);\r\n");
+					GpuSend("BOX(140,40,180,58);\r\n");
+					GpuSend("PS32(7,1,1,'储纸感应到无纸或纸多。',15);\r\n");
 					break;
 				case E8  : //搓条周期接近传感器报错。
 					iErrPosX=140;
 					iErrPosY=200;
+					iPicNum =8;
 					GpuSend("BPIC(8,0,0,8);\r\n");
 					DELAY_US(3500);
-					iPicNum =8;
+					GpuSend("BOX(100,170,139,210);\r\n");
 					GpuSend("PS32(8,1,1,'搓条周期接近传感器报错。',15);\r\n");
 					break;
 				case E9	:  //打胶到位感应器报错。
@@ -2539,6 +2561,7 @@ void LEDDisplay(void)
 		if(g_iErrStatus == 1)//从错误中恢复
 		{
 			LCDDisplayState = 0x00;
+			LCDChildDisplayState= 0;
 			g_iErrStatus = 0;
 		}
 	}
