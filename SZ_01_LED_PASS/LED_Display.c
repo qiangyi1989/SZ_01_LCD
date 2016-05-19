@@ -855,25 +855,6 @@ void LEDDisplay(void)
 	MENU_SHOW *pLCDDataValue;
 	xdata unsigned char  cLcd_data_buf[6]={0},cLcd_len_data_buf[6]={0},cLcd_count_data_buf[6]={0};
 	
-	
-	unKey.u_bit.K1 = P24;
-	unKey.u_bit.K2 = P23;
-	unKey.u_bit.K3 = P22;
-	unKey.u_bit.K4 = P21;
-	
-	unKey.u_bit.IO1 = P20;
-	unKey.u_bit.IO2 = P35;
-	unKey.u_bit.IO3 = P33;
-	unKey.u_bit.IO4 = P32;
-	unKey.u_bit.IO5 = P26;
-	unKey.u_bit.IO6 = P27;
-	unKey.u_bit.IO7 = P12;
-	unKey.u_bit.IO8 = P13;
-	unKey.u_bit.IO9 = P16;
-
-	unKey.u_bit.RED = P17;
-	unKey.u_bit.GREEN = P54;
-	unKey.u_bit.BLUE = P55;	
 
 	Key_Val = (int)unKey.all; 
 	
